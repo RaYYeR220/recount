@@ -50,7 +50,7 @@ export function createTiebreaker(candidates: readonly Candidate[], rules: Rules)
       // tie (tiebreak_previous_round_counts_then_random_test only passes that way).
       const narrow = (ids: readonly CandidateId[], prev: Readonly<Record<CandidateId, Fixed>> | undefined, pickMax: boolean) => {
         if (!prev) return ids;
-        const votes = (id: CandidateId) => prev[id] ?? 0n;
+        const votes = (id: CandidateId) => (Object.hasOwn(prev, id) ? prev[id]! : 0n);
         const target = ids.map(votes).reduce((m, v) => (pickMax ? (v > m ? v : m) : v < m ? v : m));
         return ids.filter((id) => votes(id) === target);
       };

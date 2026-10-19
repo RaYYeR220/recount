@@ -62,9 +62,6 @@ export class BallotPool {
     one: Fixed,
   ) {
     this.groups = ballots.map((b) => {
-      if (!Number.isSafeInteger(b.count) || b.count <= 0) {
-        throw new RangeError(`ballot count must be a positive integer, got ${b.count}`);
-      }
       const group: Group = { ranking: b.ranking, count: BigInt(b.count), weight: one, fractional: false, at: null, bucket: null };
       this.place(group, continuing, false);
       return group;

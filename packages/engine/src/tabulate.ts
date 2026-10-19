@@ -6,6 +6,7 @@ import { isMultiWinner, type Rules } from './rules';
 import { computeThreshold, type Threshold } from './threshold';
 import { createTiebreaker, type Tiebreaker } from './tiebreak';
 import type { Candidate, CandidateId } from './types';
+import { record, validateInput } from './validate';
 
 type Next = 'continue' | 'stop' | 'trailing';
 
@@ -34,10 +35,10 @@ class Count {
   private residual = 0n;
 
   constructor({ candidates, ballots, rules }: TabulationInput) {
+    validateInput(candidates, ballots);
     this.rules = rules;
     this.candidates = candidates;
     this.byId = new Map(candidates.map((c) => [c.id, c]));
-    if (this.byId.size !== candidates.length) throw new Error('candidate ids must be unique');
     this.order = candidates.filter((c) => !c.excluded && !c.countsOnlyForOvervote).map((c) => c.id);
     this.continuing = new Set(this.order);
     this.dp = rules.decimalPlacesForVoteArithmetic;
@@ -78,7 +79,7 @@ class Count {
 
   private openRound(round: number): RoundResult {
     const snap = this.pool.snapshot();
-    const tally: Record<CandidateId, Fixed> = {};
+    const tally = record<Fixed>();
     const fractionalTally: CandidateId[] = [];
     let activeTotal = 0n;
     for (const id of this.order) {
@@ -111,7 +112,7 @@ class Count {
         threshold: threshold.fractional,
         tally: fractionalTally,
         inactive: inactiveKinds.filter((k) => snap.inactive[k].fractional),
-        transfers: {},
+        transfers: record<TransferTarget[]>(),
         finalRoundSurplus: false,
       },
     };
@@ -299,7 +300,7 @@ class Count {
   }
 
   private pushTransfer(rec: RoundResult, from: CandidateId, movement: Movement): void {
-    const to = {} as Record<TransferTarget, Fixed>;
+    const to = record<Fixed>();
     const fractional: TransferTarget[] = [];
     for (const [target, v] of movement) {
       to[target] = v.value;

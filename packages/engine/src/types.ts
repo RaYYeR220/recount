@@ -26,3 +26,10 @@ export type Resolution =
   | { kind: 'vote'; candidate: CandidateId }
   | { kind: 'inactive'; reason: InactiveReason }
   | { kind: 'undervote' };
+
+/**
+ * Stands for a candidate that is not known, used when a CVR only says "overvote".
+ * Never a valid candidate id; a slot of two marks is an overvote nobody can receive.
+ */
+export const UNKNOWN_OVERVOTE_MARK = '';
+export const UNKNOWN_OVERVOTE: Slot = Object.freeze([UNKNOWN_OVERVOTE_MARK, UNKNOWN_OVERVOTE_MARK]);
