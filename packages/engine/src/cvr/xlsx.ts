@@ -27,6 +27,12 @@ export function parseSharedStrings(xml: string): string[] {
   return Array.from(xml.matchAll(/<si>([\s\S]*?)<\/si>|<si\/>/g), (m) => (m[1] === undefined ? '' : textOf(m[1])));
 }
 
+function sharedString(shared: readonly string[], ref: string): string {
+  const value = shared[Number(ref)];
+  if (value === undefined) throw new Error(`worksheet refers to missing shared string ${ref}`);
+  return value;
+}
+
 function columnIndex(ref: string): number {
   let n = 0;
   for (let i = 0; i < ref.length; i++) {
@@ -56,7 +62,7 @@ function parseRow(attrs: string, body: string | undefined, shared: readonly stri
       if (type === 'inlineStr') value = textOf(inner);
       else {
         const v = /<v>([\s\S]*?)<\/v>/.exec(inner)?.[1];
-        if (v !== undefined) value = type === 's' ? (shared[Number(v)] ?? null) : decodeXml(v);
+        if (v !== undefined) value = type === 's' ? sharedString(shared, v) : decodeXml(v);
       }
       while (cells.length < col) cells.push(null);
       cells[col] = value;

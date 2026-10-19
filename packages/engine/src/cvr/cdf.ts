@@ -39,7 +39,8 @@ export function parseCdfCvr(json: unknown, candidates: readonly Candidate[], opt
     const selId = asString(sel['@id']);
     const cdfCandidate = asString((sel.CandidateIds as unknown[] | undefined)?.[0]);
     if (selId === undefined || cdfCandidate === undefined) continue;
-    const name = cdfCandidateName.get(cdfCandidate) ?? cdfCandidate;
+    const name = cdfCandidateName.get(cdfCandidate);
+    if (name === undefined) throw new Error(`contest selection ${selId} names unknown CDF candidate ${JSON.stringify(cdfCandidate)}`);
     const id = names.get(name);
     if (id === undefined) throw new Error(`unrecognized candidate in CVR: ${JSON.stringify(name)}`);
     selectionToCandidate.set(selId, id);
@@ -47,9 +48,8 @@ export function parseCdfCvr(json: unknown, candidates: readonly Candidate[], opt
 
   const counter = new PatternCounter();
   for (const cvr of asArray(report.CVR)) {
-    const snapshots = asArray(cvr.CVRSnapshot);
-    const current = snapshots.find((s) => s['@id'] === cvr.CurrentSnapshotId) ?? snapshots[0];
-    const voted = asArray(current?.CVRContest).find((c) => c.ContestId === contestKey);
+    const current = currentSnapshot(cvr);
+    const voted = asArray(current.CVRContest).find((c) => c.ContestId === contestKey);
     if (!voted) continue;
     const ranks = new Map<number, Set<CandidateId>>();
     for (const sel of asArray(voted.CVRContestSelection)) {
@@ -58,7 +58,7 @@ export function parseCdfCvr(json: unknown, candidates: readonly Candidate[], opt
       for (const pos of asArray(sel.SelectionPosition)) {
         if (pos.HasIndication === 'no' || pos.IsAllocable === 'no') continue;
         const rank = Number(pos.Rank);
-        if (!Number.isInteger(rank) || rank < 1) continue;
+        if (!Number.isInteger(rank) || rank < 1) throw new Error(`CVR ${describe(cvr)} has invalid rank ${JSON.stringify(pos.Rank)}`);
         const set = ranks.get(rank) ?? new Set<CandidateId>();
         set.add(id);
         ranks.set(rank, set);
@@ -69,4 +69,21 @@ export function parseCdfCvr(json: unknown, candidates: readonly Candidate[], opt
     counter.add(ranking);
   }
   return counter.patterns();
+}
+
+function describe(cvr: Json): string {
+  return JSON.stringify(cvr.BallotPrePrintedId ?? cvr.UniqueId ?? cvr.CurrentSnapshotId ?? '?');
+}
+
+/** The snapshot CurrentSnapshotId points at; never a guess when that is ambiguous. */
+function currentSnapshot(cvr: Json): Json {
+  const snapshots = asArray(cvr.CVRSnapshot);
+  const wanted = cvr.CurrentSnapshotId;
+  if (wanted !== undefined) {
+    const found = snapshots.find((s) => s['@id'] === wanted);
+    if (!found) throw new Error(`CVR ${describe(cvr)}: CurrentSnapshotId ${JSON.stringify(wanted)} matches no snapshot`);
+    return found;
+  }
+  if (snapshots.length === 1) return snapshots[0]!;
+  throw new Error(`CVR ${describe(cvr)} has ${snapshots.length} snapshots and no CurrentSnapshotId`);
 }
