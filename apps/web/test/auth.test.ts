@@ -71,3 +71,70 @@ describe("email and password auth", () => {
     expect(error.statusCode).toBe(400);
   });
 });
+
+describe("sign-in throttling", () => {
+  let auth: Auth;
+  let clock = new Date("2026-10-19T12:00:00Z");
+
+  const signIn = (email: string, password: string, ip: string) =>
+    auth.api.signInEmail({ body: { email, password }, headers: new Headers({ "x-real-ip": ip }) });
+
+  async function failTimes(email: string, times: number) {
+    for (let i = 1; i <= times; i++) {
+      const error = await rejection(signIn(email, `wrong-password-${i}`, `203.0.113.${i}`));
+      expect(error.statusCode).toBe(401);
+    }
+  }
+
+  beforeAll(async () => {
+    auth = createAuth(await createTestDb(), () => clock);
+    for (const name of ["eve", "fay", "gus"]) {
+      await auth.api.signUpEmail({
+        body: { name, email: `${name}@example.com`, password: `${name}-password` },
+      });
+    }
+  });
+
+  it("locks an email after 10 failed attempts, whatever the client IP", async () => {
+    await failTimes("eve@example.com", 10);
+
+    const eleventh = await rejection(signIn("eve@example.com", "wrong-again", "198.51.100.7"));
+    expect(eleventh.statusCode).toBe(429);
+    const rightPassword = await rejection(signIn(" EVE@example.com", "eve-password", "198.51.100.8"));
+    expect(rightPassword.statusCode).toBe(429);
+    await expect(signIn("fay@example.com", "fay-password", "198.51.100.7")).resolves.toBeTruthy();
+  });
+
+  it("lets the email in again once the 15 minute window has passed", async () => {
+    await failTimes("gus@example.com", 10);
+    await rejection(signIn("gus@example.com", "gus-password", "198.51.100.9"));
+
+    clock = new Date(clock.getTime() + 15 * 60 * 1000);
+    await expect(signIn("gus@example.com", "gus-password", "198.51.100.9")).resolves.toBeTruthy();
+  });
+
+  it("starts counting again after a successful sign-in", async () => {
+    await failTimes("fay@example.com", 9);
+    await signIn("fay@example.com", "fay-password", "198.51.100.10");
+    await failTimes("fay@example.com", 10);
+  });
+
+  it("keys the per-IP limit on the platform client IP header, not x-forwarded-for", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const response = await auth.handler(
+        new Request("http://localhost:3000/api/auth/sign-in/email", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-real-ip": "192.0.2.10",
+            "x-forwarded-for": `198.51.100.${100 + i}`,
+          },
+          body: JSON.stringify({ email: "nobody@example.com", password: "not-a-password" }),
+        }),
+      );
+      statuses.push(response.status);
+    }
+    expect(statuses).toEqual([401, 401, 401, 429]);
+  });
+});
