@@ -1,0 +1,23 @@
+{
+  "name": "@recount/engine",
+  "version": "0.1.0",
+  "description": "Ranked-choice tabulation (IRV and STV) with fixed-point arithmetic, aligned with RCTab rule options",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
+}
