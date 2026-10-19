@@ -1,0 +1,62 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Multi-Seat UWI Test",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "multi_seat_uwi_test_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "",
+    "numberOfWinners" : "2",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

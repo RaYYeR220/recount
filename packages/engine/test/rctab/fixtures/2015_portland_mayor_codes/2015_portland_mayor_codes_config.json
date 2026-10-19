@@ -1,0 +1,110 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Portland 2015 Mayoral Race",
+    "outputDirectory" : "output",
+    "contestDate" : "2015-11-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "2015_portland_mayor_codes_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "2",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Brennan, Michael F.",
+    "excluded" : false,
+    "aliases" : [ "MFB" ]
+  }, {
+    "name" : "Bragdon, Charles E.",
+    "excluded" : false,
+    "aliases" : [ "CEB" ]
+  }, {
+    "name" : "Bryant, Peter G.",
+    "excluded" : false,
+    "aliases" : [ "PGB" ]
+  }, {
+    "name" : "Carmona, Ralph C.",
+    "excluded" : false,
+    "aliases" : [ "RCC" ]
+  }, {
+    "name" : "Dodge, Richard A.",
+    "excluded" : false,
+    "aliases" : [ "RAD" ]
+  }, {
+    "name" : "Duson, Jill C.",
+    "excluded" : false,
+    "aliases" : [ "JCD" ]
+  }, {
+    "name" : "Eder, John M.",
+    "excluded" : false,
+    "aliases" : [ "JME" ]
+  }, {
+    "name" : "Haadoow, Hamza A.",
+    "excluded" : false,
+    "aliases" : [ "HAH" ]
+  }, {
+    "name" : "Lapchick, Jodie L.",
+    "excluded" : false,
+    "aliases" : [ "JLL" ]
+  }, {
+    "name" : "Marshall, David A.",
+    "excluded" : false,
+    "aliases" : [ "DAM" ]
+  }, {
+    "name" : "Mavodones, Nicholas M. Jr.",
+    "excluded" : false,
+    "aliases" : [ "NMM" ]
+  }, {
+    "name" : "Miller, Markos S.",
+    "excluded" : false,
+    "aliases" : [ "MSM" ]
+  }, {
+    "name" : "Rathband, Jed",
+    "excluded" : false,
+    "aliases" : [ "JR" ]
+  }, {
+    "name" : "Strimling, Ethan K.",
+    "excluded" : false,
+    "aliases" : [ "EKS" ]
+  }, {
+    "name" : "Vail, Christopher L.",
+    "excluded" : false,
+    "aliases" : [ "CLV" ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

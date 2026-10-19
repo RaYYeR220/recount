@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "treatBlankAsUndeclaredWriteIn test",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_treat_images_as_undeclared_write_in_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : true
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "test",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

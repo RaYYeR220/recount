@@ -1,0 +1,62 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Duplicate test",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-05-21",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Director of Produce",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "duplicate_test_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Banana",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Kumquat",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Durian",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : true,
+    "rulesDescription" : "Doyle Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

@@ -1,7 +1,15 @@
 import type { BallotPattern, Candidate, CandidateId } from './types';
 import { UNKNOWN_OVERVOTE_MARK } from './types';
 
-const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
+const RESERVED = new Set([
+  '__proto__',
+  'constructor',
+  'prototype',
+  // transfer destinations that share the keyspace with candidates
+  'exhausted',
+  'residualSurplus',
+  'residual surplus',
+]);
 
 /** Candidate ids become object keys in results, so a few names are off limits. */
 export function assertCandidateId(id: unknown): asserts id is CandidateId {

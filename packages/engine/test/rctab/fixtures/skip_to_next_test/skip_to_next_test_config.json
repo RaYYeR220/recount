@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Overvote2",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-07-28",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Exhausted",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "skip_to_next_test_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Doyle Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Overvote Exhaust If Multiple Continuing Test",
+    "outputDirectory" : "output",
+    "contestDate" : "2022-08-15",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "exhaust_if_multiple_continuing_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "|",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustIfMultipleContinuing",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

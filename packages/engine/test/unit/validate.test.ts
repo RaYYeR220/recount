@@ -2,8 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { ballot, cands, count } from '../helpers';
 
 describe('input validation', () => {
-  it.each(['__proto__', 'constructor', 'prototype', ''])('rejects the candidate id %j', (id) => {
-    expect(() => count([...cands('a'), { id, name: 'x' }], [ballot(1, 'a')])).toThrow(TypeError);
+  it.each(['__proto__', 'constructor', 'prototype', '', 'exhausted', 'residualSurplus', 'residual surplus'])(
+    'rejects the candidate id %j',
+    (id) => {
+      expect(() => count([...cands('a'), { id, name: 'x' }], [ballot(1, 'a')])).toThrow(TypeError);
+    },
+  );
+
+  it('accepts ids that only resemble reserved ones', () => {
+    expect(count(cands('Exhausted', 'residual'), [ballot(1, 'Exhausted')]).winners).toEqual(['Exhausted']);
   });
 
   it('rejects duplicate candidate ids', () => {

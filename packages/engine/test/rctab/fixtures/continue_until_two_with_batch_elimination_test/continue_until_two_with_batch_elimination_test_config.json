@@ -1,0 +1,78 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Continue Until Two + Batch Elimination Test",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "continue_until_two_with_batch_elimination_test_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "E",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "F",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "G",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : true,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

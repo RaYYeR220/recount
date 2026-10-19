@@ -3,6 +3,8 @@ export type CandidateId = string;
 export interface Candidate {
   id: CandidateId;
   name: string;
+  /** Other spellings used for this candidate in CVR files. */
+  aliases?: readonly string[];
   /** Ignored for the whole count, as if eliminated before round 1. */
   excluded?: boolean;
   /** Undeclared write-ins; eliminated first when the rules ask for it. */

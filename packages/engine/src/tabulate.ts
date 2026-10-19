@@ -130,7 +130,7 @@ class Count {
       return 'continue';
     }
 
-    const writeIns = this.writeIns(cont);
+    const writeIns = this.writeIns(rec, cont);
     if (writeIns.length > 0) {
       this.eliminate(rec, writeIns);
       return 'continue';
@@ -152,7 +152,7 @@ class Count {
 
   private decideStv(rec: RoundResult): Next {
     const cont = this.live();
-    const writeIns = this.writeIns(cont);
+    const writeIns = this.writeIns(rec, cont);
     if (writeIns.length > 0) {
       this.eliminate(rec, writeIns);
       return 'continue';
@@ -278,7 +278,10 @@ class Count {
     const threshold: Valued = { value: rec.threshold, fractional: rec.fractional.threshold };
     const surplus = total - threshold.value;
     const fraction = surplus > 0n ? divTrunc(surplus, total, this.dp) : 0n;
-    const { movement, retained } = this.pool.moveSurplus(id, fraction, this.continuing, final, this.dp);
+    // Once every seat is filled RCTab books the last surpluses as final-round surplus
+    // rather than handing them to candidates who can no longer win.
+    const destinations = final ? new Set<CandidateId>() : this.continuing;
+    const { movement, retained } = this.pool.moveSurplus(id, fraction, destinations, final, this.dp);
     const capped = !this.rules.deferSurplus && retained.value > threshold.value;
     const held = capped ? threshold : retained;
     if (capped) {
@@ -339,9 +342,10 @@ class Count {
     return this.rounds.length >= 2 ? this.rounds[this.rounds.length - 2]!.tally : undefined;
   }
 
-  private writeIns(cont: CandidateId[]): CandidateId[] {
+  /** Write-ins holding votes go first; an empty write-in line waits its turn like anyone else. */
+  private writeIns(rec: RoundResult, cont: CandidateId[]): CandidateId[] {
     if (!this.rules.eliminateWriteInsFirst) return [];
-    const found = cont.filter((id) => this.byId.get(id)?.isWriteIn);
+    const found = cont.filter((id) => this.byId.get(id)?.isWriteIn && rec.tally[id]! > 0n);
     return found.length < cont.length ? found : [];
   }
 

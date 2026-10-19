@@ -1,0 +1,90 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "2013 Minneapolis Park Board",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "Minneapolis",
+    "contestOffice" : "Park and Recreation Commissioner",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "../_shared/2013_minneapolis_park_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "1",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "ANNIE YOUNG",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "CASPER HILL",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "HASHIM YONIS",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "ISHMAEL ISRAEL",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "JASON STONE",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "JOHN ERWIN",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "MARY LYNN MCPHERSON",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "MEG FORNEY",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "STEVE BARLAND",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "TOM NORDYKE",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "0",
+    "numberOfWinners" : "3",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "2",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Minneapolis Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}
