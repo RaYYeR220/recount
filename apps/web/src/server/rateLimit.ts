@@ -7,6 +7,7 @@ export const LIMITS = {
   castBallot: { limit: 20, windowSeconds: 60 },
   receiptLookup: { limit: 30, windowSeconds: 60 },
   emailSignIn: { limit: 10, windowSeconds: 15 * 60 },
+  tabulate: { limit: 30, windowSeconds: 60 },
 } as const;
 
 /**

@@ -1,12 +1,35 @@
+import { assertCandidateId, type PresetId as EnginePresetId } from "@recount/engine";
 import { z } from "zod";
 import { isLocalDateTime, isValidTimeZone } from "../time";
 import type { Issue } from "../validation";
 
-export const PRESET_IDS = ["recount-standard", "nyc", "minneapolis-irv", "portland-stv"] as const;
+/** The engine presets an organizer may pick; the replay-only ones stay out. */
+export const PRESET_IDS = [
+  "recount-standard",
+  "nyc",
+  "minneapolis-irv",
+  "portland-stv",
+] as const satisfies readonly EnginePresetId[];
 export type PresetId = (typeof PRESET_IDS)[number];
 
-const SINGLE_WINNER_ONLY: readonly PresetId[] = ["nyc", "minneapolis-irv"];
-const MULTI_WINNER_ONLY: readonly PresetId[] = ["portland-stv"];
+export const SINGLE_WINNER_ONLY: readonly PresetId[] = ["nyc", "minneapolis-irv"];
+export const MULTI_WINNER_ONLY: readonly PresetId[] = ["portland-stv"];
+
+function isUsableLabel(label: string): boolean {
+  try {
+    assertCandidateId(label);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const optionLabel = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .refine(isUsableLabel, "This option name is reserved, pick another");
 
 const localDateTime = z
   .string()
@@ -16,7 +39,7 @@ const localDateTime = z
 const pollFields = z.object({
   title: z.string().trim().min(3).max(120),
   description: z.string().trim().max(2000),
-  options: z.array(z.string().trim().min(1).max(80)).min(2).max(30),
+  options: z.array(optionLabel).min(2).max(30),
   seats: z.number().int().min(1).max(29),
   presetId: z.enum(PRESET_IDS),
   maxRanks: z.number().int().min(1).max(30).nullable(),

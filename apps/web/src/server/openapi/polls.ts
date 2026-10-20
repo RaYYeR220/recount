@@ -1,26 +1,6 @@
-import { z } from "zod";
-import { MAX_BODY_BYTES } from "./http";
-import { createPollSchema } from "./polls/schema";
-
-const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
-const instant = { type: ["string", "null"], format: "date-time" };
-const content = (schema: object) => ({ "application/json": { schema } });
-
-const errorResponse = (description: string) => ({ description, content: content(ref("Error")) });
-
-function jsonSchema(schema: z.ZodType): Record<string, unknown> {
-  const generated: Record<string, unknown> = z.toJSONSchema(schema, { io: "input", unrepresentable: "any" });
-  delete generated.$schema;
-  return generated;
-}
-
-const slugParameter = {
-  name: "slug",
-  in: "path",
-  required: true,
-  schema: { type: "string" },
-  description: "The poll's public slug, as in /p/{slug}.",
-};
+import { MAX_BODY_BYTES } from "../http";
+import { createPollSchema } from "../polls/schema";
+import { content, errorResponse, instant, jsonSchema, ref, slugParameter } from "./common";
 
 const pollFields = {
   slug: { type: "string" },
@@ -38,18 +18,7 @@ const pollFields = {
   status: { enum: ["scheduled", "open", "closed"] },
 };
 
-const schemas = {
-  Error: {
-    type: "object",
-    required: ["error"],
-    properties: {
-      error: {
-        type: "object",
-        required: ["code", "message"],
-        properties: { code: { type: "string" }, message: { type: "string" }, details: {} },
-      },
-    },
-  },
+export const pollSchemas = {
   PublicPoll: {
     type: "object",
     required: [...Object.keys(pollFields), "options"],
@@ -99,7 +68,7 @@ const schemas = {
   CreatePollInput: jsonSchema(createPollSchema),
 };
 
-const pollPaths = {
+export const pollPaths = {
   "/polls": {
     post: {
       operationId: "createPoll",
@@ -132,7 +101,7 @@ const pollPaths = {
   "/polls/{slug}/close": {
     post: {
       operationId: "closePoll",
-      summary: "Close a poll now",
+      summary: "Close a poll now and freeze its results",
       description: "Idempotent. A poll owned by someone else answers exactly like an unknown slug.",
       security: [{ apiToken: [] }],
       parameters: [slugParameter],
@@ -143,26 +112,4 @@ const pollPaths = {
       },
     },
   },
-};
-
-export const openApiDocument = {
-  openapi: "3.1.0",
-  info: {
-    title: "Recount API",
-    version: "1.0.0",
-    description: "Ranked-choice polls you can recount.",
-  },
-  servers: [{ url: "/api/v1" }],
-  components: {
-    securitySchemes: {
-      apiToken: {
-        type: "http",
-        scheme: "bearer",
-        description: "A personal API token (rk_…) created in settings.",
-      },
-    },
-    schemas,
-  },
-  // Tabulation, results, CVR and election paths join the polls here.
-  paths: { ...pollPaths },
 };

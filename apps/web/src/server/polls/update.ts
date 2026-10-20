@@ -67,11 +67,14 @@ export async function updatePoll(
     if (labels.join("\n") !== currentLabels.join("\n")) changed.push("options");
     if (changed.length === 0) return loadPollDetail(tx, current, now);
 
+    const status = pollStatus(current, now);
     const lockedFields = changed.filter((field) => BALLOT_FIELDS.includes(field));
-    if (lockedFields.length > 0 && (await countBallots(tx, current.id)) > 0) {
+    if (
+      lockedFields.length > 0 &&
+      (status === "closed" || (await countBallots(tx, current.id)) > 0)
+    ) {
       throw new DomainError("options_locked", { fields: lockedFields });
     }
-    const status = pollStatus(current, now);
     if (changed.includes("opensAt") && status !== "scheduled") {
       throw new DomainError("schedule_locked", { field: "opensAt" });
     }
