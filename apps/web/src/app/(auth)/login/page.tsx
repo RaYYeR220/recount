@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { SignedInRedirect } from "@/components/auth/SignedInRedirect";
+import { NextField } from "@/components/auth/NextField";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -19,10 +18,9 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
         </>
       }
     >
-      <Suspense fallback={null}>
-        <SignedInRedirect searchParams={searchParams} />
-      </Suspense>
-      <LoginForm />
+      <LoginForm>
+        <NextField searchParams={searchParams} />
+      </LoginForm>
     </AuthCard>
   );
 }

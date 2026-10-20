@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SignupForm } from "@/components/auth/SignupForm";
-import { SignedInRedirect } from "@/components/auth/SignedInRedirect";
+import { NextField } from "@/components/auth/NextField";
 
 export const metadata: Metadata = { title: "Create an account" };
 
@@ -18,10 +17,9 @@ export default function SignupPage({ searchParams }: PageProps<"/signup">) {
         </>
       }
     >
-      <Suspense fallback={null}>
-        <SignedInRedirect searchParams={searchParams} />
-      </Suspense>
-      <SignupForm />
+      <SignupForm>
+        <NextField searchParams={searchParams} />
+      </SignupForm>
     </AuthCard>
   );
 }

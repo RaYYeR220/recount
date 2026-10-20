@@ -24,11 +24,25 @@ const MAX_PASSWORD = 128;
 const SIGN_IN_LIMITED = "Too many sign-in attempts from your network. Try again in a minute.";
 const SIGN_UP_LIMITED = "Too many new accounts from your network. Try again in a minute.";
 
-function read(form: FormData) {
+/** ?next= from the page the form was sent from. */
+function nextOfReferer(referer: string | null): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).searchParams.get("next");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The form's fields. `next` comes from its hidden field, or, if the form was sent
+ * before that field streamed in, from the page's own address; safeNext vets either.
+ */
+function read(form: FormData, requestHeaders: Headers) {
   return {
     email: String(form.get("email") ?? "").trim(),
     password: String(form.get("password") ?? ""),
-    next: safeNext(form.get("next")),
+    next: safeNext(form.get("next") || nextOfReferer(requestHeaders.get("referer"))),
   };
 }
 
@@ -44,8 +58,8 @@ async function withinLimit(kind: "signIn" | "signUp", requestHeaders: Headers): 
 }
 
 export async function logIn(_prev: AuthFormState, form: FormData): Promise<AuthFormState> {
-  const { email, password, next } = read(form);
   const requestHeaders = await headers();
+  const { email, password, next } = read(form, requestHeaders);
   if (!(await withinLimit("signIn", requestHeaders))) return { email, error: SIGN_IN_LIMITED };
   if (!email || !password) {
     return {
@@ -70,8 +84,8 @@ export async function logIn(_prev: AuthFormState, form: FormData): Promise<AuthF
 }
 
 export async function signUp(_prev: AuthFormState, form: FormData): Promise<AuthFormState> {
-  const { email, password, next } = read(form);
   const requestHeaders = await headers();
+  const { email, password, next } = read(form, requestHeaders);
   if (!(await withinLimit("signUp", requestHeaders))) return { email, error: SIGN_UP_LIMITED };
   const fields: AuthFormState["fields"] = {};
   if (!EMAIL.test(email)) fields.email = "Enter an email address, like name@example.com.";

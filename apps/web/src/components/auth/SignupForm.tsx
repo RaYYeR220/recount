@@ -1,17 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, type ReactNode } from "react";
 import { signUp, type AuthFormState } from "@/app/(auth)/actions";
 import { Callout, Field, Input, SubmitButton } from "@/components/ui";
-import { NextField } from "./NextField";
 
 /** Email and a password; the account starts signed in. */
-export function SignupForm() {
+export function SignupForm({ children }: { children: ReactNode }) {
   const [state, action] = useActionState<AuthFormState, FormData>(signUp, {});
 
   return (
     <form action={action} noValidate className="grid gap-5">
-      <NextField />
+      {children}
       {state.error ? (
         <Callout tone="fail" role="alert">
           {state.error}
