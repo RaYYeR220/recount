@@ -92,7 +92,7 @@ describe("parseMutant", () => {
 
   it("keeps every field and defaults history to none", () => {
     expect(parseMutant(meta, "m06")).toEqual(meta);
-    const { history: _, ...noHistory } = meta;
+    const noHistory = { ...meta, history: undefined };
     expect(parseMutant(noHistory, "m06").history).toEqual([]);
   });
 
