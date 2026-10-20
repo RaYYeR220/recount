@@ -156,6 +156,21 @@
   .hero-stage[data-ready="true"] .plaque {
     opacity: 1;
   }
+  /* plates on narrow trays set their type a size down instead of cutting words off */
+  .hero-plaques .plaque {
+    container: plate / inline-size;
+  }
+  @container plate (max-width: 112px) {
+    .pl-name {
+      font-size: 13px;
+    }
+    .pl-count {
+      font-size: 15px;
+    }
+    .pl-meta {
+      font-size: 10.5px;
+    }
+  }
   /* plate states as data attributes: the renderer owns the class list (is-wide) */
   .hero-plaques .plaque[data-state="out"] {
     filter: saturate(0.35) brightness(0.72);
@@ -245,7 +260,7 @@
   @container hero (min-width: 900px) {
     .hero-inner {
       position: relative;
-      height: clamp(820px, 100svh, 1000px);
+      height: clamp(860px, 100svh, 1000px);
       overflow: clip;
     }
     .hero-back,
@@ -282,6 +297,10 @@
     .hero-plaques {
       position: absolute;
       inset: var(--board-top, 400px) 0 0 0;
+    }
+    /* never wider than the room between neighbours (set once the table is laid out) */
+    .hero-plaques .plaque {
+      width: min(var(--pw), var(--pw-room, 100cqi));
     }
     .hero-rail {
       position: absolute;
@@ -330,6 +349,36 @@
     }
   }
 
+  /* short wide screens (laptops at 720-860px tall): a tighter lid leaves the table more room */
+  @media (max-height: 860px) {
+    @container hero (min-width: 900px) {
+      .hero-back,
+      .hero-front {
+        padding-top: 84px;
+      }
+      .hero-lid {
+        padding-top: 30px;
+      }
+      .hero-title {
+        font-size: clamp(44px, 4cqi, 58px);
+      }
+      .hero-lede {
+        margin-top: 12px;
+      }
+      .hero-ctas {
+        margin-top: 18px;
+      }
+      .hero-proof {
+        margin-top: 24px;
+        height: calc(100% - 24px);
+        padding-top: 22px;
+      }
+      .proof-big {
+        margin-top: 10px;
+      }
+    }
+  }
+
   /* ---------- compact: claim, table, plates, rail, report ---------- */
   @container hero (max-width: 899.98px) {
     .hero-inner {
@@ -360,7 +409,7 @@
     }
     .hero-plaques {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 8px;
       padding: 12px var(--margin) 14px;
       background: linear-gradient(180deg, #2a1b10, #21150c);

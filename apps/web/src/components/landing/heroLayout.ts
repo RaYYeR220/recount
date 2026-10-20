@@ -7,6 +7,8 @@ import type { CountScene } from "@/lib/countScene";
 export const HERO_WIDE = 900;
 /** Room above the tallest stack for the shadow the table throws on the wall. */
 export const HERO_HEADROOM = 64;
+/** Compact tables stop growing here (tablets in portrait); the walnut still runs edge to edge. */
+const COMPACT_MAX_WIDTH = 640;
 
 const PER_STACK = 20;
 
@@ -80,7 +82,7 @@ export const heroLayout: LayoutFn = ({ width, trays }) => {
     lens: 2.6,
     pitchDeg: 54,
     jitter: 2,
-    contentWidth: width - 24,
+    contentWidth: Math.min(width, COMPACT_MAX_WIDTH) - 24,
     apronPx: 22,
     topLimit: 10,
     plaqueOffset: 6,
@@ -91,9 +93,9 @@ export const heroLayout: LayoutFn = ({ width, trays }) => {
 };
 
 /**
- * Height of the compact table as a CSS length: within the compact layout the fitted
- * height is a + b·width, so two widths give it exactly and the box is the right
- * size in the server HTML, before any script runs.
+ * Height of the compact table as a CSS length. The fitted height is a + b·width up
+ * to COMPACT_MAX_WIDTH, where the trays stop growing, so two widths give it exactly
+ * and the box is the right size in the server HTML, before any script runs.
  */
 export function compactHeight(scene: CountScene): string {
   const needs = trayNeeds(scene);
@@ -101,8 +103,22 @@ export function compactHeight(scene: CountScene): string {
     const L = heroLayout({ width, trays: needs });
     return fittedHeight(L, buildGeometry(L), placeChits(scene, L.perStack).heights, width);
   };
-  const [w1, w2] = [320, HERO_WIDE - 20];
+  const [w1, w2] = [320, COMPACT_MAX_WIDTH - 20];
   const h1 = height(w1);
   const b = (height(w2) - h1) / (w2 - w1);
-  return `calc(${(h1 - b * w1).toFixed(1)}px + ${(b * 100).toFixed(2)}cqi)`;
+  return `calc(${(h1 - b * w1).toFixed(1)}px + ${b.toFixed(4)} * min(100cqi, ${COMPACT_MAX_WIDTH}px))`;
+}
+
+/**
+ * Narrows each plate on the table's edge to the room between its neighbours, so
+ * plates never overlap when a short screen shrinks the table. Plates are in tray
+ * order, left to right; each may take the distance to its nearer neighbour.
+ */
+export function fitPlates(plates: readonly HTMLElement[], gap = 6): void {
+  const xs = plates.map((el) => parseFloat(el.style.getPropertyValue("--px")));
+  plates.forEach((el, i) => {
+    const room = Math.min(i > 0 ? xs[i]! - xs[i - 1]! : Infinity, i < xs.length - 1 ? xs[i + 1]! - xs[i]! : Infinity) - gap;
+    if (Number.isFinite(room)) el.style.setProperty("--pw-room", `${Math.max(0, room).toFixed(1)}px`);
+    else el.style.removeProperty("--pw-room");
+  });
 }

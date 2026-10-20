@@ -6,7 +6,7 @@ import { easeOutCubic, figureBetween } from "@/components/table/countUp";
 import { Button } from "@/components/ui/Button";
 import { buildCountScene } from "@/lib/countScene";
 import type { HeroTableInput } from "./heroData";
-import { compactHeight, HERO_HEADROOM, HERO_WIDE, heroLayout } from "./heroLayout";
+import { compactHeight, fitPlates, HERO_HEADROOM, HERO_WIDE, heroLayout } from "./heroLayout";
 import { HeroPlaque } from "./HeroPlaque";
 
 export type HeroCountProps = {
@@ -107,6 +107,8 @@ export function HeroCount({ input, claim, proof, proofLabel, railLabel }: HeroCo
         settledRef.current = e.round;
         setSettled(e.round);
         setReady(true);
+      } else if (e.type === "layout" && e.plaques === "overlay") {
+        fitPlates([...stage.querySelectorAll<HTMLElement>(".hero-plaques .plaque")]);
       }
     });
 
