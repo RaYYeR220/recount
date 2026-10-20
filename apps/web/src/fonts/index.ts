@@ -1,7 +1,11 @@
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from "next/font/google";
 import localFont from "next/font/local";
 
-/** Clash Display (Fontshare, ITF Free Font License, see ClashDisplay-LICENSE.txt), served from our own origin. */
+/**
+ * Clash Display (Fontshare, ITF Free Font License, see ClashDisplay-LICENSE.txt), served
+ * from our own origin. The licence forbids sharing the files through a repository, so
+ * scripts/fetch-fonts.mjs downloads them before dev and build.
+ */
 export const clashDisplay = localFont({
   src: [
     { path: "./ClashDisplay-Medium.woff2", weight: "500", style: "normal" },

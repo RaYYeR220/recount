@@ -9,3 +9,6 @@
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# Clash Display: fetched at build (scripts/fetch-fonts.mjs), never committed
+/src/fonts/*.woff2
