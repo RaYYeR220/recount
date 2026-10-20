@@ -165,7 +165,7 @@ async function Manage({ params, searchParams }: PageProps<"/dashboard/p/[slug]">
               <ScheduleSimulator poll={poll} at={at} action={`/dashboard/p/${poll.slug}`} />
               {poll.status === "closed" ? (
                 <p className="border-t border-paper-3 pt-5 text-sm text-ink-2">
-                  Voting closed {ended ? `on ${when(ended, poll)}` : ""}. The count is final and saved with the poll.
+                  Voting closed {ended ? `on ${when(ended, poll)} (${poll.timeZone})` : ""}. The count is final and saved with the poll.
                 </p>
               ) : (
                 <div className="border-t border-paper-3 pt-5">
@@ -213,7 +213,7 @@ async function Manage({ params, searchParams }: PageProps<"/dashboard/p/[slug]">
                 ["Access", ACCESS_LABEL[poll.accessMode]],
                 ["Results", RESULTS_LONG[poll.resultsVisibility]],
                 ["Time zone", poll.timeZone],
-                ["Created", when(poll.createdAt, poll)],
+                ["Created", `${when(poll.createdAt, poll)} (${poll.timeZone})`],
               ]}
             />
           </Paper>
