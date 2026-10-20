@@ -21,9 +21,11 @@ jobs:
         with:
           ref: ${{ github.event.deployment.sha }}
       - uses: pnpm/action-setup@v6
+      # The checked-out commit may come from any pull request: no shared cache to
+      # write into and no install scripts; the token is read-only and holds no secrets.
       - uses: actions/setup-node@v7
-        with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+        with: { node-version: 24 }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm --filter @recount/web exec playwright install --with-deps chromium
       - name: Every route of the preview
         run: pnpm --filter @recount/web exec playwright test e2e/preflight.spec.ts
