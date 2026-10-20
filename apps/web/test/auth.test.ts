@@ -1,6 +1,6 @@
 import { APIError } from "better-auth/api";
 import { beforeAll, describe, expect, it } from "vitest";
-import { createAuth, type Auth } from "@/server/auth";
+import { authBaseURL, createAuth, type Auth } from "@/server/auth";
 import { DEMO_PERSONA_EMAILS } from "@/server/demo";
 import { viewerFrom } from "@/server/session";
 import { createTestDb } from "./db";
@@ -179,5 +179,41 @@ describe("sign-in throttling", () => {
     }
     expect(statuses.slice(0, 30).every((s) => s === 200)).toBe(true);
     expect(statuses[30]).toBe(429);
+  });
+});
+
+describe("auth base URL", () => {
+  it("uses BETTER_AUTH_URL when it is set", () => {
+    expect(authBaseURL({ BETTER_AUTH_URL: "http://localhost:3000", VERCEL_URL: "x.vercel.app" })).toBe(
+      "http://localhost:3000",
+    );
+  });
+
+  it("trusts only this preview's own hosts", () => {
+    expect(
+      authBaseURL({
+        VERCEL_ENV: "preview",
+        VERCEL_URL: "recount-abc123-team.vercel.app",
+        VERCEL_BRANCH_URL: "recount-git-fix-team.vercel.app",
+        VERCEL_PROJECT_PRODUCTION_URL: "recount.example",
+      }),
+    ).toEqual({
+      allowedHosts: ["recount-git-fix-team.vercel.app", "recount-abc123-team.vercel.app", "recount.example"],
+      protocol: "https",
+      fallback: "https://recount-git-fix-team.vercel.app",
+    });
+  });
+
+  it("falls back to the production domain in production", () => {
+    const config = authBaseURL({
+      VERCEL_ENV: "production",
+      VERCEL_URL: "recount-def456-team.vercel.app",
+      VERCEL_PROJECT_PRODUCTION_URL: "recount.example",
+    });
+    expect(config).toMatchObject({ fallback: "https://recount.example" });
+  });
+
+  it("is left to the request outside Vercel without BETTER_AUTH_URL", () => {
+    expect(authBaseURL({})).toBeUndefined();
   });
 });

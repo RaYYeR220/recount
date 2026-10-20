@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
@@ -21,8 +21,24 @@ function signInKey(body: unknown): string | null {
   return DEMO_PERSONA_EMAILS.includes(normalized) ? null : `sign-in:${normalized}`;
 }
 
+/**
+ * A Vercel deployment answers on its own URL, its branch alias and (for
+ * production) the project domain. Trust exactly those hosts, never a
+ * wildcard like *.vercel.app. Outside Vercel, BETTER_AUTH_URL decides.
+ */
+export function authBaseURL(env: Record<string, string | undefined> = process.env): BetterAuthOptions["baseURL"] {
+  if (env.BETTER_AUTH_URL) return env.BETTER_AUTH_URL;
+  const own = env.VERCEL_ENV === "production" ? env.VERCEL_PROJECT_PRODUCTION_URL : env.VERCEL_BRANCH_URL;
+  const hosts = [own, env.VERCEL_URL, env.VERCEL_PROJECT_PRODUCTION_URL].filter(
+    (host): host is string => Boolean(host),
+  );
+  if (hosts.length === 0) return undefined;
+  return { allowedHosts: [...new Set(hosts)], protocol: "https", fallback: `https://${hosts[0]}` };
+}
+
 export function createAuth(db: Db, clock: () => Date = () => new Date()) {
   return betterAuth({
+    baseURL: authBaseURL(),
     database: drizzleAdapter(db, { provider: "pg", schema }),
     emailAndPassword: {
       enabled: true,
