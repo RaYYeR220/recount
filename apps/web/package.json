@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/fetch-fonts.mjs && next dev",
-    "build": "node scripts/fetch-fonts.mjs && next build",
+    "dev": "node scripts/fetch-fonts.mjs && node scripts/quality.mjs && next dev",
+    "build": "node scripts/fetch-fonts.mjs && node scripts/quality.mjs && next build",
+    "quality": "node scripts/quality.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

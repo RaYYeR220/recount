@@ -12,3 +12,7 @@ next-env.d.ts
 
 # Clash Display: fetched at build (scripts/fetch-fonts.mjs), never committed
 /src/fonts/*.woff2
+
+# Engine test figures and the saboteur catalog, written by scripts/quality.mjs
+# before dev and build, never committed
+/src/build-data/
