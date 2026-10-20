@@ -1,0 +1,386 @@
+/* Merge gates, the saboteur kill table and the gate history: the landing and /quality. Imported by landing.css. */
+
+@layer components {
+  /* ---------- the gate chain ---------- */
+  .q-gates {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .q-gates::before {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: 14px;
+    right: calc(20% - 10px);
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #6e5119, var(--color-gilt-500));
+  }
+  .q-gate-lamp {
+    position: relative;
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 45% 35%, #fff3c9, #f0c862 45%, #b5862b 80%);
+    box-shadow:
+      0 0 0 2px #e6cd85,
+      0 0 0 3px #1a110a,
+      0 0 18px rgb(255 205 110 / 0.35);
+  }
+  .q-gate.is-dark .q-gate-lamp {
+    background: radial-gradient(circle at 50% 40%, #3b2a1c, #1b120b 70%);
+    box-shadow:
+      0 0 0 2px #7a5d26,
+      0 0 0 3px #1a110a,
+      inset 0 2px 4px rgb(0 0 0 / 0.6);
+  }
+  .q-gate.is-merge .q-gate-lamp {
+    background: radial-gradient(circle at 45% 35%, #d9f3e1, #8fd3a6 50%, #2f7d4f 90%);
+    box-shadow:
+      0 0 0 2px #b9e4c8,
+      0 0 0 3px #1a110a,
+      0 0 18px rgb(143 211 166 / 0.35);
+  }
+  .q-gate h3.title {
+    margin-bottom: 8px;
+    font-size: var(--text-lg);
+    color: var(--color-cream);
+  }
+  .q-gate p,
+  .q-gate-figs {
+    font-size: var(--text-sm);
+    color: var(--color-cream-2);
+  }
+  .q-gate-figs {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .q-gate-figs b {
+    font-size: var(--text-base);
+    color: var(--color-gilt-300);
+  }
+  .q-gates-note {
+    max-width: 90ch;
+    margin: 36px 0 72px;
+    font-size: var(--text-sm);
+    color: var(--color-cream-3);
+  }
+  .q-gates-note a {
+    color: var(--color-cream-2);
+    font-weight: 700;
+    text-underline-offset: 4px;
+  }
+
+  /* ---------- the kill table ---------- */
+  .q-kill {
+    overflow: hidden;
+    border-radius: var(--radius-tray);
+    background: #140d07;
+    box-shadow: inset 0 0 0 1px var(--color-hair);
+  }
+  .q-kill-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 26px 28px 20px;
+  }
+  .q-kill-head .title {
+    font-size: var(--text-2xl);
+    color: var(--color-cream);
+  }
+  .q-kill-head p {
+    max-width: 70ch;
+    font-size: var(--text-sm);
+    color: var(--color-cream-2);
+  }
+  .q-kill-scroll {
+    overflow-x: auto;
+  }
+  .q-kill-table {
+    width: 100%;
+    min-width: 960px;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  .q-kill-table.has-live {
+    min-width: 1180px;
+  }
+  .q-kill-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-gilt-300);
+    border-top: 1px solid var(--color-hair);
+    border-bottom: 1px solid rgb(201 161 74 / 0.45);
+  }
+  .q-kill-table tbody :is(th, td) {
+    padding: 14px 16px;
+    vertical-align: top;
+    text-align: left;
+    font-weight: 400;
+    color: var(--color-cream-2);
+    border-bottom: 1px solid var(--color-hair);
+  }
+  .q-kill-table tr > :first-child {
+    padding-left: 28px;
+  }
+  .q-kill-table tr > :last-child {
+    padding-right: 28px;
+  }
+  .q-kill-table .num {
+    text-align: right;
+  }
+  .q-kill-table .c-bug {
+    min-width: 260px;
+  }
+  .q-kill-table .c-by {
+    min-width: 280px;
+  }
+  .q-kill-table .c-exp {
+    color: var(--color-cream);
+    white-space: nowrap;
+  }
+  .q-kill-table .c-verdict small {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--color-cream-3);
+  }
+  .q-kill-table a {
+    color: var(--color-cream);
+    text-underline-offset: 3px;
+  }
+  .q-mut {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--color-cream);
+  }
+  .q-mut-chit {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: repeating-linear-gradient(45deg, #1a110a 0 3px, var(--color-fail-on-dark) 3px 6px);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4);
+  }
+  .q-mut-chit.is-control {
+    background: repeating-linear-gradient(45deg, #1a110a 0 3px, var(--color-cream-3) 3px 6px);
+  }
+  .q-layer {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-chip);
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-cream-2);
+    background: rgb(243 239 230 / 0.07);
+  }
+  .q-caught {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+  }
+  .q-caught-gate {
+    display: inline-block;
+    margin-right: 4px;
+    padding: 0 6px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-walnut-900);
+    background: var(--color-match-on-dark);
+  }
+  .q-muted {
+    color: var(--color-cream-3);
+  }
+  .q-history {
+    display: grid;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    color: var(--color-cream-2);
+  }
+  .q-history .badge {
+    margin-right: 2px;
+  }
+  .q-ph {
+    font-weight: 700;
+    color: var(--color-cream-3);
+  }
+
+  /* ---------- /quality ---------- */
+  .q-page-section {
+    margin-top: 72px;
+  }
+  .q-page-section > h2 {
+    font-size: var(--text-3xl);
+    color: var(--color-cream);
+  }
+  .q-page-section > p {
+    max-width: 72ch;
+    margin-top: 8px;
+    color: var(--color-cream-2);
+  }
+  .q-figures {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gutter);
+    margin-top: 28px;
+  }
+  .q-figure {
+    padding: 22px 24px;
+  }
+  .q-figure p {
+    font-size: var(--text-md);
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--color-ink-2);
+  }
+  .q-figure b {
+    margin-right: 4px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-4xl);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-ink);
+  }
+  .q-figure small {
+    display: block;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--color-ink-3);
+  }
+  .q-history-sheet,
+  .q-empty,
+  .q-page-gates {
+    margin-top: 28px;
+  }
+  .q-empty .empty p {
+    max-width: 64ch;
+  }
+  .q-empty a {
+    color: var(--color-ink);
+    font-weight: 700;
+    text-underline-offset: 3px;
+  }
+  .q-page-section a,
+  .q-figure a {
+    text-underline-offset: 3px;
+  }
+  :is(.q-page-section, .q-figure) :is(p, small, li) > a {
+    font-weight: 700;
+    text-decoration: underline;
+  }
+  .q-kill-foot {
+    padding: 0 28px 18px;
+  }
+  .q-gate-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .q-run-meta {
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--color-cream-3);
+  }
+
+  @media (max-width: 1180px) {
+    .q-gates {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 40px;
+    }
+    .q-gates::before {
+      display: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .q-gates {
+      grid-template-columns: 1fr;
+      row-gap: 28px;
+    }
+    .q-gate {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      column-gap: 16px;
+    }
+    .q-gate > :not(.q-gate-lamp) {
+      grid-column: 2;
+    }
+    .q-gate-lamp {
+      grid-row: span 2;
+      margin: 0;
+    }
+    .q-kill-head {
+      padding: 22px 18px 16px;
+    }
+    .q-kill-table,
+    .q-kill-table.has-live {
+      min-width: 0;
+    }
+    .q-kill-table,
+    .q-kill-table tbody,
+    .q-kill-table tr,
+    .q-kill-table tbody :is(th, td) {
+      display: block;
+    }
+    .q-kill-table thead {
+      display: none;
+    }
+    .q-kill-table tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--color-hair);
+    }
+    .q-kill-table tbody :is(th, td) {
+      min-width: 0;
+      padding: 0 !important;
+      border: 0;
+    }
+    .q-kill-table :is(.c-bug, .c-exp, .c-by, .c-verdict, .c-run) {
+      grid-column: 1 / -1;
+    }
+    .q-kill-table .c-run {
+      text-align: left;
+    }
+    .q-kill-table .c-exp {
+      white-space: normal;
+    }
+    .q-kill-table .c-exp::before {
+      content: "Expected: ";
+      color: var(--color-cream-3);
+    }
+    .q-figures {
+      grid-template-columns: 1fr;
+    }
+  }
+}
