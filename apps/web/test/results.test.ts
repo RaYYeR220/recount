@@ -255,5 +255,23 @@ describe("results", () => {
       expect(first.sha256).toBe((await getResults(db, null, poll.slug, later)).cvrSha256);
       expect(first.csv.split("\n")[0]).toBe("Rank 1,Rank 2,Rank 3");
     });
+
+    it("orders rows by receipt, never by when each ballot was cast", async () => {
+      const poll = await createPoll(db, ownerId, pollInput({ options: OPTIONS, closesAtLocal: "2026-10-26T12:00" }), T0);
+      const idOf = new Map(poll.options.map((o) => [o.label, o.id]));
+      const cast: Array<{ receipt: string; ranking: string[] }> = [];
+      for (const [i, ranking] of NINE_BALLOTS.entries()) {
+        const ids = ranking.map((label) => idOf.get(label)!);
+        const { receipt } = await castBallot(db, { slug: poll.slug, ranking: ids, voterToken: `late-${i}` }, minutesAfter(1 + i));
+        cast.push({ receipt, ranking });
+      }
+      await closePoll(db, ownerId, poll.slug, now);
+
+      const { rows } = await getCvr(db, null, poll.slug, later);
+      const byReceipt = cast
+        .sort((a, b) => (a.receipt < b.receipt ? -1 : 1))
+        .map(({ ranking }) => [...ranking, ...Array(OPTIONS.length - ranking.length).fill("")]);
+      expect(rows).toEqual(byReceipt);
+    });
   });
 });
