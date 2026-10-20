@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { STEP_TEXT } from "@/lib/recount";
+import { useHydrated } from "@/lib/useHydrated";
 import type { RecountState } from "./useRecountWorker";
 
 export type RecountVerdict = { matches: boolean; line: ReactNode; detail?: ReactNode; differences: string[] };
@@ -20,9 +21,11 @@ export type RecountShellProps = {
 /** The button, the live progress line and the verdict of a browser recount. */
 export function RecountShell({ state, onRun, verdict, intro }: RecountShellProps) {
   const running = state.status === "running";
+  // A click before the script runs would be lost, so the button waits for it.
+  const hydrated = useHydrated();
   return (
     <div className="recount-box">
-      <Button variant="ink" onClick={onRun} disabled={running} aria-busy={running || undefined}>
+      <Button variant="ink" onClick={onRun} disabled={running || !hydrated} aria-busy={running || undefined}>
         {running ? "Recounting…" : state.status === "idle" ? "Recount in your browser" : "Recount again"}
       </Button>
       <div role="status" aria-live="polite" className="grid gap-2.5">
