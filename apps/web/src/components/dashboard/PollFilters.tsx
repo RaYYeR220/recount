@@ -29,14 +29,25 @@ export function PollFilters({ q, status }: { q: string; status: StatusFilter }) 
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
+  const hydrated = useRef(false);
+
   // The fields are uncontrolled (typing before hydration must survive); when the URL
   // changes some other way, such as "Clear filters" or Back, bring them in line.
   useEffect(() => {
     const search = form.current?.elements.namedItem("q");
     const select = form.current?.elements.namedItem("status");
-    if (search instanceof HTMLInputElement && document.activeElement !== search) search.value = q;
-    if (select instanceof HTMLSelectElement) select.value = status;
-  }, [q, status]);
+    if (!(search instanceof HTMLInputElement) || !(select instanceof HTMLSelectElement)) return;
+    if (!hydrated.current) {
+      hydrated.current = true;
+      // A search or status chosen before the script ran still counts: follow it.
+      if (search.value !== q || select.value !== status) {
+        startTransition(() => router.replace(href(search.value, select.value as StatusFilter), { scroll: false }));
+        return;
+      }
+    }
+    if (document.activeElement !== search) search.value = q;
+    select.value = status;
+  }, [q, status, router]);
 
   function go(nextText: string, nextStatus: StatusFilter) {
     window.clearTimeout(timer.current);

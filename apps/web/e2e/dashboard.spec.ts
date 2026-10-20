@@ -21,6 +21,17 @@ adaTest.describe("ada's dashboard (120 polls)", () => {
     expect(errors).toEqual([]);
   });
 
+  adaTest("a status chosen before the page hydrates still applies", async ({ page }) => {
+    // Hold the scripts back so the choice lands in the server HTML's select.
+    await page.route(/\/_next\/static\/chunks\/.*\.js/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await page.getByLabel("Status").selectOption("scheduled");
+    await expect(page).toHaveURL("/dashboard?status=scheduled");
+  });
+
   adaTest("T06: search finds the board election alone", async ({ page }) => {
     await page.getByRole("searchbox", { name: "Search polls by title" }).fill("Board election");
     await page.keyboard.press("Enter");
