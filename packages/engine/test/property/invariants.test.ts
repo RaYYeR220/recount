@@ -81,6 +81,34 @@ function eliminatedTransfers(r: RoundResult) {
 
 const winnersOf = (r: TabulationResult) => [...r.winners].sort();
 
+/**
+ * Three candidates tied at zero for the last seat. Random runs reach a case like
+ * this about once in 2,500, so it is always checked: settling it by list order
+ * instead of the tiebreak once shipped green.
+ */
+const SEAT_CUT_TIE: Contest = {
+  candidates: [
+    { id: 'a', name: 'A' },
+    { id: 'b', name: 'B' },
+    { id: 'c', name: 'C' },
+    { id: 'd', name: 'D', isWriteIn: true },
+  ],
+  ballots: [{ ranking: [['a']], count: 1 }],
+  rules: {
+    ...DEFAULT_RULES,
+    numberOfWinners: 2,
+    winnerElectionMode: 'multiWinnerAllowOnlyOneWinnerPerRound',
+    overvoteRule: 'exhaustImmediately',
+    maxSkippedRanksAllowed: 'unlimited',
+    maxRankingsAllowed: 'max',
+    tiebreakMode: 'random',
+    randomSeed: '0',
+    decimalPlacesForVoteArithmetic: 1,
+    hareQuota: true,
+    deferSurplus: true,
+  },
+};
+
 describe('tabulation invariants', () => {
   it('every ballot is accounted for in every round', () => {
     fc.assert(fc.property(anyContest, (c) => expectConserved(run(c))), RUNS);
@@ -110,7 +138,7 @@ describe('tabulation invariants', () => {
           expect(winnersOf(run(reversed))).toEqual(winnersOf(run(c)));
         },
       ),
-      RUNS,
+      { ...RUNS, examples: [[SEAT_CUT_TIE]] },
     );
   });
 
