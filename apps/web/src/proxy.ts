@@ -7,23 +7,20 @@ import { viewerFrom } from "@/server/session";
 
 export const config = { matcher: ["/p/:slug/results", "/elections/:slug"] };
 
-/** Marks the proxy's own request for the page, so it is not checked twice. */
-const INNER = "x-recount-status-checked";
-
 const ELECTION_SLUGS = new Set(manifest.datasets.map((d) => d.slug));
 
-/** The page as the app renders it (with the matching copy), sent with the status it should have had. */
-async function withStatus(req: NextRequest, status: number): Promise<Response> {
-  const headers = new Headers({ [INNER]: "1", accept: req.headers.get("accept") ?? "text/html" });
-  for (const name of ["cookie", "accept-language", "user-agent"]) {
-    const value = req.headers.get(name);
-    if (value) headers.set(name, value);
+/** Prerendered status pages: each answers with its own status and the matching copy. */
+const POLL_NOT_FOUND = "/status/poll-not-found";
+const RESULTS_HIDDEN = "/status/results-hidden";
+/** No route lives here, so the app's own 404 page answers. */
+const PAGE_NOT_FOUND = "/status/page-not-found";
+
+function slugOf(segment: string): string | null {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
   }
-  const page = await fetch(req.url, { headers, redirect: "manual", cache: "no-store" });
-  return new NextResponse(page.body, {
-    status,
-    headers: { "content-type": page.headers.get("content-type") ?? "text/html; charset=utf-8", "cache-control": "private, no-store" },
-  });
 }
 
 async function resultsStatus(req: NextRequest, slug: string): Promise<number> {
@@ -31,23 +28,33 @@ async function resultsStatus(req: NextRequest, slug: string): Promise<number> {
     const viewer = await viewerFrom(auth, req.headers);
     return await resultsHttpStatus(getDb(), viewer?.id ?? null, slug, new Date());
   } catch (error) {
+    // The page runs the same check and still renders the right copy, only with a 200.
     console.error("proxy: results status check failed", error instanceof Error ? error.name : typeof error);
     return 200;
   }
 }
 
+const rewrite = (req: NextRequest, path: string) => NextResponse.rewrite(new URL(path, req.url));
+
 /**
  * A page streams its static shell before notFound() or forbidden() can run, which
  * fixes the status at 200. For results and replays the answer is known up front
- * (the visibility rule, the replay list), so it is settled here and the page's own
- * copy goes out with a 403 or 404. Client navigations (RSC requests) are left alone.
+ * (the visibility rule, the replay list), so it is settled here by rewriting to a
+ * page prerendered with that status. Client navigations (RSC requests) are left to
+ * the page, which renders the same copy.
  */
 export async function proxy(req: NextRequest) {
-  if (req.headers.has(INNER) || req.headers.has("rsc") || req.headers.has("next-router-prefetch")) return NextResponse.next();
-  const [, section, rawSlug = ""] = req.nextUrl.pathname.split("/");
-  const slug = decodeURIComponent(rawSlug);
-  // Dataset files (/elections/portland-2024-d1.json.gz) are served from public/ as they are.
-  if (section === "elections" && slug.includes(".")) return NextResponse.next();
-  const status = section === "elections" ? (ELECTION_SLUGS.has(slug) ? 200 : 404) : await resultsStatus(req, slug);
-  return status === 200 ? NextResponse.next() : withStatus(req, status);
+  if (req.headers.has("rsc") || req.headers.has("next-router-prefetch")) return NextResponse.next();
+  const [, section, segment = ""] = req.nextUrl.pathname.split("/");
+  const slug = slugOf(segment);
+  if (section === "elections") {
+    // Dataset files (/elections/portland-2024-d1.json.gz) are served from public/ as they are.
+    if (slug?.includes(".")) return NextResponse.next();
+    return slug && ELECTION_SLUGS.has(slug) ? NextResponse.next() : rewrite(req, PAGE_NOT_FOUND);
+  }
+  if (!slug) return rewrite(req, POLL_NOT_FOUND);
+  const status = await resultsStatus(req, slug);
+  if (status === 404) return rewrite(req, POLL_NOT_FOUND);
+  if (status === 403) return rewrite(req, RESULTS_HIDDEN);
+  return NextResponse.next();
 }
