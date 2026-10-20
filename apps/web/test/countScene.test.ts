@@ -137,6 +137,16 @@ describe("buildCountScene: the committee poll (STV, 2 seats)", () => {
     expect(captionText(last.caption)).toMatch(/^Round 6, seats filled; surplus set aside\. /);
   });
 
+  it("names seats and eliminations on the plaques", () => {
+    const at = (round: number, label: string) => committeeScene.rounds[round]!.trays[trayIdOf(committeeScene, label)]!;
+    expect(at(0, "Ana")).toMatchObject({ state: "elected", seat: 1, meta: "Elected in round 1" });
+    expect(at(1, "Ana")).toMatchObject({ tally: "7", delta: "−3", meta: "−3" });
+    expect(at(1, "Ben")).toMatchObject({ tally: "5.8000", delta: "+1.8000", state: "continuing" });
+    expect(at(5, "Ben")).toMatchObject({ state: "elected", seat: 2, meta: "Elected in round 5" });
+    expect(at(5, "Cleo")).toMatchObject({ tally: "0", state: "out", meta: "Eliminated in round 4" });
+    expect(committeeScene.rounds[5]!.trays[INACTIVE_TRAY]).toMatchObject({ tally: "6.2000", meta: "no choices left" });
+  });
+
   it("captions the surplus and the quota", () => {
     expect(captionText(committeeScene.rounds[0]!.caption)).toBe("Round 1, first choices. Ana reaches the quota of 7 with 10 and is elected.");
     expect(captionText(committeeScene.rounds[1]!.caption)).toBe(

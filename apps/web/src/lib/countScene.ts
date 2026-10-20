@@ -83,7 +83,12 @@ export type TrayRound = {
   /** "+1.8000" or "−3" against the previous round; null when unchanged or in round 1. */
   delta: string | null;
   state: TrayState;
-  /** Plaque line: "first choices", a delta, "Eliminated", "Elected", "none yet", "no choices left". */
+  /** Order in which this tray's option took a seat (1 = first), once elected. */
+  seat: number | null;
+  /**
+   * Plaque line: "first choices", a delta, "Elected in round 1", "Eliminated in round 3",
+   * "continuing", "not elected" (final round), "none yet", "no choices left".
+   */
   meta: string;
 };
 
@@ -449,19 +454,21 @@ export function buildCountScene(input: CountSceneInput): CountScene {
       const value = trayValue(tray, r);
       const before = prev ? trayValue(tray, prev) : null;
       const out = tray.kind !== "inactive" && value === null;
-      const elected = tray.members.some((m) => electedAt.has(m) && electedAt.get(m)! <= i);
+      const electedMember = tray.members.find((m) => electedAt.has(m) && electedAt.get(m)! <= i);
+      const elected = electedMember !== undefined;
       const delta = i > 0 && value !== null ? formatDelta(value - (before ?? 0n), dp) : null;
       const state: TrayState = tray.kind === "inactive" ? "inactive" : out ? "out" : elected ? "elected" : "continuing";
       let meta: string;
       if (state === "inactive") meta = value === 0n ? "none yet" : (delta ?? "no choices left");
-      else if (state === "out") meta = "Eliminated";
-      else if (i === 0) meta = "first choices";
-      else meta = delta ?? (state === "elected" ? "Elected" : "continuing");
+      else if (state === "out") meta = `Eliminated in round ${Math.max(...tray.members.map((m) => eliminatedAt.get(m) ?? 0)) + 1}`;
+      else if (i === 0 && !elected) meta = "first choices";
+      else meta = (i > 0 ? delta : null) ?? (elected ? `Elected in round ${electedAt.get(electedMember)! + 1}` : i === rounds.length - 1 ? "not elected" : "continuing");
       trayRounds[tray.id] = {
         tally: formatUnits(value ?? 0n, dp),
         raw: fromUnits(value ?? 0n, dp),
         delta,
         state,
+        seat: elected ? winners.indexOf(electedMember) + 1 : null,
         meta,
       };
     }
