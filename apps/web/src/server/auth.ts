@@ -29,7 +29,7 @@ function signInKey(body: unknown): string | null {
 export function authBaseURL(env: Record<string, string | undefined> = process.env): BetterAuthOptions["baseURL"] {
   if (env.BETTER_AUTH_URL) return env.BETTER_AUTH_URL;
   const own = env.VERCEL_ENV === "production" ? env.VERCEL_PROJECT_PRODUCTION_URL : env.VERCEL_BRANCH_URL;
-  const hosts = [own, env.VERCEL_URL, env.VERCEL_PROJECT_PRODUCTION_URL].filter(
+  const hosts = [own, env.VERCEL_URL, env.VERCEL_PROJECT_PRODUCTION_URL, env.VERCEL_BRANCH_URL].filter(
     (host): host is string => Boolean(host),
   );
   if (hosts.length === 0) return undefined;
