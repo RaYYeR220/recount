@@ -5,6 +5,9 @@ import { headers } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { safeNext } from "@/lib/safeNext";
 import { auth } from "@/server/auth";
+import { limitAuthAttempt } from "@/server/authLimits";
+import { getDb } from "@/server/db/client";
+import { DomainError } from "@/server/errors";
 
 export type AuthFormState = {
   /** A message for the whole form, read out as an alert. */
@@ -18,6 +21,9 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 8;
 const MAX_PASSWORD = 128;
 
+const SIGN_IN_LIMITED = "Too many sign-in attempts from your network. Try again in a minute.";
+const SIGN_UP_LIMITED = "Too many new accounts from your network. Try again in a minute.";
+
 function read(form: FormData) {
   return {
     email: String(form.get("email") ?? "").trim(),
@@ -26,8 +32,21 @@ function read(form: FormData) {
   };
 }
 
+/** False when this network has used up its attempts for now. */
+async function withinLimit(kind: "signIn" | "signUp", requestHeaders: Headers): Promise<boolean> {
+  try {
+    await limitAuthAttempt(getDb(), kind, requestHeaders, new Date());
+    return true;
+  } catch (error) {
+    if (error instanceof DomainError && error.code === "rate_limited") return false;
+    throw error;
+  }
+}
+
 export async function logIn(_prev: AuthFormState, form: FormData): Promise<AuthFormState> {
   const { email, password, next } = read(form);
+  const requestHeaders = await headers();
+  if (!(await withinLimit("signIn", requestHeaders))) return { email, error: SIGN_IN_LIMITED };
   if (!email || !password) {
     return {
       email,
@@ -38,7 +57,7 @@ export async function logIn(_prev: AuthFormState, form: FormData): Promise<AuthF
     };
   }
   try {
-    await auth.api.signInEmail({ body: { email, password }, headers: await headers() });
+    await auth.api.signInEmail({ body: { email, password }, headers: requestHeaders });
   } catch (error) {
     unstable_rethrow(error);
     if (error instanceof APIError && error.statusCode === 429) {
@@ -52,6 +71,8 @@ export async function logIn(_prev: AuthFormState, form: FormData): Promise<AuthF
 
 export async function signUp(_prev: AuthFormState, form: FormData): Promise<AuthFormState> {
   const { email, password, next } = read(form);
+  const requestHeaders = await headers();
+  if (!(await withinLimit("signUp", requestHeaders))) return { email, error: SIGN_UP_LIMITED };
   const fields: AuthFormState["fields"] = {};
   if (!EMAIL.test(email)) fields.email = "Enter an email address, like name@example.com.";
   if (password.length < MIN_PASSWORD) fields.password = `Use at least ${MIN_PASSWORD} characters.`;
@@ -61,16 +82,14 @@ export async function signUp(_prev: AuthFormState, form: FormData): Promise<Auth
   try {
     await auth.api.signUpEmail({
       body: { name: email.slice(0, email.indexOf("@")), email, password },
-      headers: await headers(),
+      headers: requestHeaders,
     });
   } catch (error) {
     unstable_rethrow(error);
     if (error instanceof APIError && error.statusCode === 422) {
       return { email, fields: { email: "There is already an account with this email. Sign in instead." } };
     }
-    if (error instanceof APIError && error.statusCode === 429) {
-      return { email, error: "Too many new accounts from your network. Try again in a minute." };
-    }
+    if (error instanceof APIError && error.statusCode === 429) return { email, error: SIGN_UP_LIMITED };
     if (error instanceof APIError && error.statusCode < 500) {
       return { email, error: "That didn't work. Check the email and password and try again." };
     }
