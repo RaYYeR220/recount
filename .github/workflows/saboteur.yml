@@ -1,0 +1,56 @@
+name: saboteur
+# Plants one known bug from mutants/ on a fresh branch and opens a pull request,
+# so every gate has to prove it still catches it. The pull request says which
+# mutant it is but not what the bug is until the verdict comes in.
+on:
+  workflow_dispatch:
+    inputs:
+      mutant:
+        description: "Mutant id from mutants/, or 'next' for today's pick"
+        default: next
+  schedule:
+    - cron: "17 6 * * *"
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: saboteur
+jobs:
+  plant:
+    name: plant
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pick the mutant
+        id: pick
+        run: |
+          id="${{ inputs.mutant || 'next' }}"
+          if [ "$id" = next ]; then
+            mapfile -t ids < <(ls mutants | grep -E '^m[0-9]+-' | sort)
+            id="${ids[$(( $(date +%s) / 86400 % ${#ids[@]} ))]}"
+          fi
+          test -f "mutants/$id/patch.diff" || { echo "::error::no mutant $id"; exit 1; }
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "branch=saboteur/$id-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      - name: Plant the bug
+        run: |
+          git switch -c "${{ steps.pick.outputs.branch }}"
+          git apply --3way "mutants/${{ steps.pick.outputs.id }}/patch.diff"
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -qam "saboteur: plant ${{ steps.pick.outputs.id }}"
+          git push -q origin "${{ steps.pick.outputs.branch }}"
+      - name: Open the pull request
+        run: |
+          gh label create saboteur --color B60205 --description "Planted bug; closed by the verdict" 2>/dev/null || true
+          gh pr create --base main --head "${{ steps.pick.outputs.branch }}" --label saboteur \
+            --title "Saboteur: ${{ steps.pick.outputs.id }}" \
+            --body "A known bug from \`mutants/${{ steps.pick.outputs.id }}\` is planted in this branch. The gates aren't told what it is. The verdict comment names the gate that caught it, then closes this pull request."
+      # Pushes made with the workflow token don't start other workflows, so CI is
+      # started explicitly; its check run lands on the same commit.
+      - name: Run CI on the branch
+        run: gh workflow run ci.yml --ref "${{ steps.pick.outputs.branch }}"

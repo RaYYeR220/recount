@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  # The saboteur starts CI on its own branches (see saboteur.yml).
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -28,6 +30,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Mutants still apply
+        run: for patch in mutants/*/patch.diff; do git apply --check "$patch" || exit 1; done
       - name: Typecheck
         run: pnpm typecheck
       - name: Lint

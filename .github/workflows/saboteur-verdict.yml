@@ -1,0 +1,29 @@
+name: saboteur-verdict
+on:
+  workflow_run:
+    workflows: [ci, preflight]
+    types: [completed]
+  status:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+  actions: read
+concurrency:
+  group: saboteur-verdict
+jobs:
+  verdict:
+    name: verdict
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 24 }
+      - run: node .github/scripts/saboteur-verdict.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

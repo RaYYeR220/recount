@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm db:migrate && pnpm build",
+  "ignoreCommand": "node scripts/ignore-build.mjs",
   "crons": [{ "path": "/api/cron/purge", "schedule": "0 4 * * *" }]
 }
