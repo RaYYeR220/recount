@@ -72,15 +72,23 @@ export function listElections(dir: string = ELECTIONS_DIR): Promise<ElectionSumm
   return manifest;
 }
 
-async function replay(dir: string, entry: ElectionSummary): Promise<ElectionReplay> {
+/** The dataset file, checked against its manifest hash. */
+export async function loadDataset(dir: string, entry: ElectionSummary): Promise<{ dataset: ElectionDataset; sha256: string }> {
   const raw = await readFile(join(dir, entry.file));
   const sha256 = createHash("sha256").update(raw).digest("hex");
   if (sha256 !== entry.sha256) throw new Error(`dataset ${entry.slug} does not match its manifest hash`);
   const text = entry.file.endsWith(".gz") ? gunzipSync(raw).toString("utf8") : raw.toString("utf8");
-  const dataset = JSON.parse(text) as ElectionDataset;
-  const golden = entry.golden
-    ? (JSON.parse(await readFile(join(dir, entry.golden.file), "utf8")) as Golden)
-    : null;
+  return { dataset: JSON.parse(text) as ElectionDataset, sha256 };
+}
+
+/** The official round results transcribed for this election, if any. */
+export async function loadGolden(dir: string, entry: ElectionSummary): Promise<Golden | null> {
+  return entry.golden ? (JSON.parse(await readFile(join(dir, entry.golden.file), "utf8")) as Golden) : null;
+}
+
+async function replay(dir: string, entry: ElectionSummary): Promise<ElectionReplay> {
+  const { dataset, sha256 } = await loadDataset(dir, entry);
+  const golden = await loadGolden(dir, entry);
 
   const rules = presetRules(dataset.presetId, dataset.seats);
   const result = tabulate({ candidates: dataset.candidates, ballots: dataset.ballots, rules });
