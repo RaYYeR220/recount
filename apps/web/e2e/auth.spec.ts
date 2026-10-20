@@ -72,10 +72,8 @@ test("T16: someone else's poll is not found", async ({ page }) => {
   await expect(page.getByText("Rival")).toHaveCount(0);
 });
 
-// The status code waits for the shared proxy: pages stream from a prerendered shell, so
-// notFound() inside them can't change the 200 already sent. Re-enable once the proxy
-// rewrites missing and unshared polls to the prerendered 404 route.
-test.fixme("someone else's manage page answers 404", async ({ page }) => {
+// Pages stream from a prerendered shell, so the 404 comes from src/proxy.ts.
+test("someone else's manage page answers 404", async ({ page }) => {
   await logIn(page, "ada");
   await expect(page).toHaveURL("/dashboard");
   const direct = await page.goto("/dashboard/p/rival-private");

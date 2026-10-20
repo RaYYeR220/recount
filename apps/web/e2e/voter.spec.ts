@@ -188,10 +188,8 @@ test("an unknown poll is not found", async ({ page }) => {
   }
 });
 
-// The status code waits for the shared proxy: pages stream from a prerendered shell, so
-// notFound() inside them can't change the 200 already sent. Re-enable once the proxy
-// rewrites missing and unshared polls to the prerendered 404 route.
-test.fixme("an unknown poll answers 404", async ({ page }) => {
+// Pages stream from a prerendered shell, so the 404 comes from src/proxy.ts.
+test("an unknown poll answers 404", async ({ page }) => {
   for (const path of ["/p/no-such-poll", "/p/no-such-poll/verify", "/p/no-such-poll/receipt"]) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(404);
