@@ -1,6 +1,6 @@
-import { Pool } from "@neondatabase/serverless";
 import { loadEnvConfig } from "@next/env";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { createPool } from "../src/server/db/pool";
 import * as schema from "../src/server/db/schema";
 import { seed } from "../src/server/seed";
 
@@ -9,7 +9,7 @@ async function main() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set");
 
-  const pool = new Pool({ connectionString: url });
+  const pool = createPool(url);
   try {
     const { created, skipped } = await seed(drizzle({ client: pool, schema }), new Date());
     console.log(`Seeded ${created} polls, ${skipped} already present`);
