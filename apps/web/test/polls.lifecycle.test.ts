@@ -330,6 +330,7 @@ describe("listPolls", () => {
     expect(first).toMatchObject({ total: 45, page: 1, pageCount: 3 });
     expect(first.items).toHaveLength(20);
     expect(first.items[0].title).toBe("Lunch 44");
+    expect(first.items[0].timeZone).toBe("UTC");
 
     const third = await listPolls(db, owner, { page: 3, pageSize: 20 }, now);
     expect(third.items).toHaveLength(5);

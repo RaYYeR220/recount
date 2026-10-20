@@ -12,6 +12,7 @@ export type PollSummary = {
   presetId: string;
   accessMode: PollRow["accessMode"];
   resultsVisibility: PollRow["resultsVisibility"];
+  timeZone: string;
   opensAt: Date | null;
   closesAt: Date | null;
   closedEarlyAt: Date | null;
@@ -56,6 +57,7 @@ export async function listPolls(
       presetId: poll.presetId,
       accessMode: poll.accessMode,
       resultsVisibility: poll.resultsVisibility,
+      timeZone: poll.timeZone,
       opensAt: poll.opensAt,
       closesAt: poll.closesAt,
       closedEarlyAt: poll.closedEarlyAt,

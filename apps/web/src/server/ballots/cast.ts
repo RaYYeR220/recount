@@ -16,7 +16,7 @@ export type CastInput = {
   voterToken: string;
 };
 
-function hashVoterToken(pollId: string, voterToken: string): string {
+export function hashVoterToken(pollId: string, voterToken: string): string {
   return createHash("sha256").update(`${pollId}:${voterToken}`).digest("hex");
 }
 
