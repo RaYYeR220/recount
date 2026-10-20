@@ -116,7 +116,7 @@ async function Manage({ params, searchParams }: PageProps<"/dashboard/p/[slug]">
         </Callout>
       ) : null}
 
-      <div className="mt-7 grid items-start gap-[var(--gutter)] lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
+      <div className="mt-7 grid grid-cols-[minmax(0,1fr)] items-start gap-[var(--gutter)] lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
         <div className="grid min-w-0 gap-[var(--gutter)]">
           <Paper as="section" aria-labelledby="turnout-title">
             <PanelHeader id="turnout-title" title="Turnout" description="As of when this page loaded" />
@@ -233,7 +233,7 @@ function ManageSkeleton() {
     <div aria-label="Loading the poll" className="grid gap-6">
       <div className="h-5 w-40 rounded-chip bg-[rgb(243_239_230/0.08)]" />
       <div className="h-12 w-[min(32rem,80%)] rounded-chip bg-[rgb(243_239_230/0.08)]" />
-      <div className="mt-2 grid items-start gap-[var(--gutter)] lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
+      <div className="mt-2 grid grid-cols-[minmax(0,1fr)] items-start gap-[var(--gutter)] lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
         <Paper padded={false} className="h-[420px]">
           <span className="sr-only">Loading…</span>
         </Paper>

@@ -176,7 +176,7 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
           className="mb-7 mt-[18px]"
         />
       </div>
-      <div className="grid items-start gap-[var(--gutter)] min-[1000px]:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-[var(--gutter)] min-[1000px]:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
         <StepFrame
           key={step}
           title={STEP_COPY[step]!.title}
