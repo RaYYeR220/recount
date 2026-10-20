@@ -124,6 +124,8 @@ for (const pr of pulls) {
 
   await post(`repos/${repo}/issues/${pr.number}/comments`, { body });
   await post(`repos/${repo}/pulls/${pr.number}`, { state: "closed" }, "PATCH");
+  // /quality reads verdicts back from these comments; nobody gets to add another one.
+  await post(`repos/${repo}/issues/${pr.number}/lock`, { lock_reason: "resolved" }, "PUT");
   await gh(`repos/${repo}/git/refs/heads/${pr.head.ref}`, { method: "DELETE" }).catch(() => {});
   console.log(`${id}: ${verdict}${killedBy ? ` by ${killedBy}` : ""}`);
 }
