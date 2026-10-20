@@ -18,6 +18,8 @@ concurrency:
 jobs:
   verdict:
     name: verdict
+    # Vercel posts a status for every deployment; only TestSprite's matters here.
+    if: github.event_name != 'status' || github.event.context == 'TestSprite V3'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
