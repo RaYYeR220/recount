@@ -8,7 +8,7 @@ import { StatusMark } from "./StatusMark";
 /** Table cells on desktop; below 900px each row turns into a card. */
 const TH = "whitespace-nowrap border-b border-paper-3 bg-paper-2 px-3.5 py-2.5 text-left text-xs font-bold text-ink-2 first:pl-5 last:pr-5";
 const TD =
-  "h-[54px] border-b border-paper-3 px-3.5 py-2 align-middle first:pl-5 last:pr-5 group-hover:bg-[rgb(201_161_74/0.07)] max-[900px]:block max-[900px]:h-auto max-[900px]:border-0 max-[900px]:p-0";
+  "h-[54px] border-b border-paper-3 px-3.5 py-2 align-middle first:pl-5 last:pr-5 group-hover:bg-[rgb(201_161_74/0.07)] max-[900px]:block max-[900px]:h-auto max-[900px]:border-0 max-[900px]:!p-0";
 const FACT = "max-[900px]:flex-none max-[900px]:text-[12.5px] max-[900px]:text-ink-2";
 
 function Row({ poll }: { poll: PollSummary }) {
