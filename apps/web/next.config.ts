@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   transpilePackages: ["@recount/engine"],
   outputFileTracingIncludes: {
+    // The landing counts the NYC replay and the election ledger from these files.
+    "/": ["./public/elections/**/*"],
     "/api/v1/elections": ["./public/elections/**/*"],
     "/api/v1/elections/*": ["./public/elections/**/*"],
   },
