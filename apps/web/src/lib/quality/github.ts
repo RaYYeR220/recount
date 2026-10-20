@@ -1,7 +1,8 @@
 import { cacheLife } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 import { REPOSITORY_URL } from "@/components/shell/SiteFooter";
-import { gateStates, parseVerdictComment, type CheckRun, type CommitStatus, type GateName, type GateState, type Verdict } from "./verdict";
+import { mutants } from "./report";
+import { gateStates, pullVerdict, type CheckRun, type CommitStatus, type GateName, type GateState, type Verdict, type VerdictComment } from "./verdict";
 
 /** "RaYYeR220/recount" */
 export const REPOSITORY = new URL(REPOSITORY_URL).pathname.replace(/^\/|\/$/g, "");
@@ -52,7 +53,7 @@ type Pull = {
   state: "open" | "closed";
   merged_at: string | null;
   updated_at: string;
-  head: { sha: string };
+  head: { sha: string; ref: string };
   labels: Array<{ name: string }>;
 };
 
@@ -96,26 +97,30 @@ export async function getGateHistory(): Promise<GateHistory> {
 
 export type VerdictFeed = { kind: "ok"; verdicts: Verdict[]; checkedAt: string } | Unavailable;
 
-type Issue = { number: number; pull_request?: unknown };
-type Comment = { body?: string | null };
-
-/** Verdict comments on closed pull requests labelled saboteur, newest pull requests first. */
+/**
+ * The verdict on each closed pull request labelled saboteur, newest first. Only the
+ * workflow's own comments count (see trustedVerdict): anyone may comment on a
+ * public pull request, and a forged verdict must not rewrite the kill table.
+ */
 export async function getVerdicts(): Promise<VerdictFeed> {
   "use cache";
   cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
-  const checkedAt = new Date().toISOString();
+  const now = new Date();
+  const checkedAt = now.toISOString();
+  const catalog = new Set(mutants.map((m) => m.id));
   try {
-    const issues = await gh<Issue[]>(`repos/${REPOSITORY}/issues?labels=saboteur&state=closed&sort=updated&direction=desc&per_page=30`);
-    if (!issues.ok) return { kind: "unavailable", reason: reason(issues), checkedAt };
-    const lists = await Promise.all(
-      issues.data
-        .filter((i) => i.pull_request)
-        .map(async (i) => {
-          const comments = await gh<Comment[]>(`repos/${REPOSITORY}/issues/${i.number}/comments?per_page=100`);
-          return comments.ok ? comments.data.map((c) => parseVerdictComment(c.body ?? "")).filter((v): v is Verdict => v !== null) : [];
+    const pulls = await gh<Pull[]>(`repos/${REPOSITORY}/pulls?state=closed&sort=updated&direction=desc&per_page=50`);
+    if (!pulls.ok) return { kind: "unavailable", reason: reason(pulls), checkedAt };
+    const verdicts = await Promise.all(
+      pulls.data
+        .filter((pr) => pr.labels.some((l) => l.name === "saboteur"))
+        .map(async (pr) => {
+          const comments = await gh<VerdictComment[]>(`repos/${REPOSITORY}/issues/${pr.number}/comments?per_page=100`);
+          if (!comments.ok) return null;
+          return pullVerdict(comments.data, { number: pr.number, title: pr.title, headRef: pr.head.ref }, catalog, now);
         }),
     );
-    return { kind: "ok", verdicts: lists.flat(), checkedAt };
+    return { kind: "ok", verdicts: verdicts.filter((v): v is Verdict => v !== null), checkedAt };
   } catch (error) {
     unstable_rethrow(error);
     return { kind: "unavailable", reason: "GitHub could not be reached from this server.", checkedAt };

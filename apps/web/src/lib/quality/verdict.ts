@@ -81,6 +81,43 @@ export function parseVerdictComment(body: string): Verdict | null {
   };
 }
 
+/** Who posts verdicts: the saboteur-verdict workflow, as the Actions bot. */
+export const VERDICT_AUTHOR = "github-actions[bot]";
+
+export type VerdictComment = { body?: string | null; user?: { login?: string; type?: string } | null };
+
+/** A closed pull request labelled saboteur: its number, title and head branch. */
+export type SaboteurPull = { number: number; title: string; headRef: string };
+
+const PLANTED_BRANCH = /^saboteur\/(m\d+-[a-z0-9-]+)-\d+$/;
+const PLANTED_TITLE = /^Saboteur: (m\d+-[a-z0-9-]+)$/;
+
+/**
+ * A verdict the page can print. Anyone can comment on a public pull request, so a
+ * comment counts only when the workflow's bot wrote it, it names this pull
+ * request, its mutant is the one the branch or title says was planted and is in
+ * the catalog, and it is not dated in the future.
+ */
+export function trustedVerdict(comment: VerdictComment, pr: SaboteurPull, catalog: ReadonlySet<string>, now: Date): Verdict | null {
+  if (comment.user?.login !== VERDICT_AUTHOR || comment.user?.type !== "Bot") return null;
+  const verdict = parseVerdictComment(comment.body ?? "");
+  if (!verdict || verdict.pr !== pr.number) return null;
+  const planted = [PLANTED_BRANCH.exec(pr.headRef)?.[1], PLANTED_TITLE.exec(pr.title.trim())?.[1]];
+  if (!planted.includes(verdict.mutant) || !catalog.has(verdict.mutant)) return null;
+  if (Date.parse(verdict.at) > now.getTime()) return null;
+  return verdict;
+}
+
+/** The pull request's verdict: the latest trusted one, if any. */
+export function pullVerdict(comments: readonly VerdictComment[], pr: SaboteurPull, catalog: ReadonlySet<string>, now: Date): Verdict | null {
+  let latest: Verdict | null = null;
+  for (const c of comments) {
+    const v = trustedVerdict(c, pr, catalog, now);
+    if (v && (!latest || Date.parse(v.at) > Date.parse(latest.at))) latest = v;
+  }
+  return latest;
+}
+
 export type MutantRuns = { latest: Verdict; runs: number; killed: number };
 
 /** The latest verdict per mutant, with how many runs it has had and how many it was caught in. */

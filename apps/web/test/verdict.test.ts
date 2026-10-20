@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gateStates, latestVerdicts, parseVerdictComment, type Verdict } from "@/lib/quality/verdict";
+import { gateStates, latestVerdicts, parseVerdictComment, pullVerdict, trustedVerdict, type Verdict } from "@/lib/quality/verdict";
 
 /** A comment body in the shape .github/scripts/saboteur-verdict.mjs writes. */
 function comment(record: unknown, marker = "saboteur-verdict"): string {
@@ -56,6 +56,49 @@ describe("parseVerdictComment", () => {
     expect(parseVerdictComment(comment({ ...record, gates: { ci: { state: "failure" } } }))).toBeNull();
     expect(parseVerdictComment(comment({ ...record, gates: { ...record.gates, ci: { state: "failure", step: 7 } } }))).toBeNull();
     expect(parseVerdictComment(comment([record]))).toBeNull();
+  });
+});
+
+describe("trustedVerdict", () => {
+  const pr = { number: 41, title: "Saboteur: m08-nyc-no-batch", headRef: "saboteur/m08-nyc-no-batch-18555012345" };
+  const catalog = new Set(["m00-noop", "m08-nyc-no-batch", "m10-code-reuse"]);
+  const now = new Date("2026-10-22T00:00:00Z");
+  const bot = { login: "github-actions[bot]", type: "Bot" };
+  const byBot = (r: unknown) => ({ body: comment(r), user: bot });
+
+  it("accepts the workflow bot's verdict on its own pull request", () => {
+    expect(trustedVerdict(byBot(record), pr, catalog, now)).toEqual(record);
+  });
+
+  it("ignores a forged verdict posted by a person", () => {
+    expect(trustedVerdict({ body: comment(record), user: { login: "mallory", type: "User" } }, pr, catalog, now)).toBeNull();
+    expect(trustedVerdict({ body: comment(record), user: { login: "github-actions[bot]", type: "User" } }, pr, catalog, now)).toBeNull();
+    expect(trustedVerdict({ body: comment(record) }, pr, catalog, now)).toBeNull();
+  });
+
+  it("ignores a verdict about another pull request", () => {
+    expect(trustedVerdict(byBot({ ...record, pr: 40 }), pr, catalog, now)).toBeNull();
+  });
+
+  it("ignores a verdict for a mutant this pull request did not plant, or one not in the catalog", () => {
+    expect(trustedVerdict(byBot({ ...record, mutant: "m10-code-reuse" }), pr, catalog, now)).toBeNull();
+    const unknown = { number: 41, title: "Saboteur: m99-made-up", headRef: "saboteur/m99-made-up-1" };
+    expect(trustedVerdict(byBot({ ...record, mutant: "m99-made-up" }), unknown, catalog, now)).toBeNull();
+  });
+
+  it("takes the mutant from the title when the branch name says nothing", () => {
+    expect(trustedVerdict(byBot(record), { ...pr, headRef: "some-branch" }, catalog, now)).toEqual(record);
+  });
+
+  it("ignores a verdict dated in the future", () => {
+    expect(trustedVerdict(byBot({ ...record, at: "2026-10-23T00:00:00.000Z" }), pr, catalog, now)).toBeNull();
+  });
+
+  it("keeps the latest trusted verdict when a pull request has several", () => {
+    const earlier = { ...record, verdict: "timed out", killedBy: null, at: "2026-10-21T01:00:00.000Z" };
+    const forgedLater = { body: comment({ ...record, verdict: "survived", killedBy: null, at: "2026-10-21T23:00:00.000Z" }), user: { login: "mallory", type: "User" } };
+    expect(pullVerdict([byBot(earlier), byBot(record), forgedLater], pr, catalog, now)).toEqual(record);
+    expect(pullVerdict([forgedLater], pr, catalog, now)).toBeNull();
   });
 });
 
