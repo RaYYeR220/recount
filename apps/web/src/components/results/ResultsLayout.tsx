@@ -15,6 +15,8 @@ export type ResultsLayoutProps = {
   title: string;
   /** Where tiebreak draws are seeded from, for the tie notes. */
   seedSource?: string;
+  /** The poll is still open: tell the count so far in the present tense. */
+  provisional?: boolean;
   /** Extra panels: after the round table, at the head and at the foot of the side column. */
   main?: ReactNode;
   sideFirst?: ReactNode;
@@ -24,7 +26,7 @@ export type ResultsLayoutProps = {
 };
 
 /** The count table, the round-by-round panels and the side column of checks. */
-export function ResultsLayout({ view, scene, title, seedSource, main, sideFirst, side, roundNote, inactiveNote }: ResultsLayoutProps) {
+export function ResultsLayout({ view, scene, title, seedSource, provisional, main, sideFirst, side, roundNote, inactiveNote }: ResultsLayoutProps) {
   return (
     <div className="res-grid">
       <div className="res-main">
@@ -36,7 +38,7 @@ export function ResultsLayout({ view, scene, title, seedSource, main, sideFirst,
       </div>
       <div className="res-side">
         {sideFirst}
-        <WhyItWon view={view} seedSource={seedSource} />
+        <WhyItWon view={view} seedSource={seedSource} provisional={provisional} />
         <CondorcetCheck view={view} />
         {side}
       </div>

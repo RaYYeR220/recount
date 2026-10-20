@@ -79,11 +79,11 @@ export function ElectionsTable({ rows }: { rows: ElectionRow[] }) {
               <td className="c-meta c-seats">{r.seats === 1 ? "1 seat" : `${r.seats} seats`}</td>
               <td className="num c-meta c-ballots">
                 {formatCount(r.ballots)}
-                <span className="sr-only"> ballots</span>
+                <span className="unit"> ballots</span>
               </td>
               <td className="num c-meta c-rounds">
                 {r.rounds}
-                <span className="sr-only"> rounds</span>
+                <span className="unit"> {r.rounds === 1 ? "round" : "rounds"}</span>
               </td>
               <td className="c-figs">
                 {r.cells !== null && r.label ? (

@@ -18,6 +18,10 @@ type StoryInput = {
   seats: number;
   /** Display form of an option label. */
   show?: (label: string) => string;
+  /** The poll is still open: the count so far, told in the present tense. */
+  provisional?: boolean;
+  /** What the choices are called. Default "option". */
+  noun?: "option" | "candidate";
 };
 
 const fig = (text: string): CaptionPart => ({ text: formatVotes(text), tone: "figure" });
@@ -83,11 +87,13 @@ function eliminationSentence(round: ResultRound, show: (l: string) => string, un
   if (total === 0n) return [t(`${who} ${verb} with no ${unit}.`)];
   const dests = destinations(to, show, dp);
   if (dests.length === 0) return [t(`${who} ${verb}.`)];
-  return [t(`${who} ${verb} and ${single ? "its" : "their"} `), { text: formatUnits(total, dp), tone: "figure" }, t(` ${unit} moved on: `), ...dests, t(".")];
+  const one = total === 10n ** BigInt(dp);
+  const what = one ? `${unit.slice(0, -1)} moved on` : `${unit} moved on`;
+  return [t(`${who} ${verb} and ${single ? "its" : "their"} `), { text: formatUnits(total, dp), tone: "figure" }, t(` ${what}: `), ...dests, t(".")];
 }
 
 /** Why the winner won, in two or three short paragraphs. */
-export function whyItWon({ rounds, winners, seats, show = (l) => l }: StoryInput): Paragraph[] {
+export function whyItWon({ rounds, winners, seats, show = (l) => l, provisional = false, noun = "option" }: StoryInput): Paragraph[] {
   if (rounds.length === 0 || winners.length === 0) return [];
   const dp = placesOfRounds(rounds);
   const multi = seats > 1;
@@ -103,10 +109,10 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l }: StoryInput
     const won = rounds[at]!;
     const paragraphs: Paragraph[] = [];
     if (at === 0) {
-      paragraphs.push([strong(show(winner)), t(" had a majority of first choices: "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit}.`)]);
+      paragraphs.push([strong(show(winner)), t(provisional ? " has a majority of first choices so far: " : " had a majority of first choices: "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit}.`)]);
       return paragraphs;
     }
-    paragraphs.push([strong(show(winner)), t(" won with "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit} in round ${at + 1}.`)]);
+    paragraphs.push([strong(show(winner)), t(provisional ? " leads with " : " won with "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit} in round ${at + 1}${provisional ? " of the count so far" : ""}.`)]);
 
     const leader = Object.entries(first.tally).sort((a, b) => {
       const d = toUnits(b[1], dp) - toUnits(a[1], dp);
@@ -126,7 +132,7 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l }: StoryInput
     if (leader[0] !== winner) {
       const place = Object.values(first.tally).filter((v) => toUnits(v, dp) > toUnits(first.tally[winner] ?? "0", dp)).length + 1;
       const ordinal = ["first", "second", "third", "fourth", "fifth"][place - 1] ?? `number ${place}`;
-      paragraphs.push([t(`${show(winner)} came from behind: ${ordinal} on first choices, it won on later preferences.`)]);
+      paragraphs.push([t(`${show(winner)} came from behind: ${ordinal} on first choices, it ${provisional ? "leads" : "won"} on later preferences.`)]);
     }
     return paragraphs;
   }
@@ -151,13 +157,13 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l }: StoryInput
         p.push(t(" Every seat was filled by then, so the surplus of "), { text: formatUnits(surplus, dp), tone: "figure" }, t(" was set aside."));
       }
     } else {
-      p.push(strong(show(w)), t(` was elected in round ${at + 1} with `), fig(r.tally[w]!), t(", as one of the last options left for the remaining seats."));
+      p.push(strong(show(w)), t(` was elected in round ${at + 1} with `), fig(r.tally[w]!), t(`, as one of the last ${noun}s left for the remaining seats.`));
     }
     paragraphs.push(p);
   });
   const eliminated = rounds.flatMap((r) => r.eliminated);
   if (eliminated.length > 0) {
-    const named = eliminated.length <= 6 ? eliminated.map(show).join(", then ") : `${eliminated.length} options, starting with ${show(eliminated[0]!)},`;
+    const named = eliminated.length <= 6 ? eliminated.map(show).join(", then ") : `${eliminated.length} ${noun}s, starting with ${show(eliminated[0]!)},`;
     paragraphs.push([t(`${named} ${eliminated.length === 1 ? "was" : "were"} eliminated in turn.`)]);
   }
   if (isTrailing(rounds, last, seats)) {

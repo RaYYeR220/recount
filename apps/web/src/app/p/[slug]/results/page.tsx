@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { forbidden, notFound, unstable_rethrow } from "next/navigation";
 import { connection } from "next/server";
+import { cache } from "react";
 import { AuditLinks } from "@/components/results/AuditLinks";
 import type { CountView } from "@/components/results/model";
 import { pollFacts } from "@/components/results/pollFacts";
@@ -17,6 +18,7 @@ import { buildCountScene } from "@/lib/countScene";
 import { findPoll } from "@/server/authz";
 import { getDb } from "@/server/db/client";
 import { DomainError } from "@/server/errors";
+import type { PollRow } from "@/server/polls/detail";
 import { closedSince } from "@/server/polls/status";
 import { getResults, type PollResults } from "@/server/results/get";
 import { canSeeResults } from "@/server/results/visibility";
@@ -26,10 +28,7 @@ import "@/styles/results.css";
 /** The page waits for the visibility check, so a hidden or private poll answers 403 or 404. */
 export const instant = false;
 
-export const metadata: Metadata = {
-  title: "Poll results",
-  description: "Round-by-round results with the cast-vote record, its SHA-256 and a recount that runs in the browser.",
-};
+const DESCRIPTION = "Round-by-round results with the cast-vote record, its SHA-256 and a recount that runs in the browser.";
 
 async function viewerOrNull(): Promise<Viewer | null> {
   try {
@@ -41,25 +40,39 @@ async function viewerOrNull(): Promise<Viewer | null> {
   }
 }
 
-async function visibleResults(slug: string, viewerId: string | null, now: Date): Promise<PollResults> {
+type Loaded =
+  | { kind: "ok"; viewer: Viewer | null; now: Date; results: PollResults; poll: PollRow }
+  | { kind: "denied"; code: "not_found" | "hidden_until_close" };
+
+/** One visibility check per request, shared by the page and its metadata. */
+const load = cache(async (slug: string): Promise<Loaded> => {
+  const viewer = await viewerOrNull();
+  await connection();
+  const now = new Date();
   try {
-    return await getResults(getDb(), viewerId, slug, now);
+    const results = await getResults(getDb(), viewer?.id ?? null, slug, now);
+    // Only read once getResults has said this viewer may see the results.
+    return { kind: "ok", viewer, now, results, poll: await findPoll(getDb(), slug) };
   } catch (error) {
     unstable_rethrow(error);
-    if (error instanceof DomainError && error.code === "not_found") notFound();
-    if (error instanceof DomainError && error.code === "hidden_until_close") forbidden();
+    if (error instanceof DomainError && (error.code === "not_found" || error.code === "hidden_until_close")) return { kind: "denied", code: error.code };
     throw error;
   }
+});
+
+export async function generateMetadata({ params }: PageProps<"/p/[slug]/results">): Promise<Metadata> {
+  const loaded = await load((await params).slug);
+  return { title: loaded.kind === "ok" ? `${loaded.poll.title}: results` : "Poll results", description: DESCRIPTION };
 }
 
 export default async function ResultsPage({ params }: PageProps<"/p/[slug]/results">) {
   const { slug } = await params;
-  const viewer = await viewerOrNull();
-  await connection();
-  const now = new Date();
-  const results = await visibleResults(slug, viewer?.id ?? null, now);
-  // Only read once getResults has said this viewer may see the results.
-  const poll = await findPoll(getDb(), slug);
+  const loaded = await load(slug);
+  if (loaded.kind === "denied") {
+    if (loaded.code === "not_found") notFound();
+    forbidden();
+  }
+  const { viewer, now, results, poll } = loaded;
 
   const isOwner = viewer !== null && viewer.id === poll.ownerId;
   const isPublic = canSeeResults(poll, null, now) === "yes";
@@ -157,6 +170,7 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
           scene={buildCountScene({ rounds: results.rounds, options: results.candidates, seats: results.seats })}
           title={`${poll.title}: the count, round by round`}
           seedSource="seeded from the cast-vote record's SHA-256"
+          provisional={!closed}
           side={
             <AuditLinks
               slug={slug}

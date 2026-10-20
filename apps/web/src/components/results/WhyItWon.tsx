@@ -6,19 +6,22 @@ import { listNames } from "@/lib/names";
 import type { CountView } from "./model";
 
 export type WhyItWonProps = {
-  view: Pick<CountView, "rounds" | "winners" | "seats" | "rules">;
+  view: Pick<CountView, "rounds" | "winners" | "seats" | "rules" | "noun">;
   /** Where the tiebreak seed comes from, e.g. "seeded from the CVR hash". */
   seedSource?: string;
+  /** The poll is still open: the story of the count so far. */
+  provisional?: boolean;
   id?: string;
 };
 
 /** The count in plain words, with every tie the rules had to break. */
-export function WhyItWon({ view, seedSource, id = "why-h" }: WhyItWonProps) {
-  const paragraphs = whyItWon(view);
+export function WhyItWon({ view, seedSource, provisional, id = "why-h" }: WhyItWonProps) {
+  const paragraphs = whyItWon({ ...view, provisional });
   const ties = findTies(view.rounds);
+  const title = provisional ? (view.seats > 1 ? "Why they lead" : "Why it leads") : view.seats > 1 ? "Why they won" : "Why it won";
   return (
     <Paper as="section" aria-labelledby={id} className="story">
-      <PanelHeader id={id} title={view.seats > 1 ? "Why they won" : "Why it won"} />
+      <PanelHeader id={id} title={title} />
       {paragraphs.map((parts, i) => (
         <p key={i}>
           <Caption parts={parts} />
