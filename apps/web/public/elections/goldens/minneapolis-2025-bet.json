@@ -1,0 +1,22 @@
+{
+  "slug": "minneapolis-2025-bet",
+  "sourceUrl": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-Board-of-Estimate-and-Taxation-RCV-Tabulation-Summary.pdf",
+  "reportSha256": "2e9684da931a0434e64db33e3fc4be9bf0c404d04289c5d161aff12c8a696b5e",
+  "retrievedAt": "2026-10-19",
+  "notes": "Ranked Choice Voting Tabulation Center Summary Statement. The PDF header still reads \"UNOFFICIAL RESULTS\". Threshold 35561, undervotes 41020. Both seats were filled in round 1.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Bob Fine": "27445",
+        "Eric Harris Bernstein": "42829",
+        "Steve Brandt": "35911",
+        "Undeclared Write-ins": "497"
+      }
+    }
+  ],
+  "winners": [
+    "Eric Harris Bernstein",
+    "Steve Brandt"
+  ]
+}

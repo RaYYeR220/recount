@@ -1,0 +1,40 @@
+{
+  "slug": "nyc-2026-council-d3",
+  "sourceUrl": "https://www.vote.nyc/sites/default/files/pdf/election_results/2026/20260623Primary%20Election/DEM_Council_Member_3rd_Council_District.pdf",
+  "reportSha256": "bd47161c327768f0ae13d24103d96bb4464cd60b63a9ae4009fa7668a52146d3",
+  "retrievedAt": "2026-10-20",
+  "notes": "Official ranked choice rounds, certified July 14, 2026.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Carl Wilson": "8069",
+        "Lindsey Boylan": "6055",
+        "Layla Law-Gisiko": "2320",
+        "Leslie Boghosian Murphy": "1658",
+        "Write-ins": "197"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Carl Wilson": "8108",
+        "Lindsey Boylan": "6090",
+        "Layla Law-Gisiko": "2327",
+        "Leslie Boghosian Murphy": "1681"
+      },
+      "inactive": "93"
+    },
+    {
+      "round": 3,
+      "tally": {
+        "Carl Wilson": "9249",
+        "Lindsey Boylan": "8005"
+      },
+      "inactive": "1045"
+    }
+  ],
+  "winners": [
+    "Carl Wilson"
+  ]
+}

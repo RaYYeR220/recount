@@ -1,0 +1,19 @@
+{
+  "name": "@recount/datasets",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rebuilds the election replay datasets from the official cast vote records",
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@recount/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  }
+}

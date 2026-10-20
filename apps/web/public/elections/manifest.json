@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "datasets": [
+    {
+      "slug": "nyc-2025-dem-mayor",
+      "title": "New York City 2025 Democratic primary for Mayor",
+      "file": "nyc-2025-dem-mayor.json.gz",
+      "bytes": 215977,
+      "sha256": "b6171502458989e45b4217af46e851c241d3ac13bbd97faaec967f945e64fe48",
+      "ballots": 1114433,
+      "patterns": 42655,
+      "presetId": "nyc",
+      "source": {
+        "publisher": "Board of Elections in the City of New York",
+        "license": "Public record",
+        "url": "https://www.vote.nyc/sites/default/files/pdf/election_results/2025/20250624Primary%20Election/rcv/2025_Primary_CVR_2025-07-17.zip",
+        "file": "nyc/2025_Primary_CVR_2025-07-17.zip",
+        "retrievedAt": "2026-10-19",
+        "contest": "DEM Mayor Citywide",
+        "sha256": "704d7cf14b93953f09ac9e486812d3107bc2d9571af5cc73d3a6f78cf2d7a019"
+      },
+      "golden": {
+        "file": "goldens/nyc-2025-dem-mayor.json",
+        "sha256": "bea2e28b3b85603b69f3f5a6b4a8f55a07329bb8e92ffbc998b4a8713dcd129c"
+      }
+    },
+    {
+      "slug": "nyc-2026-council-d3",
+      "title": "New York City 2026 Democratic primary for City Council, District 3",
+      "file": "nyc-2026-council-d3.json",
+      "bytes": 36203,
+      "sha256": "b5b5126601a1de7ed9db7ed6195ab6da5f4d0a56dc811ae75a4e95ec5bdb1031",
+      "ballots": 19434,
+      "patterns": 671,
+      "presetId": "nyc",
+      "source": {
+        "publisher": "Board of Elections in the City of New York",
+        "license": "Public record",
+        "url": "https://www.vote.nyc/sites/default/files/pdf/election_results/2026/20260623Primary%20Election/2026_Primary_CVR_2026-06-23.zip",
+        "file": "nyc/2026_Primary_CVR_2026-06-23.zip",
+        "retrievedAt": "2026-10-19",
+        "contest": "DEM Council Member 3rd Council District",
+        "sha256": "045791ec4157b927188633779c0636d88f9f31aaa1d6e6a3bb951f8d13ca1347"
+      },
+      "golden": {
+        "file": "goldens/nyc-2026-council-d3.json",
+        "sha256": "6b1b57b8154c9f4e4561c3ca78b2a18c331ca0f93f92798b35255c36cc56a317"
+      }
+    },
+    {
+      "slug": "minneapolis-2025-mayor",
+      "title": "Minneapolis 2025 Mayor",
+      "file": "minneapolis-2025-mayor.json",
+      "bytes": 89689,
+      "sha256": "b275dce64220f22b966a4ac32f5194c681947c0aa0d9fe8c50ee64ed343ada29",
+      "ballots": 147702,
+      "patterns": 1949,
+      "presetId": "minneapolis-irv",
+      "source": {
+        "publisher": "City of Minneapolis Elections & Voter Services",
+        "license": "Public record",
+        "url": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-Mayor-Cast-Vote-Record.csv",
+        "file": "minneapolis/2025-Mayor-Cast-Vote-Record.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "Mayor",
+        "sha256": "a58e3f0936cace4725aab3d3ea0e79c02e1c953168a0126cfbdba0e29d3d49f1"
+      },
+      "golden": {
+        "file": "goldens/minneapolis-2025-mayor.json",
+        "sha256": "e7026e295ad97ffbaade0bec4313e9d0e4f429d15daf8f72aa33512ac3fb013a"
+      }
+    },
+    {
+      "slug": "minneapolis-2025-park-at-large",
+      "title": "Minneapolis 2025 Park and Recreation Commissioner At Large",
+      "file": "minneapolis-2025-park-at-large.json",
+      "bytes": 39698,
+      "sha256": "37d0b7fafc065953382f7a17870b5329aed1d7a451d838a1c41d6f54343a8fa5",
+      "ballots": 147702,
+      "patterns": 867,
+      "presetId": "minneapolis-stv",
+      "source": {
+        "publisher": "City of Minneapolis Elections & Voter Services",
+        "license": "Public record",
+        "url": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-Park-At-Large-CVR.csv",
+        "file": "minneapolis/2025-Park-At-Large-CVR.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "Park and Recreation Commissioner At Large",
+        "sha256": "7adf16dbe8c3d8bb1c8f4f925b26ca434b3b35f5b144a7e36ddd8e8f12bdb7cc"
+      },
+      "golden": {
+        "file": "goldens/minneapolis-2025-park-at-large.json",
+        "sha256": "8cb4a0dcf775855f286dd16d28e4520df771711ef89f7cd206344160cf82b2c9"
+      }
+    },
+    {
+      "slug": "minneapolis-2025-bet",
+      "title": "Minneapolis 2025 Board of Estimate and Taxation",
+      "file": "minneapolis-2025-bet.json",
+      "bytes": 7387,
+      "sha256": "daee8b94b99bbcf52c73658e143d6c22d52876f47b77cc4caa0ae75660179b08",
+      "ballots": 147702,
+      "patterns": 148,
+      "presetId": "minneapolis-stv",
+      "source": {
+        "publisher": "City of Minneapolis Elections & Voter Services",
+        "license": "Public record",
+        "url": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-BET-Cast-Vote-Record.csv",
+        "file": "minneapolis/2025-BET-Cast-Vote-Record.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "Board of Estimate and Taxation",
+        "sha256": "03f1b98a5755b4f0d146343b8510611ca0f9a778dfcef7a7bcee689584bdd690"
+      },
+      "golden": {
+        "file": "goldens/minneapolis-2025-bet.json",
+        "sha256": "98b424d33a792bb52a583617d4d1a73fb4e00afdfd315f7ea2748c893f2cd562"
+      }
+    },
+    {
+      "slug": "portland-2024-d1",
+      "title": "Portland, OR 2024 City Council, District 1",
+      "file": "portland-2024-d1.json.gz",
+      "bytes": 124931,
+      "sha256": "5792cc29e81c713a091dac1cb325c0991cb66e8d00554f5dcbbf52d80b6879bc",
+      "ballots": 43669,
+      "patterns": 20527,
+      "presetId": "portland-stv",
+      "source": {
+        "publisher": "Multnomah County Elections Division",
+        "license": "Public record",
+        "url": "https://drive.usercontent.google.com/download?id=1ly3IcjeQTpet-zvxd49DM_OmY_i4uftB&export=download&confirm=t",
+        "file": "portland/City_of_Portland__Councilor__District_1_2024_11_29_17_26_12.cvr.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "City of Portland, Councilor, District 1",
+        "sha256": "dab997c4a57e2c35e5f95956af9a258950cb6973760201517b652aa6b0029433"
+      },
+      "golden": {
+        "file": "goldens/portland-2024-d1.json",
+        "sha256": "6252f8751aad9ddae722ac8dc7f829c315ca963b11bfb0a359e08bccf2820950"
+      }
+    },
+    {
+      "slug": "burlington-2009-mayor",
+      "title": "Burlington, VT 2009 Mayor",
+      "file": "burlington-2009-mayor.json",
+      "bytes": 24230,
+      "sha256": "7b638ed4b8babd2d3bcb222844cf1fafc03388732d0bd5c11e9187548ea23b59",
+      "ballots": 8984,
+      "patterns": 442,
+      "presetId": "burlington-2009",
+      "source": {
+        "publisher": "FairVote (D. Otis), Harvard Dataverse doi:10.7910/DVN/AMK8PJ",
+        "license": "CC0 1.0",
+        "url": "https://dataverse.harvard.edu/api/access/datafile/11593240?format=original",
+        "file": "fairvote/Burlington_20090303_Mayor.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "Mayor",
+        "sha256": "1e0ef81402b03d522994f002e6ed1f0c8250b25944aa125be62bac9d4994cf0f"
+      },
+      "golden": {
+        "file": "goldens/burlington-2009-mayor.json",
+        "sha256": "42ef30a919f1308822e056bf8808d8494be17211177ca30a641cd4d1a0335857"
+      }
+    },
+    {
+      "slug": "alaska-2022-special",
+      "title": "Alaska 2022 special general election, U.S. Representative",
+      "file": "alaska-2022-special.json",
+      "bytes": 27890,
+      "sha256": "c8b1953a85a173ce5290fef764638de0aa64b0654acfef18b4a97eb8e2737e61",
+      "ballots": 192289,
+      "patterns": 554,
+      "presetId": "alaska",
+      "source": {
+        "publisher": "FairVote (D. Otis), Harvard Dataverse doi:10.7910/DVN/AMK8PJ",
+        "license": "CC0 1.0",
+        "url": "https://dataverse.harvard.edu/api/access/datafile/11593054?format=original",
+        "file": "fairvote/Alaska_20220816_USHouse_Special.csv",
+        "retrievedAt": "2026-10-19",
+        "contest": "U.S. Representative (Special General)",
+        "sha256": "13b978613a42355dc79feee79af1b3ad20b7bd81a5271e2050b0a6e06f62a851"
+      },
+      "golden": {
+        "file": "goldens/alaska-2022-special.json",
+        "sha256": "fb29318afe76a9249f01b212f24cde00fcd57857d8fe49335e53cc13e9f0f63f"
+      }
+    }
+  ]
+}

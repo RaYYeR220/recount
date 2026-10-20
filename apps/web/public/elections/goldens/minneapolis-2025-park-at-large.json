@@ -1,0 +1,88 @@
+{
+  "slug": "minneapolis-2025-park-at-large",
+  "sourceUrl": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-Park-At-Large-RCV-Tabulation-Summary.pdf",
+  "reportSha256": "89cb75e96c11847342659d4716c61c4d8395d4317e52a1a01b3c26c48789fdb3",
+  "retrievedAt": "2026-10-19",
+  "notes": "Ranked Choice Voting Tabulation Center Summary Statement. The PDF header still reads \"UNOFFICIAL RESULTS\". Threshold 28338, undervotes 34354. Meg Forney reached the threshold in round 3; her surplus moved after round 4.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Adam Schneider": "7083",
+        "Amber A. Frederick": "17056",
+        "Averi M. Turner": "6118",
+        "Mary McKelvey": "12116",
+        "Matthew Dowgwillo": "7112",
+        "Meg Forney": "25368",
+        "Michael Wilson": "15291",
+        "Tom Olsen": "22796",
+        "Undeclared Write-ins": "408"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Adam Schneider": "7494.0000",
+        "Amber A. Frederick": "18338.0000",
+        "Averi M. Turner": "0.0000",
+        "Mary McKelvey": "12914.0000",
+        "Matthew Dowgwillo": "7524.0000",
+        "Meg Forney": "26343.0000",
+        "Michael Wilson": "15833.0000",
+        "Tom Olsen": "23175.0000",
+        "Undeclared Write-ins": "0.0000"
+      },
+      "exhausted": "1727.0000"
+    },
+    {
+      "round": 3,
+      "tally": {
+        "Adam Schneider": "0.0000",
+        "Amber A. Frederick": "20373.0000",
+        "Averi M. Turner": "0.0000",
+        "Mary McKelvey": "14904.0000",
+        "Matthew Dowgwillo": "0.0000",
+        "Meg Forney": "28610.0000",
+        "Michael Wilson": "18617.0000",
+        "Tom Olsen": "25347.0000",
+        "Undeclared Write-ins": "0.0000"
+      },
+      "exhausted": "5497.0000"
+    },
+    {
+      "round": 4,
+      "tally": {
+        "Adam Schneider": "0.0000",
+        "Amber A. Frederick": "22261.0000",
+        "Averi M. Turner": "0.0000",
+        "Mary McKelvey": "0.0000",
+        "Matthew Dowgwillo": "0.0000",
+        "Meg Forney": "34085.0000",
+        "Michael Wilson": "19705.0000",
+        "Tom Olsen": "26655.0000",
+        "Undeclared Write-ins": "0.0000"
+      },
+      "exhausted": "10642.0000"
+    },
+    {
+      "round": 5,
+      "tally": {
+        "Adam Schneider": "0.0000",
+        "Amber A. Frederick": "23187.2884",
+        "Averi M. Turner": "0.0000",
+        "Mary McKelvey": "0.0000",
+        "Matthew Dowgwillo": "0.0000",
+        "Meg Forney": "28338.2690",
+        "Michael Wilson": "19978.3006",
+        "Tom Olsen": "27487.3782",
+        "Undeclared Write-ins": "0.0000"
+      },
+      "exhausted": "14356.7638"
+    }
+  ],
+  "winners": [
+    "Meg Forney",
+    "Tom Olsen",
+    "Amber A. Frederick"
+  ]
+}

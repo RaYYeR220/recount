@@ -1,0 +1,257 @@
+{
+  "slug": "portland-2024-d1",
+  "sourceUrl": "https://rcvresults.multco.us/Reports/e7bf14d2-d0db-4c15-bc61-e95482d2a42f/City_of_Portland_Councilor_-_District_1",
+  "reportSha256": "4216888f641a7779a787149ad75d9aeebbfd3c5e99c4cfdecc218d257a46d084",
+  "retrievedAt": "2026-10-19",
+  "notes": "Official RCTab summary JSON (report 2024-12-02_15-04-43_report_official) from the Multnomah County results site. Its download links are signed and expire, so the report page is cited. Threshold 10718.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Candace Avalos": "8297",
+        "Cayle Tern": "711",
+        "David Linn": "1111",
+        "Deian Salazar": "720",
+        "Doug Clove": "1698",
+        "Jamie Dunphy": "5064",
+        "Joe Allen": "978",
+        "Joe Furi": "355",
+        "Loretta Smith": "5586",
+        "Michael (Mike) Sands": "952",
+        "Noah Ernst": "4052",
+        "Peggy Sue Owens": "1266",
+        "Steph Routh": "3894",
+        "Terrence Hayes": "3975",
+        "Thomas Shervey": "385",
+        "Timur Ender": "3550",
+        "Uncertified Write In": "277"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Candace Avalos": "8307",
+        "Cayle Tern": "713",
+        "David Linn": "1113",
+        "Deian Salazar": "720",
+        "Doug Clove": "1709",
+        "Jamie Dunphy": "5068",
+        "Joe Allen": "981",
+        "Joe Furi": "361",
+        "Loretta Smith": "5595",
+        "Michael (Mike) Sands": "957",
+        "Noah Ernst": "4060",
+        "Peggy Sue Owens": "1269",
+        "Steph Routh": "3898",
+        "Terrence Hayes": "3984",
+        "Thomas Shervey": "387",
+        "Timur Ender": "3556"
+      }
+    },
+    {
+      "round": 3,
+      "tally": {
+        "Candace Avalos": "8337",
+        "Cayle Tern": "726",
+        "David Linn": "1130",
+        "Deian Salazar": "741",
+        "Doug Clove": "1736",
+        "Jamie Dunphy": "5075",
+        "Joe Allen": "1011",
+        "Loretta Smith": "5608",
+        "Michael (Mike) Sands": "987",
+        "Noah Ernst": "4082",
+        "Peggy Sue Owens": "1279",
+        "Steph Routh": "3904",
+        "Terrence Hayes": "4003",
+        "Thomas Shervey": "402",
+        "Timur Ender": "3567"
+      }
+    },
+    {
+      "round": 4,
+      "tally": {
+        "Candace Avalos": "8368",
+        "Cayle Tern": "741",
+        "David Linn": "1150",
+        "Deian Salazar": "754",
+        "Doug Clove": "1765",
+        "Jamie Dunphy": "5108",
+        "Joe Allen": "1026",
+        "Loretta Smith": "5634",
+        "Michael (Mike) Sands": "1013",
+        "Noah Ernst": "4095",
+        "Peggy Sue Owens": "1294",
+        "Steph Routh": "3940",
+        "Terrence Hayes": "4046",
+        "Timur Ender": "3586"
+      }
+    },
+    {
+      "round": 5,
+      "tally": {
+        "Candace Avalos": "8543",
+        "David Linn": "1195",
+        "Deian Salazar": "789",
+        "Doug Clove": "1795",
+        "Jamie Dunphy": "5146",
+        "Joe Allen": "1040",
+        "Loretta Smith": "5687",
+        "Michael (Mike) Sands": "1033",
+        "Noah Ernst": "4129",
+        "Peggy Sue Owens": "1321",
+        "Steph Routh": "3997",
+        "Terrence Hayes": "4078",
+        "Timur Ender": "3662"
+      }
+    },
+    {
+      "round": 6,
+      "tally": {
+        "Candace Avalos": "8637",
+        "David Linn": "1226",
+        "Doug Clove": "1883",
+        "Jamie Dunphy": "5180",
+        "Joe Allen": "1068",
+        "Loretta Smith": "5767",
+        "Michael (Mike) Sands": "1063",
+        "Noah Ernst": "4190",
+        "Peggy Sue Owens": "1333",
+        "Steph Routh": "4033",
+        "Terrence Hayes": "4172",
+        "Timur Ender": "3699"
+      }
+    },
+    {
+      "round": 7,
+      "tally": {
+        "Candace Avalos": "8726",
+        "David Linn": "1308",
+        "Doug Clove": "1977",
+        "Jamie Dunphy": "5250",
+        "Joe Allen": "1141",
+        "Loretta Smith": "5889",
+        "Noah Ernst": "4251",
+        "Peggy Sue Owens": "1365",
+        "Steph Routh": "4095",
+        "Terrence Hayes": "4251",
+        "Timur Ender": "3784"
+      }
+    },
+    {
+      "round": 8,
+      "tally": {
+        "Candace Avalos": "8789",
+        "David Linn": "1441",
+        "Doug Clove": "2129",
+        "Jamie Dunphy": "5303",
+        "Loretta Smith": "5999",
+        "Noah Ernst": "4360",
+        "Peggy Sue Owens": "1441",
+        "Steph Routh": "4155",
+        "Terrence Hayes": "4314",
+        "Timur Ender": "3861"
+      }
+    },
+    {
+      "round": 9,
+      "tally": {
+        "Candace Avalos": "8938",
+        "Doug Clove": "2302",
+        "Jamie Dunphy": "5412",
+        "Loretta Smith": "6158",
+        "Noah Ernst": "4479",
+        "Peggy Sue Owens": "1501",
+        "Steph Routh": "4266",
+        "Terrence Hayes": "4445",
+        "Timur Ender": "3983"
+      }
+    },
+    {
+      "round": 10,
+      "tally": {
+        "Candace Avalos": "9237",
+        "Doug Clove": "2403",
+        "Jamie Dunphy": "5483",
+        "Loretta Smith": "6399",
+        "Noah Ernst": "4642",
+        "Steph Routh": "4332",
+        "Terrence Hayes": "4525",
+        "Timur Ender": "4187"
+      }
+    },
+    {
+      "round": 11,
+      "tally": {
+        "Candace Avalos": "9372",
+        "Jamie Dunphy": "5635",
+        "Loretta Smith": "6689",
+        "Noah Ernst": "5116",
+        "Steph Routh": "4500",
+        "Terrence Hayes": "4847",
+        "Timur Ender": "4335"
+      }
+    },
+    {
+      "round": 12,
+      "tally": {
+        "Candace Avalos": "10649",
+        "Jamie Dunphy": "6079",
+        "Loretta Smith": "7198",
+        "Noah Ernst": "5658",
+        "Steph Routh": "5089",
+        "Terrence Hayes": "5214"
+      }
+    },
+    {
+      "round": 13,
+      "tally": {
+        "Candace Avalos": "12169",
+        "Jamie Dunphy": "7305",
+        "Loretta Smith": "7953",
+        "Noah Ernst": "5883",
+        "Terrence Hayes": "5787"
+      }
+    },
+    {
+      "round": 14,
+      "tally": {
+        "Candace Avalos": "10718",
+        "Jamie Dunphy": "7893.2520",
+        "Loretta Smith": "8207.2536",
+        "Noah Ernst": "5935.5672",
+        "Terrence Hayes": "5952.9264"
+      }
+    },
+    {
+      "round": 15,
+      "tally": {
+        "Candace Avalos": "10718",
+        "Jamie Dunphy": "8491.5960",
+        "Loretta Smith": "9172.8360",
+        "Terrence Hayes": "7682.3432"
+      }
+    },
+    {
+      "round": 16,
+      "tally": {
+        "Candace Avalos": "10718",
+        "Jamie Dunphy": "9749.6336",
+        "Loretta Smith": "12027.0792"
+      }
+    },
+    {
+      "round": 17,
+      "tally": {
+        "Candace Avalos": "10718",
+        "Jamie Dunphy": "9749.6336",
+        "Loretta Smith": "10718"
+      }
+    }
+  ],
+  "winners": [
+    "Candace Avalos",
+    "Jamie Dunphy",
+    "Loretta Smith"
+  ]
+}

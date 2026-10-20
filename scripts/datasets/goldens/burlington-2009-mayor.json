@@ -1,0 +1,59 @@
+{
+  "slug": "burlington-2009-mayor",
+  "sourceUrl": "https://web.archive.org/web/20110725111725/http://www.burlingtonvotes.org/20090303/2009%20Burlington%20Mayor%20Round.htm",
+  "reportSha256": "262aac6af6a6b129328f3ecc8ff4e879ca1cb09824a986eaaa81f901b92101b9",
+  "reportParts": [
+    {
+      "url": "https://web.archive.org/web/2011id_/http://www.burlingtonvotes.org/20090303/2009%20Burlington%20Mayor%20Round1.htm",
+      "sha256": "4d14277d832e31f26c334d7b711d2e9de8716adfc25c1362aa5df0c027af54fd"
+    },
+    {
+      "url": "https://web.archive.org/web/2011id_/http://www.burlingtonvotes.org/20090303/2009%20Burlington%20Mayor%20Round2.htm",
+      "sha256": "facc46d76ec8eb38bfc53bf2d45f31d32e095610729d096e51299f6f4ef293a7"
+    },
+    {
+      "url": "https://web.archive.org/web/2011id_/http://www.burlingtonvotes.org/20090303/2009%20Burlington%20Mayor%20Round3.htm",
+      "sha256": "260483508fc153b43386db3263a405641d6aec99b645780cf58279e756b43972"
+    }
+  ],
+  "retrievedAt": "2026-10-20",
+  "notes": "ChoicePlus Pro round detail report published by the City of Burlington, read from the Internet Archive. 8,980 valid ballots, 4 invalid. The ballots in this dataset are FairVote's copy, not the city's ballot file, so small differences are expected.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Kurt Wright": "2951",
+        "Bob Kiss": "2585",
+        "Andy Montroll": "2063",
+        "Dan Smith": "1306",
+        "Write-in": "36",
+        "James Simpson": "35"
+      },
+      "exhausted": "4"
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Kurt Wright": "3294",
+        "Bob Kiss": "2981",
+        "Andy Montroll": "2554",
+        "Dan Smith": "0",
+        "Write-in": "0",
+        "James Simpson": "0"
+      },
+      "exhausted": "151"
+    },
+    {
+      "round": 3,
+      "tally": {
+        "Bob Kiss": "4313",
+        "Kurt Wright": "4061",
+        "Andy Montroll": "0"
+      },
+      "exhausted": "606"
+    }
+  ],
+  "winners": [
+    "Bob Kiss"
+  ]
+}

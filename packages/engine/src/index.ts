@@ -20,3 +20,6 @@ export { parseCdfCvr, type CdfOptions } from './cvr/cdf';
 export { parseEssRows, type EssLayout } from './cvr/ess';
 export { parseSharedStrings, parseSheet, SheetRowReader, type SheetRow } from './cvr/xlsx';
 export { PatternCounter } from './cvr/names';
+export { PRESETS, presetRules, type PresetId } from './presets';
+export type { DatasetSource, ElectionDataset, Golden, GoldenRound, ReportConvention } from './dataset';
+export { compareToGolden, type GoldenComparison, type GoldenMismatch } from './golden';

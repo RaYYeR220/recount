@@ -1,0 +1,31 @@
+{
+  "slug": "alaska-2022-special",
+  "sourceUrl": "https://www.elections.alaska.gov/results/22SSPG/RcvDetailedReport.pdf",
+  "reportSha256": null,
+  "transcribedFrom": {
+    "url": "https://github.com/lucyhorowitz/FVDemocracy/blob/ff46be583d238246891fa90487d25e0aa0a8ca11/FVDemocracy/Alaska/Reproduction/PublishedReports.lean",
+    "sha256": "d2020b39931e0cac9bd055e7af774c437ec68aeebfcb5d4c4dca53bf8f6e0d31"
+  },
+  "retrievedAt": "2026-10-20",
+  "notes": "The Division of Elections site answers scripted downloads with a CAPTCHA (HTTP 405), so the round totals come from a published transcription of the official RCV detailed report. Inactive counts are left out because the report folds blank ballots into them.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Begich, Nick": "53810",
+        "Palin, Sarah": "58973",
+        "Peltola, Mary S.": "75799"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Palin, Sarah": "86026",
+        "Peltola, Mary S.": "91266"
+      }
+    }
+  ],
+  "winners": [
+    "Peltola, Mary S."
+  ]
+}

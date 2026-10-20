@@ -1,0 +1,54 @@
+{
+  "slug": "nyc-2025-dem-mayor",
+  "sourceUrl": "https://www.vote.nyc/sites/default/files/pdf/election_results/2025/20250624Primary%20Election/rcv/026916_1.html",
+  "reportSha256": "d51c8162c1bc02efcfd39e890779f13852f5d7ef9cbf528a465df07303b3f658",
+  "retrievedAt": "2026-10-20",
+  "notes": "Official ranked choice rounds, certified July 22, 2025. The Board notes that pending litigation may cause changes.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Zohran Kwame Mamdani": "469642",
+        "Andrew M. Cuomo": "387137",
+        "Brad Lander": "120634",
+        "Adrienne E. Adams": "44192",
+        "Scott M. Stringer": "17820",
+        "Zellnor Myrie": "10593",
+        "Whitney R. Tilson": "8443",
+        "Michael Blake": "4366",
+        "Jessica Ramos": "4273",
+        "Paperboy Love Prince": "1560",
+        "Selma K. Bartholomew": "1489",
+        "Write-ins": "1581"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Zohran Kwame Mamdani": "469755",
+        "Andrew M. Cuomo": "387377",
+        "Brad Lander": "120707",
+        "Adrienne E. Adams": "44359",
+        "Scott M. Stringer": "17894",
+        "Zellnor Myrie": "10648",
+        "Whitney R. Tilson": "8525",
+        "Michael Blake": "4389",
+        "Jessica Ramos": "4294",
+        "Paperboy Love Prince": "1628",
+        "Selma K. Bartholomew": "1505"
+      },
+      "inactive": "649"
+    },
+    {
+      "round": 3,
+      "tally": {
+        "Zohran Kwame Mamdani": "573169",
+        "Andrew M. Cuomo": "443229"
+      },
+      "inactive": "55332"
+    }
+  ],
+  "winners": [
+    "Zohran Kwame Mamdani"
+  ]
+}

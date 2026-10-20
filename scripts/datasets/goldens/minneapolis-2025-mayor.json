@@ -1,0 +1,57 @@
+{
+  "slug": "minneapolis-2025-mayor",
+  "sourceUrl": "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/2025-Mayor-Round-Results-Summary.pdf",
+  "reportSha256": "058d8f1bebece8cd7870d5ef30178b9b4ba5c74b17d401ad1d6ca6b2d1ee2972",
+  "retrievedAt": "2026-10-19",
+  "notes": "Ranked Choice Voting Tabulation Center Summary Statement. The PDF header still reads \"UNOFFICIAL RESULTS\"; the city archive publishes it as the round results. Threshold 73679, undervotes 346.",
+  "rounds": [
+    {
+      "round": 1,
+      "tally": {
+        "Adam Terzich": "52",
+        "Alejandro Richardson": "206",
+        "Andrea Revel": "381",
+        "Brenda Short": "773",
+        "Charlie McCloud": "481",
+        "Christopher Robin Zimmerman": "1",
+        "DeWayne Davis": "20414",
+        "Jacob Frey": "61444",
+        "Jazz Hampton": "15339",
+        "Jeffrey Alan Wagner": "129",
+        "Kevin Dwire": "297",
+        "Kevin Ward": "168",
+        "Laverne Turner": "799",
+        "Omar Fateh": "46614",
+        "Troy A. Peterson": "52",
+        "Xavier Pauke": "93",
+        "Undeclared Write-ins": "113"
+      }
+    },
+    {
+      "round": 2,
+      "tally": {
+        "Adam Terzich": "0",
+        "Alejandro Richardson": "0",
+        "Andrea Revel": "0",
+        "Brenda Short": "0",
+        "Charlie McCloud": "0",
+        "Christopher Robin Zimmerman": "0",
+        "DeWayne Davis": "0",
+        "Jacob Frey": "73723",
+        "Jazz Hampton": "0",
+        "Jeffrey Alan Wagner": "0",
+        "Kevin Dwire": "0",
+        "Kevin Ward": "0",
+        "Laverne Turner": "0",
+        "Omar Fateh": "65377",
+        "Troy A. Peterson": "0",
+        "Xavier Pauke": "0",
+        "Undeclared Write-ins": "0"
+      },
+      "exhausted": "8256"
+    }
+  ],
+  "winners": [
+    "Jacob Frey"
+  ]
+}
