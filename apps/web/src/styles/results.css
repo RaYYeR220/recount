@@ -1,0 +1,660 @@
+/*
+  Results, election replays and the count tool. Imported by those pages; uses the
+  tokens from globals.css.
+*/
+@layer components {
+  /* ---------- head ---------- */
+  .res-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px 40px;
+    align-items: end;
+    margin-bottom: 28px;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .meta-row .badge {
+    min-height: 28px;
+    font-size: 12.5px;
+    padding: 0 12px;
+  }
+  .winner-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+    max-width: 460px;
+    padding: 16px 22px 16px 18px;
+    border-radius: var(--radius-card);
+    background: linear-gradient(180deg, #fff1c2, #e8c66d 55%, #c99a3b);
+    color: #2a1a0c;
+    box-shadow:
+      var(--shadow-plate),
+      0 18px 36px -20px rgb(0 0 0 / 0.8);
+  }
+  .winner-card .wl {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: -0.03em;
+    word-spacing: 0.1em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+  .winner-card .ws {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #47330f;
+    margin-top: 3px;
+  }
+  .winner-chits {
+    display: flex;
+    flex: none;
+  }
+  .winner-chits .chit {
+    margin-left: -8px;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 2px #f1dc9c,
+      0 2px 4px rgb(0 0 0 / 0.35);
+  }
+  .winner-chits .chit:first-child {
+    margin-left: 0;
+  }
+
+  /* ---------- grid ---------- */
+  .res-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: var(--gutter);
+    align-items: start;
+  }
+  .res-main,
+  .res-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gutter);
+    min-width: 0;
+  }
+  .res-note {
+    margin-bottom: var(--gutter);
+  }
+
+  /* ---------- round ledger ---------- */
+  .round-scroll {
+    /* positioned, so sr-only text in the cells stays inside the scroller */
+    position: relative;
+    overflow-x: auto;
+    margin: 0 -24px;
+    padding: 0 24px;
+    scrollbar-width: thin;
+  }
+  .round-ledger {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-sm);
+    color: var(--color-ink);
+  }
+  .round-ledger th,
+  .round-ledger td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--color-paper-3);
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .round-ledger thead th {
+    font-size: 12px;
+    color: var(--color-ink-2);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--color-ink);
+    vertical-align: bottom;
+  }
+  .round-ledger thead th small {
+    display: block;
+    font-weight: 500;
+    color: var(--color-ink-3);
+  }
+  .round-ledger th[scope="row"],
+  .round-ledger thead th:first-child {
+    text-align: left;
+  }
+  .round-ledger th[scope="row"] {
+    font-weight: 700;
+    color: var(--color-ink);
+    white-space: normal;
+    min-width: 132px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-paper);
+  }
+  .round-ledger thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-paper);
+  }
+  .round-ledger .opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .round-ledger .opt .chit {
+    flex: none;
+  }
+  .round-ledger td .d {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--color-match);
+  }
+  .round-ledger td .d.neg {
+    color: var(--color-ink-3);
+  }
+  .round-ledger td .tag {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .round-ledger td.el {
+    background: rgb(201 161 74 / 0.16);
+    font-weight: 700;
+  }
+  .round-ledger td.el .tag {
+    color: var(--color-gilt-800);
+  }
+  .round-ledger td .tag.out {
+    color: var(--color-fail);
+  }
+  .round-ledger td.gone {
+    color: var(--color-ink-3);
+  }
+  .round-ledger th.trail,
+  .round-ledger td.trail {
+    background: rgb(29 26 22 / 0.035);
+  }
+  .round-ledger tr.quota th,
+  .round-ledger tr.quota td {
+    color: var(--color-ink-3);
+    font-weight: 500;
+    border-bottom: 0;
+  }
+  .round-ledger tr.inactive th {
+    font-weight: 500;
+    color: var(--color-ink-2);
+  }
+  .round-ledger td.miss {
+    background: var(--color-fail-wash);
+    color: #5c1a0f;
+  }
+  .round-ledger td.miss small,
+  .round-ledger td.hit small {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .round-ledger td.hit small {
+    color: var(--color-match);
+  }
+
+  /* ---------- transfers ---------- */
+  .transfers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-sm);
+  }
+  .transfers li {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-paper-3);
+  }
+  .transfers li:last-child {
+    border-bottom: 0;
+  }
+  .transfers .when {
+    color: var(--color-ink-3);
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+  .transfers .what {
+    color: var(--color-ink-2);
+    min-width: 0;
+  }
+  .transfers .what b {
+    color: var(--color-ink);
+  }
+  .flows {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .flow-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px 3px 5px;
+    border-radius: var(--radius-chip);
+    background: var(--color-paper-2);
+    box-shadow: inset 0 0 0 1px var(--color-paper-3);
+    font-weight: 700;
+    color: var(--color-ink);
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .more-transfers > summary {
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    width: fit-content;
+  }
+
+  /* ---------- side cards ---------- */
+  .story p {
+    color: var(--color-ink-2);
+  }
+  .story p + p,
+  .story p + .callout,
+  .story .callout + p {
+    margin-top: 10px;
+  }
+  .story b {
+    color: var(--color-ink);
+  }
+  .story .n {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .pair-scroll {
+    position: relative;
+    overflow-x: auto;
+    margin-top: 12px;
+  }
+  .pair {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    color: var(--color-ink);
+  }
+  .pair th,
+  .pair td {
+    padding: 6px;
+    text-align: center;
+    border-bottom: 1px solid var(--color-paper-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .pair th {
+    color: var(--color-ink-2);
+    font-weight: 700;
+  }
+  .pair th[scope="row"] {
+    text-align: left;
+  }
+  .pair td.w {
+    color: var(--color-match);
+    font-weight: 700;
+  }
+  .pair td.self {
+    color: var(--color-ink-3);
+  }
+  .hint-line {
+    margin-top: 10px;
+    font-size: var(--text-sm);
+    color: var(--color-ink-3);
+  }
+
+  /* ---------- audit ---------- */
+  .audit-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+  }
+  .audit-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-paper-3);
+  }
+  .audit-list a {
+    font-weight: 700;
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+  }
+  .audit-list a:hover {
+    text-decoration-color: var(--color-gilt-600);
+  }
+  .audit-list .sub {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: var(--color-ink-3);
+  }
+  .sha {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--color-ink-2);
+    font-variant-ligatures: none;
+  }
+  .sha b {
+    color: var(--color-ink);
+    background: rgb(201 161 74 / 0.25);
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .recount-box {
+    margin-top: 14px;
+    display: grid;
+    gap: 10px;
+  }
+  .recount-box .btn {
+    width: 100%;
+  }
+  .recount-steps {
+    min-height: 1.5em;
+    font-size: var(--text-sm);
+    color: var(--color-ink-3);
+  }
+  .recount-box .callout ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    list-style: disc;
+    font-weight: 500;
+  }
+
+  /* ---------- sources ---------- */
+  .facts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px 16px;
+    font-size: var(--text-sm);
+  }
+  .facts dt {
+    color: var(--color-ink-3);
+  }
+  .facts dd {
+    margin: 0;
+    color: var(--color-ink);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .facts a {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- count tool ---------- */
+  .count-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: var(--gutter);
+    align-items: start;
+  }
+  .count-guide dl {
+    display: grid;
+    gap: 4px;
+    font-size: var(--text-sm);
+  }
+  .count-guide dt {
+    margin-top: 10px;
+  }
+  .count-guide dt:first-child {
+    margin-top: 0;
+  }
+  .count-guide dt code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: var(--radius-slip);
+    background: var(--color-paper-2);
+    box-shadow: inset 0 0 0 1px var(--color-paper-3);
+    font-variant-ligatures: none;
+    overflow-wrap: anywhere;
+  }
+  .count-guide dd {
+    margin: 0;
+    color: var(--color-ink-2);
+  }
+  @media (max-width: 900px) {
+    .count-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- elections library ---------- */
+  .sec-head {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px var(--gutter);
+    align-items: end;
+    margin-bottom: 40px;
+  }
+  .sec-head h1 {
+    font-size: clamp(36px, 4.4vw, 60px);
+    color: var(--color-cream);
+    text-wrap: balance;
+  }
+  .sec-lede {
+    color: var(--color-cream-2);
+    font-size: var(--text-md);
+    line-height: 1.55;
+  }
+  .ledger-sheet {
+    position: relative;
+    padding: 10px 28px 18px;
+    overflow-x: auto;
+  }
+  .replays {
+    font-size: var(--text-sm);
+    min-width: 980px;
+  }
+  .replays th {
+    padding-top: 18px;
+  }
+  .replays td {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .replays td.c-seats {
+    white-space: nowrap;
+  }
+  /* "ballots", "rounds": read out in the table, printed on the phone cards */
+  .replays .unit {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .rp-title {
+    font-weight: 700;
+    color: var(--color-ink);
+    font-size: var(--text-base);
+    line-height: 1.3;
+  }
+  .rp-sub {
+    color: var(--color-ink-3);
+    font-size: 12.5px;
+    margin-top: 2px;
+  }
+  .rp-figs {
+    display: grid;
+    gap: 7px;
+    justify-items: start;
+    min-width: 250px;
+  }
+  .rp-figs-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .rp-count {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .pips {
+    display: flex;
+    gap: 2px;
+    width: 150px;
+    height: 12px;
+    flex: none;
+  }
+  .pips i {
+    flex: 1;
+    min-width: 1px;
+    border-radius: 2px;
+    background: var(--color-match);
+    opacity: 0.85;
+  }
+  .pips i.x {
+    background: var(--color-fail);
+    opacity: 1;
+  }
+  .pips.dense {
+    gap: 0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pips.dense i {
+    border-radius: 0;
+  }
+  .rp-win {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .rp-win small {
+    display: block;
+    font-weight: 500;
+    color: var(--color-ink-3);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .rp-open {
+    font-weight: 700;
+    color: var(--color-ink);
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+  }
+  .replays-foot {
+    margin-top: 18px;
+    font-size: var(--text-sm);
+    color: var(--color-cream-3);
+    max-width: 90ch;
+  }
+
+  @media (max-width: 760px) {
+    .sec-head {
+      grid-template-columns: minmax(0, 1fr);
+      margin-bottom: 28px;
+    }
+    .ledger-sheet {
+      padding: 4px 0 8px;
+      overflow: visible;
+      background: transparent;
+      box-shadow: none;
+    }
+    .replays {
+      min-width: 0;
+    }
+    .replays thead {
+      display: none;
+    }
+    .replays,
+    .replays tbody,
+    .replays tr,
+    .replays td {
+      display: block;
+    }
+    .replays tr {
+      background: var(--color-paper);
+      border-radius: var(--radius-card);
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-paper);
+      display: grid;
+      grid-template-columns: auto auto 1fr;
+      column-gap: 16px;
+    }
+    .replays td {
+      border: 0;
+      padding: 4px 0;
+    }
+    .replays td.c-title {
+      grid-column: 1 / -1;
+      padding-bottom: 6px;
+    }
+    .replays td.c-meta {
+      color: var(--color-ink-2);
+      font-size: 13px;
+      text-align: left;
+      padding-bottom: 8px;
+    }
+    .replays .unit {
+      position: static;
+      width: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+      white-space: nowrap;
+    }
+    .replays td.c-figs,
+    .replays td.c-win {
+      grid-column: 1 / -1;
+    }
+    .replays td.c-open {
+      grid-column: 1 / -1;
+      padding-top: 10px;
+    }
+    .rp-figs {
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .res-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .res-head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .res-head .winner-card {
+      justify-self: start;
+    }
+  }
+  @media (max-width: 640px) {
+    .winner-card .wl {
+      font-size: 24px;
+    }
+    .round-scroll {
+      margin: 0 -16px;
+      padding: 0 16px;
+    }
+    .transfers li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+  }
+}
