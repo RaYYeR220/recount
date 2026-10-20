@@ -25,8 +25,18 @@ export function PollFilters({ q, status }: { q: string; status: StatusFilter }) 
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const timer = useRef<number | undefined>(undefined);
+  const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // The fields are uncontrolled (typing before hydration must survive); when the URL
+  // changes some other way, such as "Clear filters" or Back, bring them in line.
+  useEffect(() => {
+    const search = form.current?.elements.namedItem("q");
+    const select = form.current?.elements.namedItem("status");
+    if (search instanceof HTMLInputElement && document.activeElement !== search) search.value = q;
+    if (select instanceof HTMLSelectElement) select.value = status;
+  }, [q, status]);
 
   function go(nextText: string, nextStatus: StatusFilter) {
     window.clearTimeout(timer.current);
@@ -34,7 +44,7 @@ export function PollFilters({ q, status }: { q: string; status: StatusFilter }) 
   }
 
   return (
-    <Form action="/dashboard" role="search" aria-label="Filter polls" className="flex flex-[1_1_480px] flex-wrap items-center gap-3.5" onSubmit={() => window.clearTimeout(timer.current)}>
+    <Form ref={form} action="/dashboard" role="search" aria-label="Filter polls" className="flex flex-[1_1_480px] flex-wrap items-center gap-3.5" onSubmit={() => window.clearTimeout(timer.current)}>
       <label className="relative min-w-0 flex-[1_1_280px] sm:max-w-[420px]">
         <span className="sr-only">Search polls by title</span>
         <svg viewBox="0 0 16 16" aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3">

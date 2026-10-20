@@ -52,6 +52,18 @@ test.describe("new poll wizard", () => {
     await expect(page.getByText("Two options are both called “pizza”. Give each one its own name.")).toBeVisible();
   });
 
+  test("going back keeps what was typed, by Back, the stepper or the browser", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByRole("heading", { name: "Who votes, who sees" })).toBeVisible();
+    await page.getByRole("list", { name: "New poll steps" }).getByRole("link", { name: /Options/ }).click();
+    await expect(page.getByRole("heading", { name: "What are people choosing between?" })).toBeVisible();
+    await expect(page.getByLabel("Title")).toHaveValue("Spring offsite 2027");
+    await expect(page.getByLabel("Option 2", { exact: true })).toHaveValue("Kraków");
+    await page.goBack();
+    await expect(page.getByRole("heading", { name: "Who votes, who sees" })).toBeVisible();
+  });
+
   test("the rules step offers four presets, each in one sentence, and keeps them to the seats", async ({ page }) => {
     await page.goto("/new");
     await page.getByLabel("Title").fill("Committee");

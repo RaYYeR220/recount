@@ -62,6 +62,7 @@ adaTest.describe("ada's dashboard (120 polls)", () => {
     await expect(page.getByRole("heading", { name: "No polls match “no-such-poll-anywhere”" })).toBeVisible();
     await page.getByRole("link", { name: "Clear filters" }).click();
     await expect(page.getByText("Showing 1–20 of 120 polls")).toBeVisible();
+    await expect(page.getByRole("searchbox", { name: "Search polls by title" })).toHaveValue("");
   });
 });
 
