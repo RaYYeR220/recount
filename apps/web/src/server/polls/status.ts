@@ -18,6 +18,15 @@ export function pollStatus(p: Schedule, now: Date): PollStatus {
   return "open";
 }
 
+/** When the poll stopped taking ballots, or null while it has not. */
+export function closedSince(p: Schedule, now: Date): Date | null {
+  const t = now.getTime();
+  const ends = [p.closedEarlyAt, p.closesAt]
+    .filter((d): d is Date => d !== null && d.getTime() <= t)
+    .map((d) => d.getTime());
+  return ends.length > 0 ? new Date(Math.min(...ends)) : null;
+}
+
 /** The SQL twin of `pollStatus`, for filtering lists in the database. */
 export function statusCondition(status: PollStatus, now: Date): SQL {
   const at = sql`${now.toISOString()}::timestamptz`;

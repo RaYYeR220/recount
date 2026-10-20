@@ -5,7 +5,7 @@ import { ballot, inviteCode, poll } from "../db/schema";
 import { DomainError } from "../errors";
 import { normalizeInviteCode } from "../polls/codes";
 import { loadOptions } from "../polls/detail";
-import { pollStatus } from "../polls/status";
+import { closedSince, pollStatus } from "../polls/status";
 import { validationError } from "../validation";
 import { formatReceipt, newReceipt } from "./receipt";
 
@@ -55,7 +55,7 @@ export async function castBallot(db: Db, input: CastInput, now: Date): Promise<{
 
     const status = pollStatus(target, now);
     if (status === "scheduled") throw new DomainError("poll_not_open");
-    if (status === "closed") throw new DomainError("poll_closed");
+    if (status === "closed") throw new DomainError("poll_closed", { closedAt: closedSince(target, now) });
 
     const usesCodes = target.accessMode === "codes";
     const typedCode = input.code?.trim() ?? "";
