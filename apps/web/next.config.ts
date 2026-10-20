@@ -2,13 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   agentRules: false,
-  experimental: { agentFeedback: false },
+  // authInterrupts: forbidden() answers 403 for results hidden until close.
+  experimental: { agentFeedback: false, authInterrupts: true },
   cacheComponents: true,
   partialPrefetching: true,
   transpilePackages: ["@recount/engine"],
   outputFileTracingIncludes: {
     "/api/v1/elections": ["./public/elections/**/*"],
     "/api/v1/elections/*": ["./public/elections/**/*"],
+    "/elections": ["./public/elections/**/*"],
+    "/elections/*": ["./public/elections/**/*"],
   },
   turbopack: {
     rules: {
