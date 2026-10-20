@@ -81,7 +81,7 @@ async function Voter({ params }: { params: PageProps<"/p/[slug]">["params"] }) {
     return (
       <PollNotice
         {...common}
-        headline="This poll has closed."
+        headline="Voting is over."
         options={labels}
         actions={
           <>
@@ -92,7 +92,7 @@ async function Voter({ params }: { params: PageProps<"/p/[slug]">["params"] }) {
       >
         {ended ? (
           <p>
-            Voting closed {formatWhen(ended, tz)} ({tz}). No more ballots are taken.
+            This poll closed at {formatWhen(ended, tz)} ({tz}). No more ballots are taken.
           </p>
         ) : null}
         {poll.resultsVisibility === "owner_only" ? <p>The organizer keeps the results private.</p> : <p>The count is final, and anyone can recount it.</p>}

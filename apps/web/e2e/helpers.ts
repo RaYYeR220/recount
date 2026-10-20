@@ -109,7 +109,12 @@ export async function createPollWithWizard(page: Page, poll: WizardPoll): Promis
 }
 
 /** A link-mode poll through the API, for tests that only need one to exist. */
-export async function createPollWithApi(page: Page, request: APIRequestContext, title: string): Promise<string> {
+export async function createPollWithApi(
+  page: Page,
+  request: APIRequestContext,
+  title: string,
+  options: string[] = ["Lisbon", "Kraków", "Tallinn", "Valencia"],
+): Promise<string> {
   await page.goto("/settings");
   await page.getByLabel("Token name").fill("e2e");
   await page.getByRole("button", { name: "Create token" }).click();
@@ -118,7 +123,7 @@ export async function createPollWithApi(page: Page, request: APIRequestContext, 
     headers: { authorization: `Bearer ${token}` },
     data: {
       title,
-      options: ["Lisbon", "Kraków", "Tallinn", "Valencia"],
+      options,
       seats: 1,
       presetId: "recount-standard",
       maxRanks: null,

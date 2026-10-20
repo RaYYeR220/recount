@@ -82,6 +82,43 @@ test("a double click on Cast ballot casts one ballot", async ({ page, request, b
   await expect(page.getByRole("region", { name: "Turnout" }).getByText("ballot cast", { exact: true })).toBeVisible();
 });
 
+test("a poll that closes during review refuses the ballot with the closing time, not an error page", async ({ page, request, browser }) => {
+  await signUp(page);
+  const slug = await createPollWithApi(page, request, "Closes mid-review");
+  const voter = await browser.newPage();
+  await voter.goto(`/p/${slug}`);
+  await rank(voter, "Valencia");
+  await voter.getByRole("button", { name: "Review ballot" }).click();
+
+  await page.goto(`/dashboard/p/${slug}`);
+  await page.getByRole("button", { name: "Close voting now" }).click();
+  await page.getByRole("button", { name: "Yes, close voting" }).click();
+  await expect(page.getByText(/^Voting closed on/)).toBeVisible();
+
+  await voter.getByRole("button", { name: "Cast ballot" }).click();
+  // The cast is refused; whether the ballot stays up with the error or the page turns
+  // into the closed notice, the voter reads when it closed, in the poll's zone.
+  await expect(voter.getByText(/This poll closed at \w+ \d+, \d{4}, \d+:\d{2} [AP]M \(UTC\)\./)).toBeVisible();
+  await expect(voter.getByRole("heading", { name: "Your receipt" })).toHaveCount(0);
+  await voter.close();
+});
+
+test("thirty long options stay usable and never scroll sideways", async ({ page, request, browser }) => {
+  await signUp(page);
+  const options = Array.from({ length: 30 }, (_, i) => `Option ${i + 1}: a long name that has to wrap onto a second line on a phone`);
+  const slug = await createPollWithApi(page, request, "Thirty options", options);
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    const voter = await browser.newPage({ viewport });
+    await voter.goto(`/p/${slug}`);
+    for (const label of options.slice(0, 12)) await voter.getByRole("button", { name: `Rank ${label}`, exact: true }).click();
+    await expect(voter.getByRole("region", { name: "Your ranking" }).getByRole("listitem")).toHaveCount(12);
+    await voter.getByRole("button", { name: `Move up ${options[11]}`, exact: true }).click();
+    const overflow = await voter.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    await voter.close();
+  }
+});
+
 test("the ballot works from the keyboard alone", async ({ page }) => {
   await page.goto("/p/offsite-2026");
   const first = page.getByRole("button", { name: "Rank Lisbon", exact: true });
@@ -138,7 +175,8 @@ test.describe("in another time zone", () => {
 
 test("a closed poll links to its results", async ({ page }) => {
   await page.goto("/p/lunch-closed");
-  await expect(page.getByRole("heading", { name: "This poll has closed." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Voting is over." })).toBeVisible();
+  await expect(page.getByText(/This poll closed at .* \(Europe\/Warsaw\)\./)).toBeVisible();
   await expect(page.getByRole("link", { name: "See the results" })).toHaveAttribute("href", "/p/lunch-closed/results");
   await expect(page.getByRole("button", { name: "Cast ballot" })).toHaveCount(0);
 });
