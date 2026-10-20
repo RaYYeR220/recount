@@ -29,7 +29,7 @@ async function Settings() {
         <CreateTokenForm />
         {tokens.length > 0 ? (
           <div className="mt-6">
-            <Ledger caption="Your API tokens" captionHidden>
+            <Ledger caption="Your API tokens" captionHidden className="relative">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
