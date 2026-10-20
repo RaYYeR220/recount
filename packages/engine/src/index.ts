@@ -23,3 +23,4 @@ export { PatternCounter } from './cvr/names';
 export { PRESETS, presetRules, type PresetId } from './presets';
 export type { DatasetSource, ElectionDataset, Golden, GoldenRound, ReportConvention } from './dataset';
 export { compareToGolden, type GoldenComparison, type GoldenMismatch } from './golden';
+export { pairwise, pluralityWinner, type PairwiseResult } from './pairwise';

@@ -187,8 +187,7 @@ class Count {
     }
     const seatsLeft = this.rules.numberOfWinners - this.winners.length;
     if (this.pending.length >= seatsLeft) {
-      const chosen = [...this.pending].sort((a, b) => cmpDesc(rec.tally[a]!, rec.tally[b]!)).slice(0, seatsLeft);
-      this.electNow(rec, chosen);
+      this.electNow(rec, this.highest(rec, this.pending, seatsLeft));
       return 'stop';
     }
 
@@ -270,7 +269,23 @@ class Count {
     const over = cont.filter((id) => rec.tally[id]! >= rec.threshold);
     if (over.length <= 1) return over;
     if (this.rules.winnerElectionMode === 'multiWinnerAllowOnlyOneWinnerPerRound') return [this.top(rec, over)];
-    return [...over].sort((a, b) => cmpDesc(rec.tally[a]!, rec.tally[b]!)).slice(0, Math.max(seatsLeft, 0));
+    return this.highest(rec, over, Math.max(seatsLeft, 0));
+  }
+
+  /** The `n` highest tallies; a tie straddling the cut is settled by the tiebreak. */
+  private highest(rec: RoundResult, ids: CandidateId[], n: number): CandidateId[] {
+    if (n <= 0) return [];
+    if (ids.length <= n) return [...ids];
+    const sorted = [...ids].sort((a, b) => cmpDesc(rec.tally[a]!, rec.tally[b]!));
+    const cut = rec.tally[sorted[n - 1]!]!;
+    const chosen = sorted.filter((id) => rec.tally[id]! > cut);
+    const tied = sorted.filter((id) => rec.tally[id] === cut);
+    while (chosen.length < n) {
+      const pick = tied.length === 1 ? tied[0]! : this.tiebreak.winner(tied, this.previousTally());
+      chosen.push(pick);
+      tied.splice(tied.indexOf(pick), 1);
+    }
+    return chosen;
   }
 
   private distributeSurplus(rec: RoundResult, id: CandidateId, final: boolean): void {
