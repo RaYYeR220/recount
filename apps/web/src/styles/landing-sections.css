@@ -925,7 +925,7 @@
       background: var(--color-paper);
       box-shadow: var(--shadow-paper);
     }
-    .lp-replays td {
+    .lp-replays tbody td {
       padding: 4px 0;
       border: 0;
     }

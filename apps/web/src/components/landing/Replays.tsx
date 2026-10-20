@@ -67,11 +67,11 @@ export async function Replays() {
                 <td className="c-meta c-seats">{row.seats === 1 ? "1 seat" : `${row.seats} seats`}</td>
                 <td className="num c-meta">
                   {row.ballots}
-                  <span className="lp-unit"> ballots</span>
+                  <span className="lp-unit"> {row.ballots === "1" ? "ballot" : "ballots"}</span>
                 </td>
                 <td className="num c-meta">
                   {row.rounds}
-                  <span className="lp-unit"> rounds</span>
+                  <span className="lp-unit"> {row.rounds === 1 ? "round" : "rounds"}</span>
                 </td>
                 <td className="c-figs">
                   <div className="lp-rp-figs">

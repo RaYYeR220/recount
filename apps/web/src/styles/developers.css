@@ -91,7 +91,11 @@
     gap: 8px;
     margin: 14px 0 16px;
     padding-left: 20px;
+    list-style: disc;
     color: var(--color-cream-2);
+  }
+  .dev-facts li::marker {
+    color: var(--color-gilt-500);
   }
   .dev-note {
     font-size: var(--text-sm);
