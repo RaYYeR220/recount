@@ -12,6 +12,9 @@ describe("safeNext", () => {
     ["/dashboard?q=Board&page=2", "/dashboard?q=Board&page=2"],
     ["/new", "/new"],
     ["/p/offsite-2026#ballot", "/p/offsite-2026#ballot"],
+    ["/dashboard?x=1#y", "/dashboard?x=1#y"],
+    // An encoded slash is part of one path segment, so this stays on the site.
+    ["/%2F%2Fevil.com", "/%2F%2Fevil.com"],
   ])("keeps the same-site path %s", (raw, expected) => {
     expect(safeNext(raw)).toBe(expected);
   });
@@ -22,6 +25,10 @@ describe("safeNext", () => {
     "//evil.example",
     "/\\evil.example",
     "\\\\evil.example",
+    "/.//evil.com",
+    "/./\\evil.com",
+    "/a/..//evil.com",
+    "/.//evil.example",
     "javascript:alert(1)",
     "evil.example",
     "/\n/evil.example",
