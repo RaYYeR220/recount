@@ -16,3 +16,6 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 next-env.d.ts
+
+# local tooling
+.claude/
