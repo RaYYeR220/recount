@@ -1,0 +1,12 @@
+# Deploys from a working copy (vercel deploy) upload only what git would.
+.claude
+.git
+**/node_modules
+**/.next
+**/.env*
+!**/.env.example
+**/test-results
+**/playwright-report
+apps/web/src/fonts/*.woff2
+apps/web/src/build-data
+data-raw
