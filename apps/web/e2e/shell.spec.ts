@@ -95,7 +95,7 @@ test.describe("on a phone", () => {
 
   test("the menu button opens the sections", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Menu").click();
+    await page.getByLabel("Menu", { exact: true }).click();
     const sections = page.getByRole("navigation", { name: "Sections" });
     await expect(sections.getByRole("link", { name: "Elections" })).toBeVisible();
     await expect(sections.getByRole("link", { name: "Quality" })).toBeVisible();

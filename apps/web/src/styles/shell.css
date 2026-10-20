@@ -280,9 +280,13 @@
     .site-nav {
       margin-left: auto;
     }
+    /* fixed width, so the nav beside it never moves when the account streams in */
     .site-account {
       margin-left: 0;
-      width: 17.5rem;
+      width: 14.5rem;
+    }
+    .account-email {
+      max-width: 8rem;
     }
     .menu-sheet {
       top: 72px;

@@ -13,7 +13,8 @@ export type DisclosureProps = {
 
 /**
  * A native <details> menu: opens and closes without JavaScript. Once hydrated it
- * also closes on Escape, on a click outside, and after following a link inside.
+ * also closes on Escape, on a click outside, after following a link inside, and
+ * once a form inside has been sent.
  */
 export function Disclosure({ summary, summaryLabel, className, children }: DisclosureProps) {
   const ref = useRef<HTMLDetailsElement>(null);
@@ -38,13 +39,16 @@ export function Disclosure({ summary, summaryLabel, className, children }: Discl
       if (target.closest("summary")) return;
       if (target.closest("a[href]")) close(false);
     };
+    const onSubmit = () => window.setTimeout(() => close(false), 0);
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
     details.addEventListener("click", onClick);
+    details.addEventListener("submit", onSubmit);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointer);
       details.removeEventListener("click", onClick);
+      details.removeEventListener("submit", onSubmit);
     };
   }, [open]);
 
