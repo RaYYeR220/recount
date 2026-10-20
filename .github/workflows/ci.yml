@@ -19,9 +19,29 @@ jobs:
     name: ci
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # The same Postgres + Neon WebSocket proxy as docker-compose.yml, so the app
+    # keeps its production driver in CI.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: main
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-retries 20
+      neon-proxy:
+        image: ghcr.io/timowilhelm/local-neon-http-proxy:main
+        env:
+          PG_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/main
+        ports: ["54444:4444"]
     env:
+      DATABASE_URL: postgres://postgres:postgres@db.localtest.me:55432/main
       BETTER_AUTH_SECRET: ci-only-not-a-secret-0123456789abcdef
-      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3100
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -40,5 +60,15 @@ jobs:
         run: pnpm --filter @recount/engine test
       - name: Web services (PGlite)
         run: pnpm --filter @recount/web test
+      - name: Database (migrate and seed)
+        run: pnpm --filter @recount/web db:migrate && pnpm --filter @recount/web db:seed
       - name: Build
         run: pnpm --filter @recount/web build
+      - run: pnpm --filter @recount/web exec playwright install --with-deps chromium
+      - name: End to end (Playwright against next start)
+        run: pnpm --filter @recount/web test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
