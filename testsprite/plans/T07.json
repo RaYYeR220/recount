@@ -1,0 +1,45 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T07 Voter: rank, reorder and cast a ballot",
+  "description": "A voter ranks options with buttons only (no drag and drop), changes their mind, casts the ballot and gets a receipt.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/offsite-2026"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Kraków"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Lisbon"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Tallinn"
+    },
+    {
+      "type": "action",
+      "description": "In \"Your ranking\", click \"Move up\" on Lisbon"
+    },
+    {
+      "type": "action",
+      "description": "In \"Your ranking\", click \"Remove\" on Tallinn"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Review ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click \"Cast ballot\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows the heading \"Your receipt\" and a receipt code made of three groups of four characters separated by dashes, like abcd-efgh-ijkl"
+    }
+  ]
+}

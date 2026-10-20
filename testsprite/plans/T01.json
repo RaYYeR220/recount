@@ -1,0 +1,25 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T01 Certified replay: NYC 2025 winner and final round",
+  "description": "The NYC 2025 Democratic mayoral primary replay names the certified winner and the final-round totals.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /elections/nyc-2025-dem-mayor"
+    },
+    {
+      "type": "action",
+      "description": "Scroll to the round-by-round table"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Winner: Zohran Kwame Mamdani\""
+    },
+    {
+      "type": "assertion",
+      "description": "The final round of the round-by-round table shows 573,169 for Mamdani and 443,229 for Cuomo"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T19 Results: the lunch vote",
+  "description": "A closed IRV poll shows its winner and the number of rounds.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/lunch-closed/results"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Winner: Tacos\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"2 rounds\""
+    }
+  ]
+}

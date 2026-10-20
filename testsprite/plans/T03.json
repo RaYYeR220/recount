@@ -1,0 +1,25 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T03 Browser recount: Portland 2024 District 1 STV",
+  "description": "Recounting Portland's 43,669 ballots in the browser reproduces all 159 figures of the official 17-round report.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /elections/portland-2024-d1"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Recount in your browser\" button"
+    },
+    {
+      "type": "action",
+      "description": "Wait until the recount result appears"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"159 of 159 figures match\""
+    }
+  ]
+}

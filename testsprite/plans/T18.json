@@ -1,0 +1,29 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T18 Auth: wrong credentials",
+  "description": "Signing in with an unknown account is refused with one message that doesn't say which part was wrong.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login"
+    },
+    {
+      "type": "action",
+      "description": "Type \"nobody-7f3a@test.recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"not-the-password\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Wrong email or password.\""
+    }
+  ]
+}

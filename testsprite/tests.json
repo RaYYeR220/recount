@@ -1,0 +1,126 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "target": "https://recount-kappa.vercel.app",
+  "tests": {
+    "T01": {
+      "testId": "780c24fc-18c5-4cba-9e0c-d324ebfdbccb",
+      "name": "T01 Certified replay: NYC 2025 winner and final round",
+      "priority": "p1"
+    },
+    "T02": {
+      "testId": "c86e6136-8aaf-4443-a0cd-1f29d015143a",
+      "name": "T02 Certified replay: every NYC figure matches the official count",
+      "priority": "p1"
+    },
+    "T03": {
+      "testId": "35a7d14b-e093-41de-b781-8d434f0ae15b",
+      "name": "T03 Browser recount: Portland 2024 District 1 STV",
+      "priority": "p1"
+    },
+    "T04": {
+      "testId": "4958f0e3-6a1b-42c8-aacf-d59674e2abb4",
+      "name": "T04 Burlington 2009: ranked-choice and Condorcet winners differ",
+      "priority": "p2"
+    },
+    "T05": {
+      "testId": "53cec157-504b-40db-b1b9-96da1747aebe",
+      "name": "T05 Power user: dashboard pages through 120 polls",
+      "priority": "p1"
+    },
+    "T06": {
+      "testId": "160f9110-4e6e-4851-91b0-6726160b033c",
+      "name": "T06 Power user: dashboard search finds one poll",
+      "priority": "p2"
+    },
+    "T07": {
+      "testId": "1e0dd0d0-5a1d-4797-ab2a-3580cf20c897",
+      "name": "T07 Voter: rank, reorder and cast a ballot",
+      "priority": "p0"
+    },
+    "T08": {
+      "testId": "9ec9cf7e-3389-4995-b940-3c9220acb33b",
+      "name": "T08 Voter: the receipt finds the ballot exactly as cast",
+      "priority": "p0"
+    },
+    "T09": {
+      "testId": "5a2fb406-8873-4898-98ee-56f7d2cd52b6",
+      "name": "T09 Voter: one ballot per browser",
+      "priority": "p1"
+    },
+    "T10": {
+      "testId": "075888ab-ba37-40b3-973c-712767cb353f",
+      "name": "T10 Voter: an invalid invite code is refused",
+      "priority": "p1"
+    },
+    "T11": {
+      "testId": "b158e5bd-374d-4ca2-b101-34986b199bd2",
+      "name": "T11 Organizer and voter: an invite code works exactly once",
+      "priority": "p0"
+    },
+    "T12": {
+      "testId": "0c89e0de-d9b1-4596-b62b-df72020ea011",
+      "name": "T12 Time: a scheduled poll shows its opening time in its own zone",
+      "priority": "p1"
+    },
+    "T13": {
+      "testId": "c66b4889-9d99-49b0-a2dd-ce0b574e9a93",
+      "name": "T13 Time: the wizard warns about a daylight-saving gap",
+      "priority": "p1"
+    },
+    "T14": {
+      "testId": "d194513d-3eb2-4872-bbc6-7f9b93dbba1e",
+      "name": "T14 Time: the schedule simulator",
+      "priority": "p2"
+    },
+    "T15": {
+      "testId": "e26e63f6-e006-498b-98fc-4e7fa9debe64",
+      "name": "T15 Access: private results look like a poll that doesn't exist",
+      "priority": "p0"
+    },
+    "T16": {
+      "testId": "431cbee4-fa6d-492d-8118-9433dd193e28",
+      "name": "T16 Access: another organizer's manage page",
+      "priority": "p0"
+    },
+    "T17": {
+      "testId": "d8a64f00-6849-4c37-ae41-74abd65a50b8",
+      "name": "T17 Access: results hidden until the poll closes",
+      "priority": "p1"
+    },
+    "T18": {
+      "testId": "8b191479-f0ac-4cc6-8893-61ad4d66d454",
+      "name": "T18 Auth: wrong credentials",
+      "priority": "p1"
+    },
+    "T19": {
+      "testId": "f2891f54-ce31-474c-98c5-498e2028c57d",
+      "name": "T19 Results: the lunch vote",
+      "priority": "p0"
+    },
+    "T20": {
+      "testId": "30431a0f-8e82-4168-9df2-887e2ca1ca28",
+      "name": "T20 Audit: recount the published result in the browser",
+      "priority": "p0"
+    },
+    "T21": {
+      "testId": "6ab6f3e2-0854-472f-ad65-32fb3ff7d786",
+      "name": "T21 Audit: RCTab summary JSON",
+      "priority": "p2"
+    },
+    "T22": {
+      "testId": "321456a4-8bdc-428b-87ec-bfac01cd6b0c",
+      "name": "T22 Count tool: NYC overvote rule",
+      "priority": "p1"
+    },
+    "T23": {
+      "testId": "1a9e7831-edab-4dae-a740-f8e628ae249a",
+      "name": "T23 Count tool: Minneapolis overvote rule",
+      "priority": "p1"
+    },
+    "T24": {
+      "testId": "3ef48d65-6d40-4479-a622-aa3798c2a678",
+      "name": "T24 Quality: conformance figures",
+      "priority": "p2"
+    }
+  }
+}

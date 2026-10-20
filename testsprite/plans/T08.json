@@ -1,0 +1,53 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T08 Voter: the receipt finds the ballot exactly as cast",
+  "description": "After casting, the receipt opens the check page, which lists the ranking in the order it was cast.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/offsite-2026"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Tallinn"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Valencia"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Lisbon"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Review ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click \"Cast ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Note the receipt code shown under Your receipt"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Check your ballot\" link"
+    },
+    {
+      "type": "action",
+      "description": "Type the noted receipt code into the \"Receipt\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Check\" button"
+    },
+    {
+      "type": "assertion",
+      "description": "The ranking is listed in this order: \"1. Tallinn\", \"2. Valencia\", \"3. Lisbon\""
+    }
+  ]
+}

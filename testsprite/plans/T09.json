@@ -1,0 +1,33 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T09 Voter: one ballot per browser",
+  "description": "A browser that already voted in a link-mode poll cannot vote again.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/offsite-2026"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Valencia"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Review ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click \"Cast ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Back to ballot\" link"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"You've already voted in this poll from this browser.\""
+    }
+  ]
+}

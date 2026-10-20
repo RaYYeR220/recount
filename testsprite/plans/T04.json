@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T04 Burlington 2009: ranked-choice and Condorcet winners differ",
+  "description": "The Burlington 2009 replay explains the pathology: the ranked-choice winner is not the Condorcet winner.",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /elections/burlington-2009-mayor"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Ranked-choice winner: Bob Kiss\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Condorcet winner: Andy Montroll\""
+    }
+  ]
+}

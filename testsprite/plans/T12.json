@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T12 Time: a scheduled poll shows its opening time in its own zone",
+  "description": "Before it opens, a poll names its opening time in the poll's time zone and shows no ballot.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/launch-2027"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Opens January 15, 2027, 12:00 PM (America/New_York)\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Voting hasn't started yet.\" and has no \"Review ballot\" button"
+    }
+  ]
+}

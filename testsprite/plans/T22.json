@@ -1,0 +1,29 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T22 Count tool: NYC overvote rule",
+  "description": "The same ballots elect a different winner under New York City rules, which exhaust an overvoted ballot.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /count"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Load the overvote example\""
+    },
+    {
+      "type": "action",
+      "description": "Select \"New York City\" in the rules list"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Count\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Winner: Bea\""
+    }
+  ]
+}

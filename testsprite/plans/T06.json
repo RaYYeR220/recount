@@ -1,0 +1,41 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T06 Power user: dashboard search finds one poll",
+  "description": "Searching the dashboard narrows 120 polls to the board election.",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "action",
+      "description": "Type \"Board election\" into the \"Search polls by title\" field"
+    },
+    {
+      "type": "action",
+      "description": "Wait for the list to update"
+    },
+    {
+      "type": "assertion",
+      "description": "The table lists a poll titled \"Board election 2026\""
+    },
+    {
+      "type": "assertion",
+      "description": "The dashboard shows \"Showing 1–1 of 1 poll\""
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T20 Audit: recount the published result in the browser",
+  "description": "The browser downloads the cast-vote record, hashes it and counts it again; the result matches what was published.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/lunch-closed/results"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Recount in your browser\" button"
+    },
+    {
+      "type": "action",
+      "description": "Wait until the recount result appears"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows a line starting with \"Recount matches: same winner, same 2 rounds, CVR SHA-256\""
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T02 Certified replay: every NYC figure matches the official count",
+  "description": "The replay of 1,114,433 NYC ballots matches the Board of Elections report cell for cell.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /elections/nyc-2025-dem-mayor"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"28 of 28 figures match the official count\""
+    }
+  ]
+}

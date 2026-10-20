@@ -1,0 +1,29 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T16 Access: another organizer's manage page",
+  "description": "A signed-in organizer opening someone else's poll gets the same page as for a poll that doesn't exist.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login?next=/dashboard/p/rival-private"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"This poll doesn't exist or isn't shared with you.\""
+    }
+  ]
+}

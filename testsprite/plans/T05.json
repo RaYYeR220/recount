@@ -1,0 +1,41 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T05 Power user: dashboard pages through 120 polls",
+  "description": "An organizer with 120 polls sees the right counts on the first and second dashboard pages.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "action",
+      "description": "Wait for the dashboard to load"
+    },
+    {
+      "type": "assertion",
+      "description": "The dashboard shows \"Showing 1–20 of 120 polls\""
+    },
+    {
+      "type": "action",
+      "description": "Click the link to the next page of polls"
+    },
+    {
+      "type": "assertion",
+      "description": "The dashboard shows \"Showing 21–40 of 120 polls\""
+    }
+  ]
+}

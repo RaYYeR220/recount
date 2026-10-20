@@ -1,0 +1,37 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T14 Time: the schedule simulator",
+  "description": "The organizer asks what a scheduled poll looks like at a later moment.",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login?next=/dashboard/p/launch-2027"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "action",
+      "description": "Type \"2027-01-16 10:00\" into the \"See this poll at\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Show\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"At that time this poll is open.\""
+    }
+  ]
+}

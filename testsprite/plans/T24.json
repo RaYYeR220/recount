@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T24 Quality: conformance figures",
+  "description": "The quality page reports the engine's conformance, measured when the site was built.",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /quality"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"38 of 38\" next to \"RCTab rules fixtures\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"6\" next to \"elections match the official count\""
+    }
+  ]
+}

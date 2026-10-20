@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T15 Access: private results look like a poll that doesn't exist",
+  "description": "Anonymous visitors cannot see owner-only results, and the page doesn't reveal who owns the poll.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/rival-private/results"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"This poll doesn't exist or isn't shared with you.\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page does not contain the word \"Rival\""
+    }
+  ]
+}

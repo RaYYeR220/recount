@@ -1,0 +1,29 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T23 Count tool: Minneapolis overvote rule",
+  "description": "Under Minneapolis rules an overvoted rank is skipped, which changes the winner.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /count"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Load the overvote example\""
+    },
+    {
+      "type": "action",
+      "description": "Select \"Minneapolis\" in the rules list"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Count\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"Winner: Ash\""
+    }
+  ]
+}

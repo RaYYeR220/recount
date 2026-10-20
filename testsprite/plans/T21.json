@@ -1,0 +1,21 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T21 Audit: RCTab summary JSON",
+  "description": "The results page links to an RCTab-format summary that names the winner with the final tally.",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/lunch-closed/results"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"RCTab summary (JSON)\" link"
+    },
+    {
+      "type": "assertion",
+      "description": "The JSON text contains \"Tacos\" with a final-round tally of 7"
+    }
+  ]
+}

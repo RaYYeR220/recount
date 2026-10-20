@@ -1,0 +1,57 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T13 Time: the wizard warns about a daylight-saving gap",
+  "description": "Scheduling a poll inside the hour that clocks skip produces a precise warning before anything is saved.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login?next=/new"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "action",
+      "description": "Type \"Spring retro\" into the \"Title\" field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"Start\" into the \"Option 1\" field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"Stop\" into the \"Option 2\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Continue\" until the step \"When can people vote?\" is shown"
+    },
+    {
+      "type": "action",
+      "description": "Choose \"At a set time\""
+    },
+    {
+      "type": "action",
+      "description": "Select \"America/New_York\" in the \"Time zone\" list"
+    },
+    {
+      "type": "action",
+      "description": "Type \"2027-03-14 02:30\" into the \"Opens\" field"
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"2:30 AM doesn't exist on March 14, 2027 in America/New_York (clocks jump forward). We'll open the poll at 3:30 AM.\""
+    }
+  ]
+}

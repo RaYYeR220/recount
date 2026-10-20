@@ -1,0 +1,77 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T11 Organizer and voter: an invite code works exactly once",
+  "description": "The organizer generates invite codes; a voter uses one; the same code is refused the second time.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /login?next=/dashboard/p/board-2026"
+    },
+    {
+      "type": "action",
+      "description": "Type \"ada@recount.dev\" into the Email field"
+    },
+    {
+      "type": "action",
+      "description": "Type \"recount-demo-ada\" into the Password field"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Sign in\" button"
+    },
+    {
+      "type": "action",
+      "description": "Type \"1\" into the \"How many codes?\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Generate codes\""
+    },
+    {
+      "type": "action",
+      "description": "Note the first code in the \"Invite codes\" list that is marked Unused"
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Voter link\" to open the voter page"
+    },
+    {
+      "type": "action",
+      "description": "Type the noted code into the \"Invite code\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Continue to the ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Rank\" button next to Chen Wei"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Review ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click \"Cast ballot\""
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Back to ballot\" link"
+    },
+    {
+      "type": "action",
+      "description": "Type the same noted code into the \"Invite code\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Continue to the ballot\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"This code has already been used.\""
+    }
+  ]
+}

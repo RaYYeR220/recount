@@ -1,0 +1,25 @@
+{
+  "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
+  "type": "frontend",
+  "name": "T10 Voter: an invalid invite code is refused",
+  "description": "A poll that needs invite codes refuses a code it never issued.",
+  "priority": "p1",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to /p/board-2026"
+    },
+    {
+      "type": "action",
+      "description": "Type \"WRONG-CODE-0000\" into the \"Invite code\" field"
+    },
+    {
+      "type": "action",
+      "description": "Click \"Continue to the ballot\""
+    },
+    {
+      "type": "assertion",
+      "description": "The page shows \"That code isn't valid for this poll.\""
+    }
+  ]
+}
