@@ -1,7 +1,6 @@
 import type { Ref } from "react";
 import { Chit } from "@/components/ui/Chit";
 import type { SceneTray, TrayRound } from "@/lib/countScene";
-import { cx } from "@/lib/cx";
 
 export type PlaqueProps = {
   tray: SceneTray;
@@ -18,7 +17,8 @@ export type PlaqueProps = {
 export function Plaque({ tray, state, figure, multiSeat, countRef }: PlaqueProps) {
   const up = state.delta?.startsWith("+") && state.meta === state.delta;
   return (
-    <div className={cx("plaque", state.state === "out" && "is-out", state.state === "elected" && "is-win")} data-tray={tray.id}>
+    // State goes in data-state: the renderer adds is-wide to the class list, and a changing className would wipe it.
+    <div className="plaque" data-state={state.state} data-tray={tray.id}>
       <div className="pl-top">
         <Chit index={tray.chit} size={12} />
         <span className="pl-name" title={tray.label}>

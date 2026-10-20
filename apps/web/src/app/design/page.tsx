@@ -228,7 +228,7 @@ export default function DesignPage() {
                 <span className="ct-lamp-n">3</span>
               </span>
             </span>
-            <span className="plaque plaque-demo is-win">
+            <span className="plaque plaque-demo" data-state="elected">
               <span className="pl-top">
                 <span className="pl-name">Tacos</span>
                 <span className="pl-badge">Winner</span>

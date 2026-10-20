@@ -117,10 +117,10 @@
   .pl-meta .up {
     color: #1f5a33;
   }
-  .plaque.is-out {
+  .plaque[data-state="out"] {
     filter: saturate(0.35) brightness(0.72);
   }
-  .plaque.is-win {
+  .plaque[data-state="elected"] {
     background: linear-gradient(180deg, #fff1c2 0%, #e8c66d 46%, #c99a3b 100%);
     box-shadow:
       var(--shadow-plate),
@@ -140,7 +140,7 @@
     line-height: 1;
     letter-spacing: 0.01em;
   }
-  .plaque.is-win .pl-badge {
+  .plaque[data-state="elected"] .pl-badge {
     display: inline-block;
   }
   .plaque.is-wide {
