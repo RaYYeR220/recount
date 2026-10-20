@@ -1,6 +1,7 @@
 import { APIError } from "better-auth/api";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createAuth, type Auth } from "@/server/auth";
+import { DEMO_PERSONA_EMAILS } from "@/server/demo";
 import { viewerFrom } from "@/server/session";
 import { createTestDb } from "./db";
 
@@ -86,16 +87,37 @@ describe("sign-in throttling", () => {
     }
   }
 
+  const post = (path: string, body: object, ip: string, forwardedFor = ip) =>
+    auth.handler(
+      new Request(`http://localhost:3000/api/auth${path}`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-real-ip": ip,
+          "x-forwarded-for": forwardedFor,
+        },
+        body: JSON.stringify(body),
+      }),
+    );
+
   beforeAll(async () => {
     auth = createAuth(await createTestDb(), () => clock);
-    for (const name of ["eve", "fay", "gus"]) {
+    for (const name of ["eve", "fay", "gus", "hal"]) {
       await auth.api.signUpEmail({
         body: { name, email: `${name}@example.com`, password: `${name}-password` },
       });
     }
+    await auth.api.signUpEmail({
+      body: { name: "Ada", email: DEMO_PERSONA_EMAILS[0], password: "recount-demo-ada" },
+    });
   });
 
-  it("locks an email after 10 failed attempts, whatever the client IP", async () => {
+  it("never locks a published demo persona by email", async () => {
+    await failTimes(DEMO_PERSONA_EMAILS[0], 11);
+    await expect(signIn(DEMO_PERSONA_EMAILS[0], "recount-demo-ada", "198.51.100.1")).resolves.toBeTruthy();
+  });
+
+  it("locks any other email after 10 failed attempts, whatever the client IP", async () => {
     await failTimes("eve@example.com", 10);
 
     const eleventh = await rejection(signIn("eve@example.com", "wrong-again", "198.51.100.7"));
@@ -119,22 +141,43 @@ describe("sign-in throttling", () => {
     await failTimes("fay@example.com", 10);
   });
 
-  it("keys the per-IP limit on the platform client IP header, not x-forwarded-for", async () => {
+  it("lets 20 sign-ins from one IP through within 10 seconds", async () => {
+    const started = Date.now();
     const statuses: number[] = [];
-    for (let i = 0; i < 4; i++) {
-      const response = await auth.handler(
-        new Request("http://localhost:3000/api/auth/sign-in/email", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-real-ip": "192.0.2.10",
-            "x-forwarded-for": `198.51.100.${100 + i}`,
-          },
-          body: JSON.stringify({ email: "nobody@example.com", password: "not-a-password" }),
-        }),
+    for (let i = 0; i < 20; i++) {
+      const response = await post("/sign-in/email", { email: "hal@example.com", password: "hal-password" }, "192.0.2.20");
+      statuses.push(response.status);
+    }
+    expect(Date.now() - started).toBeLessThan(10_000);
+    expect(statuses).toEqual(Array(20).fill(200));
+  });
+
+  it("caps one IP at 60 sign-in attempts a minute, keyed on the platform IP header", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 61; i++) {
+      const response = await post(
+        "/sign-in/email",
+        { email: `nobody-${i}@example.com`, password: "not-a-password" },
+        "192.0.2.10",
+        `198.51.100.${i}`,
       );
       statuses.push(response.status);
     }
-    expect(statuses).toEqual([401, 401, 401, 429]);
+    expect(statuses.slice(0, 60).every((s) => s === 401)).toBe(true);
+    expect(statuses[60]).toBe(429);
+  });
+
+  it("caps one IP at 30 sign-ups a minute", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 31; i++) {
+      const response = await post(
+        "/sign-up/email",
+        { name: `User ${i}`, email: `signup-${i}@example.com`, password: "long-enough" },
+        "192.0.2.30",
+      );
+      statuses.push(response.status);
+    }
+    expect(statuses.slice(0, 30).every((s) => s === 200)).toBe(true);
+    expect(statuses[30]).toBe(429);
   });
 });
