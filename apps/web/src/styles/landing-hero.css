@@ -171,19 +171,14 @@
       font-size: 10.5px;
     }
   }
-  /* plate states as data attributes: the renderer owns the class list (is-wide) */
-  .hero-plaques .plaque[data-state="out"] {
-    filter: saturate(0.35) brightness(0.72);
-  }
-  .hero-plaques .plaque[data-state="elected"] {
-    background: linear-gradient(180deg, #fff1c2 0%, #e8c66d 46%, #c99a3b 100%);
-    box-shadow:
-      var(--shadow-plate),
-      0 0 0 2px #f1dc9c,
-      0 0 24px rgb(255 214 120 / 0.45);
-  }
-  .hero-plaques .plaque[data-state="elected"] .pl-badge {
-    display: inline-block;
+  /* a wide plate on a smaller tray keeps the change and share whole by setting the figure smaller */
+  @container plate (max-width: 240px) {
+    .hero-plaques .plaque.is-wide .pl-count {
+      font-size: 21px;
+    }
+    .hero-plaques .plaque.is-wide .pl-meta {
+      font-size: 11px;
+    }
   }
 
   /* the rail: lamps, caption, next round */
