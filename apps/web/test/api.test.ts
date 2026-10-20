@@ -5,26 +5,9 @@ import { createApiToken } from "@/server/apiTokens";
 import { closePollEndpoint, createPollEndpoint, getPollEndpoint } from "@/server/api/polls";
 import type { Db } from "@/server/db/client";
 import { GET as getOpenApi } from "@/app/api/v1/openapi.json/route";
+import { call, postJson, type CallInit, type Handler } from "./apiClient";
 import { createTestDb } from "./db";
 import { T0, createUser, minutesAfter, pollInput } from "./factories";
-
-const BASE = "http://localhost:3000/api/v1";
-
-type Handler = (req: Request, ctx: { params: Promise<{ slug: string }> }) => Promise<Response>;
-
-function call(handler: Handler, path: string, init: RequestInit & { token?: string } = {}) {
-  const headers = new Headers(init.headers);
-  if (init.token) headers.set("authorization", `Bearer ${init.token}`);
-  const slug = path.split("/")[2] ?? "";
-  return handler(new Request(`${BASE}${path}`, { ...init, headers }), { params: Promise.resolve({ slug }) });
-}
-
-const postJson = (body: unknown, token?: string): RequestInit & { token?: string } => ({
-  method: "POST",
-  headers: { "content-type": "application/json" },
-  body: JSON.stringify(body),
-  token,
-});
 
 describe("API v1 polls", () => {
   let db: Db;
@@ -38,7 +21,7 @@ describe("API v1 polls", () => {
   let rivalToken: string;
 
   async function createVia(token: string) {
-    const response = await call(createRoute, "/polls", postJson(pollInput(), token));
+    const response = await call(createRoute, "/polls", postJson(pollInput(), { token }));
     expect(response.status).toBe(201);
     return (await response.json()) as { slug: string };
   }
@@ -62,12 +45,16 @@ describe("API v1 polls", () => {
     });
 
     it("rejects an unknown token", async () => {
-      const response = await call(createRoute, "/polls", postJson(pollInput(), `rk_${"z".repeat(32)}`));
+      const response = await call(createRoute, "/polls", postJson(pollInput(), { token: `rk_${"z".repeat(32)}` }));
       expect(response.status).toBe(401);
     });
 
     it("creates a poll for the token's owner", async () => {
-      const response = await call(createRoute, "/polls", postJson(pollInput({ title: "Via the API" }), adaToken));
+      const response = await call(
+        createRoute,
+        "/polls",
+        postJson(pollInput({ title: "Via the API" }), { token: adaToken }),
+      );
       expect(response.status).toBe(201);
       const body = await response.json();
       expect(body).toMatchObject({ title: "Via the API", status: "open", ballotCount: 0 });
@@ -77,7 +64,11 @@ describe("API v1 polls", () => {
     });
 
     it("reports validation issues", async () => {
-      const response = await call(createRoute, "/polls", postJson({ ...pollInput(), options: ["Only one"] }, adaToken));
+      const response = await call(
+        createRoute,
+        "/polls",
+        postJson({ ...pollInput(), options: ["Only one"] }, { token: adaToken }),
+      );
       expect(response.status).toBe(422);
       const body = await response.json();
       expect(body.error.code).toBe("validation");
@@ -100,7 +91,7 @@ describe("API v1 polls", () => {
         duplex: "half",
         headers: { "content-length": "10" },
         token: adaToken,
-      } as RequestInit & { token: string });
+      } as CallInit);
       expect(lying.status).toBe(413);
     });
   });

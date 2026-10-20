@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   transpilePackages: ["@recount/engine"],
+  outputFileTracingIncludes: {
+    "/api/v1/elections": ["./public/elections/**/*"],
+    "/api/v1/elections/*": ["./public/elections/**/*"],
+  },
   turbopack: {
     rules: {
       "*.css": {
