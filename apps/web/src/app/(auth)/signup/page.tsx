@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SignupForm } from "@/components/auth/SignupForm";
-import { safeNext } from "@/lib/safeNext";
-import { getViewer } from "@/server/session";
+import { SignedInRedirect } from "@/components/auth/SignedInRedirect";
 
 export const metadata: Metadata = { title: "Create an account" };
-
-async function SignupGate({ searchParams }: { searchParams: PageProps<"/signup">["searchParams"] }) {
-  const next = safeNext((await searchParams).next);
-  if (await getViewer()) redirect(next);
-  return <SignupForm next={next} />;
-}
 
 export default function SignupPage({ searchParams }: PageProps<"/signup">) {
   return (
@@ -26,9 +18,10 @@ export default function SignupPage({ searchParams }: PageProps<"/signup">) {
         </>
       }
     >
-      <Suspense fallback={<SignupForm next="/dashboard" />}>
-        <SignupGate searchParams={searchParams} />
+      <Suspense fallback={null}>
+        <SignedInRedirect searchParams={searchParams} />
       </Suspense>
+      <SignupForm />
     </AuthCard>
   );
 }

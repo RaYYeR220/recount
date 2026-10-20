@@ -3,14 +3,15 @@
 import { useActionState } from "react";
 import { signUp, type AuthFormState } from "@/app/(auth)/actions";
 import { Callout, Field, Input, SubmitButton } from "@/components/ui";
+import { NextField } from "./NextField";
 
 /** Email and a password; the account starts signed in. */
-export function SignupForm({ next }: { next: string }) {
+export function SignupForm() {
   const [state, action] = useActionState<AuthFormState, FormData>(signUp, {});
 
   return (
     <form action={action} noValidate className="grid gap-5">
-      <input type="hidden" name="next" value={next} />
+      <NextField />
       {state.error ? (
         <Callout tone="fail" role="alert">
           {state.error}

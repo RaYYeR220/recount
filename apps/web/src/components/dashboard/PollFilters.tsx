@@ -2,7 +2,7 @@
 
 import Form from "next/form";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { Input, Select } from "@/components/ui";
 
 export type StatusFilter = "" | "open" | "scheduled" | "closed";
@@ -23,7 +23,6 @@ function href(q: string, status: StatusFilter): string {
  */
 export function PollFilters({ q, status }: { q: string; status: StatusFilter }) {
   const router = useRouter();
-  const [text, setText] = useState(q);
   const [pending, startTransition] = useTransition();
   const timer = useRef<number | undefined>(undefined);
 
@@ -45,14 +44,13 @@ export function PollFilters({ q, status }: { q: string; status: StatusFilter }) 
         <Input
           type="search"
           name="q"
-          value={text}
+          defaultValue={q}
           placeholder="Search polls by title"
           autoComplete="off"
           enterKeyHint="search"
           className="pl-10"
           onChange={(event) => {
             const value = event.target.value;
-            setText(value);
             window.clearTimeout(timer.current);
             timer.current = window.setTimeout(() => go(value, status), SEARCH_DELAY_MS);
           }}
@@ -60,7 +58,14 @@ export function PollFilters({ q, status }: { q: string; status: StatusFilter }) 
       </label>
       <label className="min-w-[180px] max-[900px]:flex-1 sm:flex-none">
         <span className="sr-only">Status</span>
-        <Select name="status" defaultValue={status} onChange={(event) => go(text, event.target.value as StatusFilter)}>
+        <Select
+          name="status"
+          defaultValue={status}
+          onChange={(event) => {
+            const search = event.target.form?.elements.namedItem("q");
+            go(search instanceof HTMLInputElement ? search.value : q, event.target.value as StatusFilter);
+          }}
+        >
           <option value="">All statuses</option>
           <option value="open">Open</option>
           <option value="scheduled">Scheduled</option>

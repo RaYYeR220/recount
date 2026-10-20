@@ -27,19 +27,21 @@ export function VerifyForm({ check, labels, timeZone }: VerifyFormProps) {
           Check
         </SubmitButton>
       </form>
-      {state.ranking ? (
-        <section aria-labelledby="recorded-title" className="grid gap-3" role="status">
-          <h2 id="recorded-title" className="title text-xl text-ink">
-            Your ballot as recorded
-          </h2>
-          <RankedList ranking={state.ranking.map((label) => ({ label, index: index.get(label) ?? 0 }))} />
-          {state.castAt ? (
-            <Callout tone="match">
-              Cast {formatWhen(state.castAt, timeZone)} ({timeZone}). This is the ranking the count reads.
-            </Callout>
-          ) : null}
-        </section>
-      ) : null}
+      <div role="status" className="empty:hidden">
+        {state.ranking ? (
+          <section aria-labelledby="recorded-title" className="grid gap-3">
+            <h2 id="recorded-title" className="title text-xl text-ink">
+              Your ballot as recorded
+            </h2>
+            <RankedList ranking={state.ranking.map((label) => ({ label, index: index.get(label) ?? 0 }))} />
+            {state.castAt ? (
+              <Callout tone="match">
+                Cast {formatWhen(state.castAt, timeZone)} ({timeZone}). This is the ranking the count reads.
+              </Callout>
+            ) : null}
+          </section>
+        ) : null}
+      </div>
     </div>
   );
 }

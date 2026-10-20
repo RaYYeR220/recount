@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Chit } from "@/components/ui";
 import { moveDown, moveUp, ordinal, rankOption, removeOption } from "@/lib/ranking";
+import { useHydrated } from "@/lib/useHydrated";
 
 export type BallotOption = { id: string; label: string };
 
@@ -24,6 +25,7 @@ type Act = "rank" | "up" | "down" | "remove";
  */
 export function Ranker({ options, ranking, onChange, maxRanks }: RankerProps) {
   const root = useRef<HTMLDivElement>(null);
+  const ready = useHydrated();
   const [focusTarget, setFocusTarget] = useState<{ act: Act; id: string; fallback: Act } | null>(null);
   const [announcement, setAnnouncement] = useState("");
 
@@ -101,7 +103,7 @@ export function Ranker({ options, ranking, onChange, maxRanks }: RankerProps) {
                   {label(id)}
                 </span>
                 <span className="col-span-3 flex flex-wrap gap-1.5 sm:col-span-1 sm:justify-end">
-                  <Button variant="line" size="sm" data-act="up" data-id={id} disabled={i === 0} onClick={() => act("up", id)} className="!min-h-[34px] !px-3 text-[13px]">
+                  <Button variant="line" size="sm" data-act="up" data-id={id} disabled={!ready || i === 0} onClick={() => act("up", id)} className="!min-h-[34px] !px-3 text-[13px]">
                     Move up<span className="sr-only"> {label(id)}</span>
                   </Button>
                   <Button
@@ -109,13 +111,13 @@ export function Ranker({ options, ranking, onChange, maxRanks }: RankerProps) {
                     size="sm"
                     data-act="down"
                     data-id={id}
-                    disabled={i === ranking.length - 1}
+                    disabled={!ready || i === ranking.length - 1}
                     onClick={() => act("down", id)}
                     className="!min-h-[34px] !px-3 text-[13px]"
                   >
                     Move down<span className="sr-only"> {label(id)}</span>
                   </Button>
-                  <Button variant="line" size="sm" data-act="remove" data-id={id} onClick={() => act("remove", id)} className="!min-h-[34px] !px-3 text-[13px]">
+                  <Button variant="line" size="sm" data-act="remove" data-id={id} disabled={!ready} onClick={() => act("remove", id)} className="!min-h-[34px] !px-3 text-[13px]">
                     Remove<span className="sr-only"> {label(id)}</span>
                   </Button>
                 </span>
@@ -141,7 +143,7 @@ export function Ranker({ options, ranking, onChange, maxRanks }: RankerProps) {
                 <li key={option.id} className="grid grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-[14px] bg-paper-2 py-2 pl-3.5 pr-2">
                   <Chit index={index.get(option.id)!} size="sm" />
                   <span className="font-semibold text-ink [overflow-wrap:anywhere]">{option.label}</span>
-                  <Button variant="ink" size="sm" data-act="rank" data-id={option.id} disabled={full} onClick={() => act("rank", option.id)} className="!mb-1 !px-3.5 text-[13.5px]">
+                  <Button variant="ink" size="sm" data-act="rank" data-id={option.id} disabled={!ready || full} onClick={() => act("rank", option.id)} className="!mb-1 !px-3.5 text-[13.5px]">
                     Rank<span className="sr-only"> {option.label}</span>
                   </Button>
                 </li>

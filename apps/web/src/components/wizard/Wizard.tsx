@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { checkNewPoll, createNewPoll, type PollCheck } from "@/app/new/actions";
 import { Paper, Stepper } from "@/components/ui";
+import { useHydrated } from "@/lib/useHydrated";
 import type { CreatePollInput } from "@/server/polls/schema";
 import type { Issue } from "@/server/validation";
 import { AccessFields } from "./AccessFields";
@@ -16,6 +17,7 @@ import { ScheduleWarnings } from "./ScheduleWarnings";
 import { StepFrame } from "./StepFrame";
 import { Summary } from "./Summary";
 import { useBrowserZone } from "./useBrowserZone";
+import { WizardSkeleton } from "./WizardSkeleton";
 import { VoterPreview } from "./VoterPreview";
 
 const SCHEDULE_STEP = 4;
@@ -65,6 +67,7 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
   const [createIssues, setCreateIssues] = useState<Issue[]>([]);
   const [pending, startTransition] = useTransition();
   const latestCheck = useRef("");
+  const ready = useHydrated();
 
   const browserZone = useBrowserZone(zones);
   const timeZone = draft.timeZone || browserZone || "UTC";
@@ -164,6 +167,9 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
       />
     </div>,
   ];
+
+  // Every field is controlled, so typing before hydration would be lost: show the frame until then.
+  if (!ready) return <WizardSkeleton />;
 
   return (
     <>

@@ -3,6 +3,7 @@
 import { useActionState, type MouseEvent } from "react";
 import { logIn, type AuthFormState } from "@/app/(auth)/actions";
 import { Button, Callout, Field, Input, SubmitButton } from "@/components/ui";
+import { NextField } from "./NextField";
 
 const DEMO = { email: "ada@recount.dev", password: "recount-demo-ada" };
 
@@ -18,12 +19,12 @@ function fillDemo(event: MouseEvent<HTMLButtonElement>) {
 }
 
 /** Email and password. Wrong credentials say so without telling which one was wrong. */
-export function LoginForm({ next }: { next: string }) {
+export function LoginForm() {
   const [state, action] = useActionState<AuthFormState, FormData>(logIn, {});
 
   return (
     <form action={action} noValidate className="grid gap-5">
-      <input type="hidden" name="next" value={next} />
+      <NextField />
       {state.error ? (
         <Callout tone="fail" role="alert">
           {state.error}
