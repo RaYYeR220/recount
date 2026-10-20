@@ -12,6 +12,7 @@ const STATUS = {
   schedule_locked: 409,
   hidden_until_close: 403,
   rate_limited: 429,
+  payload_too_large: 413,
 } as const;
 
 export type DomainErrorCode = keyof typeof STATUS;

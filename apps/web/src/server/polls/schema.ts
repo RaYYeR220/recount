@@ -8,18 +8,24 @@ export type PresetId = (typeof PRESET_IDS)[number];
 const SINGLE_WINNER_ONLY: readonly PresetId[] = ["nyc", "minneapolis-irv"];
 const MULTI_WINNER_ONLY: readonly PresetId[] = ["portland-stv"];
 
-const localDateTime = z.string().refine(isLocalDateTime, "Use the format YYYY-MM-DDTHH:mm");
+const localDateTime = z
+  .string()
+  .refine(isLocalDateTime, "Use the format YYYY-MM-DDTHH:mm")
+  .describe("Wall-clock time YYYY-MM-DDTHH:mm in the poll's time zone");
 
 const pollFields = z.object({
   title: z.string().trim().min(3).max(120),
   description: z.string().trim().max(2000),
   options: z.array(z.string().trim().min(1).max(80)).min(2).max(30),
-  seats: z.number().int().min(1),
+  seats: z.number().int().min(1).max(29),
   presetId: z.enum(PRESET_IDS),
-  maxRanks: z.number().int().min(1).nullable(),
+  maxRanks: z.number().int().min(1).max(30).nullable(),
   accessMode: z.enum(["link", "codes"]),
   resultsVisibility: z.enum(["live", "after_close", "owner_only"]),
-  timeZone: z.string().refine(isValidTimeZone, "Unknown time zone"),
+  timeZone: z
+    .string()
+    .refine(isValidTimeZone, "Unknown time zone")
+    .describe("IANA time zone, for example Europe/Warsaw"),
   opensAtLocal: localDateTime.nullable(),
   closesAtLocal: localDateTime.nullable(),
 });
