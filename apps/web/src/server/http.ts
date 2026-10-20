@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { DomainError, httpStatus, type DomainErrorCode } from "./errors";
 import { validationError } from "./validation";
 
@@ -60,6 +61,8 @@ export function handle<Rest extends unknown[]>(
     try {
       return await fn(req, ...rest);
     } catch (error) {
+      // Next signals request-time APIs during prerendering by throwing; let it through.
+      unstable_rethrow(error);
       if (error instanceof DomainError) return errorResponse(error);
       console.error("Unhandled API error", describe(error));
       return json({ error: { code: "internal", message: "Something went wrong" } }, { status: 500 });
