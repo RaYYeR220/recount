@@ -1,0 +1,14 @@
+{
+  "id": "m05-pagination-offset",
+  "layer": "service",
+  "bug": "Page offset is page × size, so page 1 skips the first 20 polls.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: listPolls > pages through the owner's polls newest first",
+    "ci: seed > gives ada exactly 120 polls and rival one",
+    "ci: seed > spreads ada's polls over every status, preset and access mode, with ballots on closed ones"
+  ]
+}

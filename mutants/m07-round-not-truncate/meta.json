@@ -1,0 +1,14 @@
+{
+  "id": "m07-round-not-truncate",
+  "layer": "engine",
+  "bug": "Fractional division rounds half up instead of truncating at 4 decimal places.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: RCTab rules fixtures > 2013_minneapolis_park_hare",
+    "ci: RCTab rules fixtures > test_set_allow_only_one_winner_per_round",
+    "ci: STV > surplus transfers at truncated fraction"
+  ]
+}

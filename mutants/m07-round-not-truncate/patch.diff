@@ -1,0 +1,13 @@
+diff --git a/packages/engine/src/fixed.ts b/packages/engine/src/fixed.ts
+index 3832b8b..6f255b7 100644
+--- a/packages/engine/src/fixed.ts
++++ b/packages/engine/src/fixed.ts
+@@ -15,7 +15,7 @@ export function mulTrunc(a: Fixed, b: Fixed, dp: number): Fixed {
+ 
+ export function divTrunc(a: Fixed, b: Fixed, dp: number): Fixed {
+   if (b === 0n) throw new RangeError('fixed-point division by zero');
+-  return (a * makeScale(dp)) / b;
++  return (a * makeScale(dp) + b / 2n) / b;
+ }
+ 
+ /**

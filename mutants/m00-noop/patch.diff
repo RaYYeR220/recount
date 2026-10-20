@@ -1,0 +1,12 @@
+diff --git a/apps/web/src/server/polls/list.ts b/apps/web/src/server/polls/list.ts
+index 7903435..505c581 100644
+--- a/apps/web/src/server/polls/list.ts
++++ b/apps/web/src/server/polls/list.ts
+@@ -66,6 +66,7 @@ export async function listPolls(
+     .where(where)
+     .orderBy(desc(poll.createdAt), desc(poll.id))
+     .limit(pageSize)
++    // Pages are numbered from 1.
+     .offset((page - 1) * pageSize);
+ 
+   return {

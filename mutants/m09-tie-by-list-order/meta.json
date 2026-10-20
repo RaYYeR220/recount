@@ -1,0 +1,19 @@
+{
+  "id": "m09-tie-by-list-order",
+  "layer": "engine",
+  "bug": "A tie at the last seat goes to whoever is listed first instead of the tiebreak.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: tabulation invariants > listing candidates in another order keeps the winners unless candidate order breaks ties"
+  ],
+  "history": [
+    {
+      "date": "2026-10-20",
+      "event": "Survived: the order-independence property reaches this tie about once in 2,500 runs and CI runs 200.",
+      "fix": "1185526 test(engine): always check a tie at the seat cut"
+    }
+  ]
+}

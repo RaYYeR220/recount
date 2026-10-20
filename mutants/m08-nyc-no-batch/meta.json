@@ -1,0 +1,13 @@
+{
+  "id": "m08-nyc-no-batch",
+  "layer": "engine",
+  "bug": "NYC rules lose batch elimination: same winner, wrong number of rounds.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: certified replays > nyc-2025-dem-mayor matches the official report in every cell",
+    "ci: certified replays > nyc-2026-council-d3 matches the official report in every cell"
+  ]
+}

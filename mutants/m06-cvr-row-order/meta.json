@@ -1,0 +1,19 @@
+{
+  "id": "m06-cvr-row-order",
+  "layer": "service",
+  "bug": "CVR rows are ordered by cast time instead of receipt, so the file and its hash change with insertion order.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: results > CVR > orders rows by receipt, never by when each ballot was cast"
+  ],
+  "history": [
+    {
+      "date": "2026-10-20",
+      "event": "Survived: every test passed with rows in cast order.",
+      "fix": "a24402d test(web): CVR rows follow receipt order, not cast order"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "m10-code-reuse",
+  "layer": "service",
+  "bug": "Claiming an invite code doesn't check it is unused, so one code can cast two ballots.",
+  "gates": [
+    "ci"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: ballots > castBallot in codes mode > accepts each code once",
+    "ci: ballots > castBallot in codes mode > stores exactly one ballot when two voters submit the same code at once"
+  ]
+}

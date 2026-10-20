@@ -1,0 +1,13 @@
+diff --git a/packages/engine/src/presets.ts b/packages/engine/src/presets.ts
+index c63ed04..d00df64 100644
+--- a/packages/engine/src/presets.ts
++++ b/packages/engine/src/presets.ts
+@@ -21,7 +21,7 @@ export const PRESETS: Record<PresetId, Partial<Rules>> = {
+     maxSkippedRanksAllowed: 'unlimited',
+     maxRankingsAllowed: 5,
+     eliminateWriteInsFirst: true,
+-    batchElimination: true,
++    batchElimination: false,
+     continueUntilTwoCandidatesRemain: true,
+   },
+   // Minneapolis Code ch. 167: an overvoted rank is skipped, three rankings, threshold fixed

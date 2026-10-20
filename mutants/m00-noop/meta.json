@@ -1,0 +1,12 @@
+{
+  "id": "m00-noop",
+  "layer": "control",
+  "bug": "A comment-only change. Every gate must stay green.",
+  "gates": [
+    "ci",
+    "preflight",
+    "TestSprite V3"
+  ],
+  "expectedKiller": "none",
+  "caughtBy": []
+}
