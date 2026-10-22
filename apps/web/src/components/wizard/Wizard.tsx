@@ -165,14 +165,18 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
     <ScheduleFields key="schedule" {...fieldsProps} zones={zones} timeZone={timeZone} browserZone={browserZone} check={okCheck} />,
     <div key="review" className="grid gap-5">
       <Summary draft={draft} timeZone={timeZone} check={okCheck} upTo={REVIEW_STEP} onEdit={go} />
-      <ScheduleWarnings
-        warnings={okCheck?.warnings ?? []}
-        opensAtLocal={input.opensAtLocal}
-        closesAtLocal={input.closesAtLocal}
-        opensAt={okCheck?.opensAt ?? null}
-        closesAt={okCheck?.closesAt ?? null}
-        timeZone={timeZone}
-      />
+      {(["opensAt", "closesAt"] as const).map((field) => (
+        <ScheduleWarnings
+          key={field}
+          field={field}
+          warnings={okCheck?.warnings ?? []}
+          opensAtLocal={input.opensAtLocal}
+          closesAtLocal={input.closesAtLocal}
+          opensAt={okCheck?.opensAt ?? null}
+          closesAt={okCheck?.closesAt ?? null}
+          timeZone={timeZone}
+        />
+      ))}
     </div>,
   ];
 

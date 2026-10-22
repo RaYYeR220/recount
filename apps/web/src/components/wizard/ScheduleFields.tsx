@@ -37,6 +37,14 @@ function longWhen(date: Date, timeZone: string): string {
  */
 export function ScheduleFields({ draft, update, errors, zones, timeZone, browserZone, check }: ScheduleFieldsProps) {
   const input = toCreateInput(draft, timeZone);
+  const warningProps = {
+    warnings: check?.warnings ?? [],
+    opensAtLocal: input.opensAtLocal,
+    closesAtLocal: input.closesAtLocal,
+    opensAt: check?.opensAt ?? null,
+    closesAt: check?.closesAt ?? null,
+    timeZone,
+  };
   return (
     <>
       <Field
@@ -78,25 +86,21 @@ export function ScheduleFields({ draft, update, errors, zones, timeZone, browser
         />
       </fieldset>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         {draft.openMode === "at" ? (
-          <Field id="opens" label="Opens" hint={`Format ${WALL_INPUT_FORMAT}, 24-hour, in ${timeZone}.`} error={errors.opens}>
-            <Input mono value={draft.opensText} onChange={(e) => update({ opensText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
-          </Field>
+          <div className="grid gap-2">
+            <Field id="opens" label="Opens" hint={`Format ${WALL_INPUT_FORMAT}, 24-hour, in ${timeZone}.`} error={errors.opens}>
+              <Input mono value={draft.opensText} onChange={(e) => update({ opensText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
+            </Field>
+          </div>
         ) : null}
-        <Field id="closes" label="Closes" optional hint="Leave empty to close the poll by hand." error={errors.closes}>
-          <Input mono value={draft.closesText} onChange={(e) => update({ closesText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
-        </Field>
+        <div className="grid gap-2">
+          <Field id="closes" label="Closes" optional hint="Leave empty to close the poll by hand." error={errors.closes}>
+            <Input mono value={draft.closesText} onChange={(e) => update({ closesText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
+          </Field>
+          <ScheduleWarnings field="closesAt" {...warningProps} />
+        </div>
       </div>
-
-      <ScheduleWarnings
-        warnings={check?.warnings ?? []}
-        opensAtLocal={input.opensAtLocal}
-        closesAtLocal={input.closesAtLocal}
-        opensAt={check?.opensAt ?? null}
-        closesAt={check?.closesAt ?? null}
-        timeZone={timeZone}
-      />
 
       {check && (check.closesAt || draft.openMode === "at") ? (
         <p className="text-sm text-ink-2 [&_b]:text-ink">
