@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { assertSlugShape } from "../authz";
 import type { Db } from "../db/client";
 import { ballot, inviteCode, poll } from "../db/schema";
 import { DomainError } from "../errors";
@@ -49,6 +50,7 @@ async function claimCode(tx: Db, pollId: string, code: string, now: Date): Promi
  * after such an edit sees the edited options.
  */
 export async function castBallot(db: Db, input: CastInput, now: Date): Promise<{ receipt: string }> {
+  assertSlugShape(input.slug);
   return db.transaction(async (tx) => {
     const [target] = await tx.select().from(poll).where(eq(poll.slug, input.slug)).for("share");
     if (!target) throw new DomainError("not_found");

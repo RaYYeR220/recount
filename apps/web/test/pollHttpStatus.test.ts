@@ -23,6 +23,13 @@ describe("poll page statuses", () => {
     expect(await voterPageStatus(db, "no-such-poll")).toBe(404);
   });
 
+  it("answers 404 for a slug no poll could have, without asking the database", async () => {
+    for (const slug of ["\u0000", "%00", "Offsite 2026", "a".repeat(65), ""]) {
+      expect(await voterPageStatus(db, slug)).toBe(404);
+      expect(await managePageStatus(db, ownerId, slug)).toBe(404);
+    }
+  });
+
   it("serves the manage page to its owner only; anyone else gets the same 404 as no poll", async () => {
     expect(await managePageStatus(db, ownerId, slug)).toBe(200);
     expect(await managePageStatus(db, strangerId, slug)).toBe(404);

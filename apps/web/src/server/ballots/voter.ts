@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { SLUG } from "../authz";
 import type { Db } from "../db/client";
 import { ballot, poll } from "../db/schema";
 import { hashVoterToken } from "./cast";
@@ -13,7 +14,7 @@ export async function findVoterBallot(
   slug: string,
   voterToken: string,
 ): Promise<{ receipt: string; castAt: Date } | null> {
-  if (voterToken === "") return null;
+  if (voterToken === "" || !SLUG.test(slug)) return null;
   const [target] = await db.select({ id: poll.id }).from(poll).where(eq(poll.slug, slug));
   if (!target) return null;
   const [row] = await db

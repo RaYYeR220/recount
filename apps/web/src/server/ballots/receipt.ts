@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { assertSlugShape } from "../authz";
 import type { Db } from "../db/client";
 import { ballot, poll } from "../db/schema";
 import { DomainError } from "../errors";
@@ -24,6 +25,7 @@ export async function lookupReceipt(
   slug: string,
   receipt: string,
 ): Promise<{ castAt: Date; ranking: string[] }> {
+  assertSlugShape(slug);
   const normalized = normalizeReceipt(receipt);
   if (!RECEIPT_SHAPE.test(normalized)) throw new DomainError("not_found");
 
