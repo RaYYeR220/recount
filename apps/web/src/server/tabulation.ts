@@ -57,7 +57,7 @@ export const tabulateInputSchema = z.object({
   candidates: z
     .array(z.string().trim().min(1).max(200).refine(isCandidateName, "This candidate name is reserved"))
     .min(1)
-    .max(1000)
+    .max(200)
     .refine((names) => new Set(names).size === names.length, "Candidate names must be unique")
     .describe("Candidate names; ballots refer to candidates by these names."),
   ballots: z
@@ -65,7 +65,7 @@ export const tabulateInputSchema = z.object({
       z.object({
         ranking: z
           .array(slot)
-          .max(500)
+          .max(200)
           .describe('One entry per rank: a name, "" or [] for a skipped rank, or several names for an overvote.'),
         count: z.number().int().min(1).max(1_000_000_000).default(1),
       }),
