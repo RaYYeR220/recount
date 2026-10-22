@@ -29,8 +29,12 @@ async function limit(kind: "cast" | "code" | "receipt", slug: string): Promise<v
 
 async function closedMessage(slug: string, closedAt: Date | null | undefined): Promise<string> {
   if (!closedAt) return "This poll has closed.";
-  const { timeZone } = await getPublicPoll(getDb(), slug, new Date());
-  return `This poll closed at ${formatWhen(closedAt, timeZone)} (${timeZone}).`;
+  // The poll can be deleted between the failed cast and this lookup.
+  const timeZone = await getPublicPoll(getDb(), slug, new Date()).then(
+    (p) => p.timeZone,
+    () => null,
+  );
+  return timeZone ? `This poll closed at ${formatWhen(closedAt, timeZone)} (${timeZone}).` : "This poll has closed.";
 }
 
 /** Words for the errors a voter can run into. */
