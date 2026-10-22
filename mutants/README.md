@@ -9,6 +9,7 @@ A mutant only counts as caught when a gate fails on it. One that gets through ev
 | Mutant | Layer | Gates it meets |
 |---|---|---|
 | m00-noop | control | ci, preflight, TestSprite |
+| m02-dst-warning-dropped | page | ci, preflight, TestSprite |
 | m05-pagination-offset | service | ci |
 | m06-cvr-row-order | service | ci |
 | m07-round-not-truncate | engine | ci |

@@ -1,0 +1,16 @@
+{
+  "id": "m02-dst-warning-dropped",
+  "layer": "page",
+  "bug": "The schedule step only explains daylight-saving problems with the closing time, so an opening time the clocks skip goes unexplained and the poll quietly opens an hour later.",
+  "gates": [
+    "ci",
+    "preflight",
+    "TestSprite V3"
+  ],
+  "expectedKiller": "ci",
+  "caughtBy": [
+    "ci: e2e new poll wizard > T13: a time skipped by the clocks springing forward is explained",
+    "ci: e2e new poll wizard > a time that happens twice when clocks fall back is explained",
+    "TestSprite: T13 Time: the wizard warns about a daylight-saving gap"
+  ]
+}

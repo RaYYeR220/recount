@@ -1,0 +1,13 @@
+diff --git a/apps/web/src/components/wizard/ScheduleFields.tsx b/apps/web/src/components/wizard/ScheduleFields.tsx
+index b921a98..c668c27 100644
+--- a/apps/web/src/components/wizard/ScheduleFields.tsx
++++ b/apps/web/src/components/wizard/ScheduleFields.tsx
+@@ -90,7 +90,7 @@ export function ScheduleFields({ draft, update, errors, zones, timeZone, browser
+       </div>
+ 
+       <ScheduleWarnings
+-        warnings={check?.warnings ?? []}
++        warnings={(check?.warnings ?? []).filter((w) => w.field === "closesAt")}
+         opensAtLocal={input.opensAtLocal}
+         closesAtLocal={input.closesAtLocal}
+         opensAt={check?.opensAt ?? null}
