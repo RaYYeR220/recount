@@ -1,15 +1,14 @@
 diff --git a/apps/web/src/server/ballots/cast.ts b/apps/web/src/server/ballots/cast.ts
-index d62bf79..dabc406 100644
 --- a/apps/web/src/server/ballots/cast.ts
 +++ b/apps/web/src/server/ballots/cast.ts
 @@ -1,5 +1,5 @@
  import { createHash } from "node:crypto";
 -import { and, eq, isNull, sql } from "drizzle-orm";
 +import { and, eq, sql } from "drizzle-orm";
+ import { assertSlugShape } from "../authz";
  import type { Db } from "../db/client";
  import { ballot, inviteCode, poll } from "../db/schema";
- import { DomainError } from "../errors";
-@@ -32,7 +32,7 @@ async function claimCode(tx: Db, pollId: string, code: string, now: Date): Promi
+@@ -33,7 +33,7 @@
    const [claimed] = await tx
      .update(inviteCode)
      .set({ usedAt: now })
