@@ -45,7 +45,7 @@ Voters get a receipt (`xxxx-xxxx-xxxx`) and can look their ballot up afterwards,
 | Preflight | Every route of a preview deployment answers with the right status and copy, before anything slower runs | `e2e/preflight.spec.ts`, `.github/workflows/preflight.yml` |
 | TestSprite | 24 scenarios on the live app: voters, organisers, an intruder, time zones, the replays, the audit trail | `testsprite/` |
 
-The TestSprite scenarios are kept in the repository as plan files (`testsprite/plans/`), each decided by one or two sentences the app renders word for word. Their first run against the live site passed 23 of 24. The one it blocked was right to: a click on "Recount in your browser" before the page's script had loaded did nothing, and the test's assertion couldn't tell the browser's recount from the build-time comparison printed above it. Both were fixed (`9099685`), and all 24 pass.
+The TestSprite scenarios are kept in the repository as plan files (`testsprite/plans/`), each decided by one or two sentences the app renders word for word. Their first run against the live site passed 23 of 24. The one it blocked was right to: a click on "Recount in your browser" before the page's script had loaded did nothing, and the test's assertion couldn't tell the browser's recount from the build-time comparison printed above it. Both were fixed (`9099685`), and all 24 pass. With a bug planted on a preview (a wizard that stops explaining a skipped opening time), the suite failed on exactly that scenario and passed again on the fixed code; [`testsprite/RUNS.md`](testsprite/RUNS.md) lists the runs.
 
 ### The saboteur
 
