@@ -1,5 +1,4 @@
 # Deploys from a working copy (vercel deploy) upload only what git would.
-.claude
 .git
 **/node_modules
 **/.next
