@@ -122,5 +122,34 @@
       "name": "T24 Quality: conformance figures",
       "priority": "p2"
     }
+  },
+  "generated": {
+    "note": "Proposed by TestSprite's own exploration of the live site (test plan generate) and accepted as is; they cover public pages ours don't.",
+    "tests": {
+      "G1": {
+        "testId": "db2ee0b8-0658-4cd7-b568-3025936cde61",
+        "name": "Open a ranked-choice election from the homepage"
+      },
+      "G2": {
+        "testId": "35ba0fd0-2a7a-4f3b-92a1-96cc672a00ff",
+        "name": "Count ranked ballots with the default example"
+      },
+      "G3": {
+        "testId": "9d2ce65b-a09f-4757-a4de-fdbb76d0dbdc",
+        "name": "Load the tie ballot example"
+      },
+      "G4": {
+        "testId": "b3c4e7e2-535d-4ef1-8e54-4aaee2d9453a",
+        "name": "Review the API documentation for poll creation"
+      },
+      "G5": {
+        "testId": "4a80b97e-e2ab-425f-81ce-3b74dfa13377",
+        "name": "Review API token guidance"
+      },
+      "G6": {
+        "testId": "18d000e1-1cfc-46d1-85c7-473b1083b9d0",
+        "name": "Create a new poll from the start poll flow"
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 # TestSprite suite
 
-The 24 browser scenarios TestSprite runs against every deployment. `plans/` holds each test's plan (the steps and the one or two assertions that decide it), `tests.json` maps our ids to TestSprite's. The plans are the source: a change to the suite is a change to these files, uploaded with the TestSprite CLI (`testsprite test create-batch --plan-from-dir testsprite/plans`).
+The browser scenarios TestSprite runs against every deployment: 24 we wrote and 6 it proposed itself. `plans/` holds each of our tests' plan (the steps and the one or two assertions that decide it), `tests.json` maps our ids to TestSprite's. The plans are the source: a change to the suite is a change to these files, uploaded with the TestSprite CLI (`testsprite test create-batch --plan-from-dir testsprite/plans`).
 
 Every assertion is a sentence the app renders word for word, so a test fails on the product being wrong, not on the wording drifting. The tests start from one URL, then click; nothing is dragged, uploaded or opened in a second tab. Seeded data is read-only for them: anything a test writes (a ballot in `offsite-2026`, an invite code in `board-2026`) leaves the next run's assertions true.
 
@@ -32,5 +32,7 @@ Every assertion is a sentence the app renders word for word, so a test fails on 
 | T24 | Quality | "38 of 38" RCTab rules fixtures, 6 elections matching exactly |
 
 Negative paths: T09, T10, T11, T13, T15, T16, T17, T18. Several actors in one test: T11 (organizer, then voter), T16 (one organizer, another's poll). Time: T12, T13, T14. Checked against an outside answer: T01–T04 (official election reports), T20–T23 (the published count, RCTab's format, two cities' overvote rules).
+
+TestSprite's own exploration of the live site proposed eight more tests; the six that cover pages ours don't (opening a replay from the home page, the count tool's default and tie examples, the API reference and token guidance, starting a poll) were accepted as they were and run with the suite. They are listed under `generated` in `tests.json`.
 
 The demo accounts these tests sign in with are public: `ada@recount.dev` / `recount-demo-ada`.
