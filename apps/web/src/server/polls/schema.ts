@@ -24,12 +24,16 @@ function isUsableLabel(label: string): boolean {
   }
 }
 
+/** Spreadsheets run a cell that starts like this as a formula, and the CVR is opened in them. */
+const FORMULA_START = /^[=+\-@\t\r]/;
+
 const optionLabel = z
   .string()
   .trim()
   .min(1)
   .max(80)
-  .refine(isUsableLabel, "This option name is reserved, pick another");
+  .refine(isUsableLabel, "This option name is reserved, pick another")
+  .refine((label) => !FORMULA_START.test(label), "Start the name with something other than =, +, - or @");
 
 const localDateTime = z
   .string()

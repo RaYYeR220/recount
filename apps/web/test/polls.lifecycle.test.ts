@@ -97,6 +97,10 @@ describe("poll lifecycle", () => {
     it.each([
       ["a single option", { options: ["Pizza"] }, "options"],
       ["labels equal after trim and case folding", { options: ["Pizza", " pizza ", "Tacos"] }, "options"],
+      // The CVR is a CSV people open in spreadsheets; these would run as formulas there.
+      ["an option starting like a formula", { options: ['=HYPERLINK("http://evil.example","x")', "Tacos"] }, "options.0"],
+      ["an option starting with @", { options: ["Pizza", "@SUM(A1:A9)"] }, "options.1"],
+      ["an option starting with +", { options: ["Pizza", "+1 for tacos"] }, "options.1"],
       ["as many seats as options", { seats: 3, presetId: "portland-stv" as const }, "seats"],
       ["more ranks than options", { maxRanks: 4 }, "maxRanks"],
       ["a too-short title", { title: "Hi" }, "title"],
