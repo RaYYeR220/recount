@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { DomainError } from "../errors";
 import { handle, json } from "../http";
-import { purgeTestData } from "../purge";
+import { purgeRateLimits, purgeTestData } from "../purge";
 import type { ApiDeps } from "./context";
 
 const digest = (value: string) => createHash("sha256").update(value).digest();
@@ -16,6 +16,7 @@ function authorized(req: Request, secret: string | undefined): boolean {
 export function purgeEndpoint(deps: ApiDeps, secret: () => string | undefined = () => process.env.CRON_SECRET) {
   return handle(async (req: Request) => {
     if (!authorized(req, secret())) throw new DomainError("unauthorized");
-    return json(await purgeTestData(deps.db(), deps.now()));
+    const removed = await purgeTestData(deps.db(), deps.now());
+    return json({ ...removed, rateLimits: await purgeRateLimits(deps.db(), deps.now()) });
   });
 }

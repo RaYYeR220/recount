@@ -88,7 +88,7 @@ export async function signUp(_prev: AuthFormState, form: FormData): Promise<Auth
   const { email, password, next } = read(form, requestHeaders);
   if (!(await withinLimit("signUp", requestHeaders))) return { email, error: SIGN_UP_LIMITED };
   const fields: AuthFormState["fields"] = {};
-  if (!EMAIL.test(email)) fields.email = "Enter an email address, like name@example.com.";
+  if (!EMAIL.test(email)) fields.email = "Enter an email address, like ada@lovelace.org.";
   if (password.length < MIN_PASSWORD) fields.password = `Use at least ${MIN_PASSWORD} characters.`;
   else if (password.length > MAX_PASSWORD) fields.password = `Use at most ${MAX_PASSWORD} characters.`;
   if (fields.email || fields.password) return { email, fields };

@@ -5,13 +5,13 @@ import { purgeEndpoint } from "@/server/api/cron";
 import { createAuth } from "@/server/auth";
 import { lookupReceipt } from "@/server/ballots/receipt";
 import type { Db } from "@/server/db/client";
-import { auditEvent, ballot, inviteCode, poll, pollOption, user } from "@/server/db/schema";
+import { auditEvent, ballot, inviteCode, poll, pollOption, rateLimit, user } from "@/server/db/schema";
 import { DEMO_PERSONAS } from "@/server/demo";
 import { listInviteCodes } from "@/server/polls/codes";
 import { createPoll } from "@/server/polls/create";
 import { getPollForOwner, getPublicPoll } from "@/server/polls/get";
 import { listPolls } from "@/server/polls/list";
-import { purgeTestData } from "@/server/purge";
+import { purgeRateLimits, purgeTestData } from "@/server/purge";
 import { getResults } from "@/server/results/get";
 import { seed } from "@/server/seed";
 import { seedReceipt } from "@/server/seed/insert";
@@ -174,13 +174,22 @@ describe("purge", () => {
     for (const kept of [fresh, real, persona]) expect(await db.$count(poll, eq(poll.id, kept.pollId))).toBe(1);
   });
 
+  it("clears rate-limit windows older than a day and keeps current ones", async () => {
+    await db.insert(rateLimit).values([
+      { key: "cast:203.0.113.7:offsite-2026", windowStart: new Date(now.getTime() - 26 * 3_600_000), count: 3 },
+      { key: "cast:203.0.113.8:offsite-2026", windowStart: new Date(now.getTime() - 30_000), count: 1 },
+    ]);
+    expect(await purgeRateLimits(db, now)).toBe(1);
+    expect((await db.select({ key: rateLimit.key }).from(rateLimit)).map((r) => r.key)).toContain("cast:203.0.113.8:offsite-2026");
+  });
+
   it("runs from the cron route only with the cron secret", async () => {
     const route = purgeEndpoint({ db: () => db, now: () => now }, () => "cron-secret-for-tests") as Handler;
     expect((await call(route, "/cron/purge")).status).toBe(401);
     expect((await call(route, "/cron/purge", { headers: { authorization: "Bearer nope" } })).status).toBe(401);
     const ok = await call(route, "/cron/purge", { headers: { authorization: "Bearer cron-secret-for-tests" } });
     expect(ok.status).toBe(200);
-    expect(await ok.json()).toEqual({ users: 0, polls: 0 });
+    expect(await ok.json()).toEqual({ users: 0, polls: 0, rateLimits: 0 });
 
     const unconfigured = purgeEndpoint({ db: () => db, now: () => now }, () => undefined) as Handler;
     expect((await call(unconfigured, "/cron/purge", { headers: { authorization: "Bearer " } })).status).toBe(401);

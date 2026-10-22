@@ -1,6 +1,6 @@
 import { and, ilike, inArray, lt, or } from "drizzle-orm";
 import type { Db } from "./db/client";
-import { auditEvent, poll, user } from "./db/schema";
+import { auditEvent, poll, rateLimit, user } from "./db/schema";
 
 /** Accounts made by test runs; real users never sign up with these. */
 export const TEST_EMAIL_DOMAINS = ["example.com", "test.recount.dev"];
@@ -30,4 +30,11 @@ export async function purgeTestData(db: Db, now: Date): Promise<{ users: number;
     await tx.delete(user).where(inArray(user.id, userIds));
     return { users: userIds.length, polls: polls.length };
   });
+}
+
+/** Rate-limit windows are a minute to a quarter of an hour; a day-old row only takes space. */
+export async function purgeRateLimits(db: Db, now: Date): Promise<number> {
+  const cutoff = new Date(now.getTime() - MAX_AGE_MS);
+  const gone = await db.delete(rateLimit).where(lt(rateLimit.windowStart, cutoff)).returning({ key: rateLimit.key });
+  return gone.length;
 }
