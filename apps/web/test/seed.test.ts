@@ -37,7 +37,7 @@ describe("seed", () => {
 
   beforeAll(async () => {
     db = await createTestDb();
-    expect(await seed(db, now)).toEqual({ created: 121, skipped: 0 });
+    expect(await seed(db, now)).toEqual({ created: 122, skipped: 0 });
     const idOf = async (email: string) => (await db.select().from(user).where(eq(user.email, email)))[0].id;
     ada = await idOf("ada@recount.dev");
     rival = await idOf("rival@recount.dev");
@@ -45,13 +45,13 @@ describe("seed", () => {
 
   it("changes nothing when it runs again", async () => {
     const before = await counts();
-    expect(await seed(db, minutesAfter(90))).toEqual({ created: 0, skipped: 121 });
+    expect(await seed(db, minutesAfter(90))).toEqual({ created: 0, skipped: 122 });
     expect(await counts()).toEqual(before);
   });
 
-  it("gives ada exactly 120 polls and rival one", async () => {
+  it("gives ada exactly 120 polls and rival two", async () => {
     expect((await listPolls(db, ada, {}, now)).total).toBe(120);
-    expect((await listPolls(db, rival, {}, now)).items.map((p) => p.slug)).toEqual(["rival-private"]);
+    expect((await listPolls(db, rival, {}, now)).items.map((p) => p.slug)).toEqual(["rival-private", "rival-club"]);
   });
 
   it("spreads ada's polls over every status, preset and access mode, with ballots on closed ones", async () => {

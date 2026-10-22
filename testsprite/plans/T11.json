@@ -2,20 +2,20 @@
   "projectId": "09e3cdbd-0340-48af-95ac-2789db1a41fd",
   "type": "frontend",
   "name": "T11 Organizer and voter: an invite code works exactly once",
-  "description": "The organizer generates invite codes; a voter uses one; the same code is refused the second time.",
+  "description": "The organizer generates an invite code; a voter uses it; the same code is refused the second time. Runs on rival's chess club poll, so the seeded board election stays as it was.",
   "priority": "p0",
   "planSteps": [
     {
       "type": "action",
-      "description": "Navigate to /login?next=/dashboard/p/board-2026"
+      "description": "Navigate to /login?next=/dashboard/p/rival-club"
     },
     {
       "type": "action",
-      "description": "Type \"ada@recount.dev\" into the Email field"
+      "description": "Type \"rival@recount.dev\" into the Email field"
     },
     {
       "type": "action",
-      "description": "Type \"recount-demo-ada\" into the Password field"
+      "description": "Type \"recount-demo-rival\" into the Password field"
     },
     {
       "type": "action",
@@ -47,7 +47,7 @@
     },
     {
       "type": "action",
-      "description": "Click the \"Rank\" button next to Chen Wei"
+      "description": "Click the \"Rank\" button next to Kemal"
     },
     {
       "type": "action",

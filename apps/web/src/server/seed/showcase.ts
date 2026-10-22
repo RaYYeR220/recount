@@ -143,5 +143,24 @@ export function showcasePolls(now: Date): SeedPoll[] {
       closesAt: farFuture,
       ballots: [["North", "East"], ["South"], ["North"], ["West", "North"]],
     },
+    {
+      // Invite codes are generated and spent here by the browser tests, so the board
+      // election keeps the codes and audit trail it was seeded with.
+      slug: "rival-club",
+      owner: "rival",
+      title: "Chess club captain",
+      description: "Members vote with the invite code from the club newsletter.",
+      options: ["Ines", "Joao", "Kemal", "Lena"],
+      seats: 1,
+      presetId: "recount-standard",
+      maxRanks: null,
+      accessMode: "codes",
+      resultsVisibility: "live",
+      timeZone: "Europe/Lisbon",
+      createdAt: daysFrom(now, -3),
+      opensAt: daysFrom(now, -3),
+      closesAt: farFuture,
+      ballots: [],
+    },
   ];
 }

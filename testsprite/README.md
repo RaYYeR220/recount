@@ -2,7 +2,7 @@
 
 The browser scenarios TestSprite runs against every deployment: 24 we wrote and 6 it proposed itself. `plans/` holds each of our tests' plan (the steps and the one or two assertions that decide it), `tests.json` maps our ids to TestSprite's. The plans are the source: a change to the suite is a change to these files, uploaded with the TestSprite CLI (`testsprite test create-batch --plan-from-dir testsprite/plans`).
 
-Every assertion is a sentence the app renders word for word, so a test fails on the product being wrong, not on the wording drifting. The tests start from one URL, then click; nothing is dragged, uploaded or opened in a second tab. Seeded data is read-only for them: anything a test writes (a ballot in `offsite-2026`, an invite code in `board-2026`) leaves the next run's assertions true.
+Every assertion is a sentence the app renders word for word, so a test fails on the product being wrong, not on the wording drifting. The tests start from one URL, then click; nothing is dragged, uploaded or opened in a second tab. Seeded data is read-only for them: anything a test writes (a ballot in `offsite-2026`, an invite code in rival's `rival-club`) leaves the next run's assertions true.
 
 | Id | Area | What decides it |
 |---|---|---|
