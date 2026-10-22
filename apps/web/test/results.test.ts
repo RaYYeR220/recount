@@ -165,6 +165,25 @@ describe("results", () => {
       expect(row.cvrSha256).toBe(results.cvrSha256);
     });
 
+    it("refuses a ballot that read the clock before the close but reached the poll after it", async () => {
+      const poll = await pollWith(NINE_BALLOTS);
+      await closePoll(db, ownerId, poll.slug, now);
+      const alder = poll.options.find((o) => o.label === "Alder")!.id;
+      const late = castBallot(db, { slug: poll.slug, ranking: [alder], voterToken: "slow-network" }, minutesAfter(20));
+      expect(await errorCode(late)).toBe("poll_closed");
+      expect((await getCvr(db, null, poll.slug, later)).rows).toHaveLength(9);
+    });
+
+    it("refuses a ballot that reached a scheduled close after its snapshot was taken", async () => {
+      const poll = await pollWith(NINE_BALLOTS);
+      const afterClose = new Date("2026-10-26T12:00:00Z");
+      const { cvrSha256 } = await getResults(db, null, poll.slug, afterClose);
+      const alder = poll.options.find((o) => o.label === "Alder")!.id;
+      const late = castBallot(db, { slug: poll.slug, ranking: [alder], voterToken: "slow-network" }, minutesAfter(20));
+      expect(await errorCode(late)).toBe("poll_closed");
+      expect((await getCvr(db, null, poll.slug, afterClose)).sha256).toBe(cvrSha256);
+    });
+
     it("says when the poll closed to a ballot that arrives afterwards", async () => {
       const poll = await pollWith([]);
       await closePoll(db, ownerId, poll.slug, now);

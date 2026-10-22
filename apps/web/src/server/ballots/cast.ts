@@ -56,6 +56,11 @@ export async function castBallot(db: Db, input: CastInput, now: Date): Promise<{
     const status = pollStatus(target, now);
     if (status === "scheduled") throw new DomainError("poll_not_open");
     if (status === "closed") throw new DomainError("poll_closed", { closedAt: closedSince(target, now) });
+    // `now` was read before the lock. A close or a results snapshot that committed
+    // while this cast waited for it has frozen the count, so the ballot is too late.
+    if (target.closedEarlyAt || target.resultsSnapshot) {
+      throw new DomainError("poll_closed", { closedAt: target.closedEarlyAt ?? target.closesAt });
+    }
 
     const usesCodes = target.accessMode === "codes";
     const typedCode = input.code?.trim() ?? "";
