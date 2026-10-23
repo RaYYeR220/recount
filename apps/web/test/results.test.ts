@@ -257,7 +257,7 @@ describe("results", () => {
   describe("CVR", () => {
     it("is only published once the poll is closed", async () => {
       const poll = await pollWith(NINE_BALLOTS);
-      expect(await errorCode(getCvr(db, ownerId, poll.slug, now))).toBe("poll_not_open");
+      expect(await errorCode(getCvr(db, ownerId, poll.slug, now))).toBe("cvr_not_published");
     });
 
     it("lists labels by rank, ordered by receipt, with a stable hash equal to the snapshot's", async () => {

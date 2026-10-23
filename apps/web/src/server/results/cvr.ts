@@ -68,7 +68,7 @@ export async function getCvr(
 ): Promise<Pick<Cvr, "header" | "rows" | "sha256" | "csv">> {
   const poll = await findPoll(db, slug);
   if (canSeeResults(poll, viewerId, now) === "not_found") throw new DomainError("not_found");
-  if (pollStatus(poll, now) !== "closed") throw new DomainError("poll_not_open");
+  if (pollStatus(poll, now) !== "closed") throw new DomainError("cvr_not_published");
   const { header, rows, sha256, csv } = await loadCvr(db, poll);
   return { header, rows, sha256, csv };
 }

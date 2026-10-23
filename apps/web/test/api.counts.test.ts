@@ -155,7 +155,12 @@ describe("API v1 counts", () => {
   describe("GET /polls/{slug}/cvr", () => {
     it("waits for the poll to close", async () => {
       const { slug } = await pollWithBallots();
-      expect((await call(cvrRoute, `/polls/${slug}/cvr`)).status).toBe(423);
+      const response = await call(cvrRoute, `/polls/${slug}/cvr`);
+      expect(response.status).toBe(423);
+      expect((await response.json()).error).toEqual({
+        code: "cvr_not_published",
+        message: "The cast-vote record is published when the poll closes",
+      });
     });
 
     it("serves JSON or the exact CSV the published hash covers", async () => {
