@@ -195,16 +195,20 @@ test.describe("new poll wizard", () => {
       for (const heading of ["Method and seats", "Counting rules", "Who votes, who sees", "When can people vote?"]) {
         await page.getByRole("button", { name: "Continue" }).click();
         await expect(page.getByRole("heading", { name: heading })).toBeFocused();
-        const { header, step, title } = await page.evaluate(() => {
-          const rect = (el: Element | null) => el!.getBoundingClientRect();
-          return {
-            header: rect(document.querySelector(".site-header")).bottom,
-            step: rect(document.getElementById("step-title")).top,
-            title: { top: rect(document.querySelector("h1")).top, bottom: rect(document.querySelector("h1")).bottom },
-          };
+        const { header, step, cut } = await page.evaluate(() => {
+          const header = document.querySelector(".site-header")!.getBoundingClientRect().bottom;
+          const current = '[aria-label="New poll steps"] [aria-current="step"]';
+          // The page title and this step's dot and label: each wholly behind the header or wholly below it.
+          const below = (selector: string) => document.querySelector(selector)!.getBoundingClientRect().top >= header;
+          const cut = ["h1", `${current} .stepper-dot`, `${current} .stepper-label`].filter((selector) => {
+            const { top, bottom } = document.querySelector(selector)!.getBoundingClientRect();
+            return top < header && bottom > header;
+          });
+          if (below(`${current} .stepper-label`) && !below(`${current} .stepper-dot`)) cut.push("label without its dot");
+          return { header, step: document.getElementById("step-title")!.getBoundingClientRect().top, cut };
         });
         expect(step).toBeGreaterThanOrEqual(header);
-        expect(title.bottom <= header || title.top >= header).toBe(true);
+        expect(cut).toEqual([]);
       }
     });
   });

@@ -27,7 +27,8 @@ export function StepFrame({ title, hint, problems = [], onBack, onNext, nextLabe
 
   useEffect(() => {
     if (!focusHeading) return;
-    // Scrolls only when the heading is out of view; its scroll margin keeps it clear of the sticky header.
+    // Scrolls only when the heading is out of view. Its scroll margin clears the sticky header,
+    // and on phones takes in the whole stepper, whose current label sits just above the paper.
     heading.current?.scrollIntoView({ block: "nearest" });
     heading.current?.focus({ preventScroll: true });
     // Only when the step first appears.
@@ -45,7 +46,7 @@ export function StepFrame({ title, hint, problems = [], onBack, onNext, nextLabe
         id="step-title"
         ref={heading}
         tabIndex={-1}
-        className="title scroll-mt-[calc(var(--header-h)+38px)] text-2xl text-ink focus:outline-none sm:scroll-mt-[calc(var(--header-h)+46px)]"
+        className="title scroll-mt-[calc(var(--header-h)+94px)] text-2xl text-ink focus:outline-none min-[641px]:scroll-mt-[calc(var(--header-h)+46px)]"
       >
         {title}
       </h2>
