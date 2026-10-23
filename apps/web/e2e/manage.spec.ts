@@ -14,6 +14,10 @@ test("T14: the schedule simulator shows a scheduled poll open at a later time", 
   await page.getByLabel("See this poll at").fill(`${utcDay(0)} 00:00`);
   await page.getByRole("button", { name: "Show" }).click();
   await expect(page.getByText("At that time this poll hasn't opened yet.")).toBeVisible();
+  await page.getByLabel("See this poll at").fill("next tuesday");
+  await page.getByRole("button", { name: "Show" }).click();
+  await expect(page.getByText("Use the format YYYY-MM-DD HH:mm, for example 2027-03-14 09:00.")).toBeVisible();
+  await expect(page.getByLabel("See this poll at")).toHaveAttribute("aria-invalid", "true");
 });
 
 test("T11: invite codes are generated, listed and work once each", async ({ page, browser }) => {

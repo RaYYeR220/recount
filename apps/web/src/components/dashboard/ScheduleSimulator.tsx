@@ -24,7 +24,13 @@ export function ScheduleSimulator({ poll, at, action }: { poll: PollDetail; at: 
   return (
     <Form action={action} scroll={false} className="grid gap-3">
       <div className="flex flex-wrap items-start gap-3">
-        <Field id="see-at" label="See this poll at" hint={`${WALL_INPUT_FORMAT}, in ${poll.timeZone}.`} error={error} className="min-w-0 flex-[1_1_16rem]">
+        <Field
+          id="see-at"
+          label="See this poll at"
+          hint={`Shows whether voting is open at the time you type. Format ${WALL_INPUT_FORMAT}, 24-hour, in ${poll.timeZone}.`}
+          error={error}
+          className="min-w-0 flex-[1_1_16rem]"
+        >
           <Input mono name="at" defaultValue={typed} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
         </Field>
         <Button type="submit" variant="line" className="sm:mt-[26px]">

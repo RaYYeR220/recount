@@ -45,7 +45,7 @@ export function VotingControls({ closeNow, changeClosingTime, closesText, timeZo
     <div className="grid gap-6">
       <form action={extend} className="grid gap-3">
         <div className="flex flex-wrap items-start gap-3">
-          <Field id="closes-at" label="Closing time" hint={`${WALL_INPUT_FORMAT}, in ${timeZone}. Leave empty to close by hand.`} className="min-w-0 flex-[1_1_16rem]">
+          <Field id="closes-at" label="Closing time" hint={`Format ${WALL_INPUT_FORMAT}, 24-hour, in ${timeZone}. Leave empty to close by hand.`} className="min-w-0 flex-[1_1_16rem]">
             <Input mono name="closes" defaultValue={closesText} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
           </Field>
           <SubmitButton variant="line" pendingLabel="Saving…" className="sm:mt-[26px]">
