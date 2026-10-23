@@ -8,7 +8,7 @@ import { useHydrated } from "@/lib/useHydrated";
 import type { CreatePollInput } from "@/server/polls/schema";
 import type { Issue } from "@/server/validation";
 import { AccessFields } from "./AccessFields";
-import { emptyDraft, firstOpenStep, REVIEW_STEP, stepIssues, stepOfPath, STEPS, toCreateInput, type Draft } from "./draft";
+import { clearDraft, emptyDraft, firstOpenStep, loadDraft, REVIEW_STEP, saveDraft, stepIssues, stepOfPath, STEPS, toCreateInput, type Draft } from "./draft";
 import { MethodFields } from "./MethodFields";
 import { OptionsFields } from "./OptionsFields";
 import { RulesFields } from "./RulesFields";
@@ -54,14 +54,15 @@ function withPeriod(message: string): string {
 }
 
 /**
- * The new-poll wizard. The draft lives here; the step lives in the URL (?step=), so
- * Back and the stepper work like pages. The schedule and the review are checked by
- * createPoll itself, run without keeping the poll, so its DST warnings and its
- * validation appear before anything is created.
+ * The new-poll wizard. The draft lives here, copied to the tab's sessionStorage until
+ * the poll is created; the step lives in the URL (?step=), so Back and the stepper work
+ * like pages. The schedule and the review are checked by createPoll itself, run without
+ * keeping the poll, so its DST warnings and its validation appear before anything is created.
  */
 export function Wizard({ zones }: { zones: readonly string[] }) {
   const params = useSearchParams();
-  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  // Until hydrated only the skeleton renders, so a draft kept by this tab can load in the first render.
+  const [draft, setDraft] = useState<Draft>(() => (typeof window === "undefined" ? null : loadDraft()) ?? emptyDraft());
   const [attempted, setAttempted] = useState<ReadonlySet<number>>(new Set());
   const [check, setCheck] = useState<{ key: string; result: PollCheck } | null>(null);
   const [createIssues, setCreateIssues] = useState<Issue[]>([]);
@@ -109,6 +110,9 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
     return () => window.clearTimeout(timer);
   }, [step, key, scheduleReady, hasCheck]);
 
+  // A reload in this tab picks up where the organizer was.
+  useEffect(() => saveDraft(draft), [draft]);
+
   function update(patch: Partial<Draft>) {
     setDraft((d) => ({ ...d, ...patch }));
     setCreateIssues([]);
@@ -128,8 +132,13 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
         if (result.ok) go(REVIEW_STEP);
         return;
       }
+      // Success redirects without returning here, so the kept draft goes first.
+      clearDraft();
       const result = await createNewPoll(input);
-      if (!result.ok) setCreateIssues(result.issues);
+      if (!result.ok) {
+        saveDraft(draft);
+        setCreateIssues(result.issues);
+      }
     });
   }
 

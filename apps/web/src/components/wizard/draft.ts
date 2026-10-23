@@ -174,3 +174,40 @@ export function pasteOptions(options: Draft["options"], index: number, lines: st
   const after = options.slice(index + 1).filter((o) => o.label.trim() !== "");
   return [...options.slice(0, index), ...pasted, ...after].slice(0, MAX_OPTIONS);
 }
+
+const STORAGE_KEY = "recount:new-poll";
+
+/**
+ * The draft this tab was working on, so a reload doesn't lose it. Storage can be
+ * blocked or full; then the wizard starts empty and keeps nothing.
+ */
+export function loadDraft(): Draft | null {
+  try {
+    const saved: unknown = JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) ?? "null");
+    if (typeof saved !== "object" || saved === null || Array.isArray(saved)) return null;
+    // A draft saved by an earlier version of the wizard may not fit this one.
+    const empty = emptyDraft();
+    const draft: Draft = { ...empty, ...saved };
+    const fields = (Object.keys(empty) as Array<keyof Draft>).every((k) => k === "maxRanks" || typeof draft[k] === typeof empty[k]);
+    const rows = Array.isArray(draft.options) && draft.options.every((o) => typeof o?.key === "number" && typeof o.label === "string");
+    return fields && rows && draft.options.length >= 2 ? draft : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveDraft(draft: Draft): void {
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  } catch {
+    // Not kept; the draft still lives in the page.
+  }
+}
+
+export function clearDraft(): void {
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing was kept.
+  }
+}

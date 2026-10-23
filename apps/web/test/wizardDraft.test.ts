@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  clearDraft,
   emptyDraft,
   firstOpenStep,
+  loadDraft,
   pasteOptions,
   REVIEW_STEP,
+  saveDraft,
   splitPasted,
   stepIssues,
   stepOfPath,
@@ -98,5 +101,50 @@ describe("new poll draft", () => {
   it("keeps a pasted list to the most options a poll can have", () => {
     const lines = Array.from({ length: 40 }, (_, i) => `City ${i + 1}`);
     expect(pasteOptions(emptyDraft().options, 0, lines)).toHaveLength(30);
+  });
+});
+
+describe("the draft kept for the tab", () => {
+  function storage(): Storage {
+    const items = new Map<string, string>();
+    return {
+      getItem: (k) => items.get(k) ?? null,
+      setItem: (k, v) => void items.set(k, v),
+      removeItem: (k) => void items.delete(k),
+    } as Storage;
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("comes back as it was saved, and is gone once cleared", () => {
+    vi.stubGlobal("window", { sessionStorage: storage() });
+    const saved = draft({ openMode: "at", opensText: "2027-03-14 02:30", timeZone: "America/New_York" });
+    saveDraft(saved);
+    expect(loadDraft()).toEqual(saved);
+    clearDraft();
+    expect(loadDraft()).toBeNull();
+  });
+
+  it("is ignored when it doesn't fit the wizard", () => {
+    const sessionStorage = storage();
+    vi.stubGlobal("window", { sessionStorage });
+    for (const raw of ["not json", "[]", JSON.stringify({ title: 3 }), JSON.stringify({ options: [{ label: "Lisbon" }] })]) {
+      sessionStorage.setItem("recount:new-poll", raw);
+      expect(loadDraft()).toBeNull();
+    }
+  });
+
+  it("is nothing when storage is blocked", () => {
+    const blocked = {
+      get sessionStorage(): Storage {
+        throw new DOMException("The operation is insecure.", "SecurityError");
+      },
+    };
+    vi.stubGlobal("window", blocked);
+    expect(loadDraft()).toBeNull();
+    expect(() => saveDraft(draft())).not.toThrow();
+    expect(() => clearDraft()).not.toThrow();
   });
 });

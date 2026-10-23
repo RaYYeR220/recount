@@ -144,6 +144,21 @@ test.describe("new poll wizard", () => {
     await expect(page.getByLabel("Option 4", { exact: true })).toHaveValue("Valencia");
   });
 
+  test("a reload keeps the draft, and creating the poll lets it go", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-01-15 12:00");
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "When can people vote?" })).toBeVisible();
+    await expect(page.getByLabel("Opens", { exact: true })).toHaveValue("2027-01-15 12:00");
+    await expect(page.getByLabel("Time zone")).toHaveValue("America/New_York");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toBeVisible();
+    await page.getByRole("button", { name: "Create poll" }).click();
+    await expect(page).toHaveURL(/\/dashboard\/p\/[^/?]+\?created=1$/);
+    await page.goto("/new");
+    await expect(page.getByLabel("Title")).toHaveValue("");
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();
