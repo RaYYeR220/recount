@@ -168,4 +168,29 @@ test.describe("new poll wizard", () => {
       await expect(page.getByLabel("Time zone")).toHaveValue("Asia/Kolkata");
     });
   });
+
+  test.describe("on a phone", () => {
+    test.use({ viewport: { width: 390, height: 844 } });
+
+    test("each step's heading comes into view below the header, with nothing half hidden behind it", async ({ page }) => {
+      await page.goto("/new");
+      await page.getByLabel("Title").fill("Spring offsite 2027");
+      await page.getByLabel("Option 1", { exact: true }).fill("Lisbon");
+      await page.getByLabel("Option 2", { exact: true }).fill("Kraków");
+      for (const heading of ["Method and seats", "Counting rules", "Who votes, who sees", "When can people vote?"]) {
+        await page.getByRole("button", { name: "Continue" }).click();
+        await expect(page.getByRole("heading", { name: heading })).toBeFocused();
+        const { header, step, title } = await page.evaluate(() => {
+          const rect = (el: Element | null) => el!.getBoundingClientRect();
+          return {
+            header: rect(document.querySelector(".site-header")).bottom,
+            step: rect(document.getElementById("step-title")).top,
+            title: { top: rect(document.querySelector("h1")).top, bottom: rect(document.querySelector("h1")).bottom },
+          };
+        });
+        expect(step).toBeGreaterThanOrEqual(header);
+        expect(title.bottom <= header || title.top >= header).toBe(true);
+      }
+    });
+  });
 });

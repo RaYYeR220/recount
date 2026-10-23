@@ -116,7 +116,6 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
 
   function go(to: number) {
     window.history.pushState(null, "", stepHref(to));
-    document.getElementById("new-poll-steps")?.scrollIntoView({ block: "start" });
   }
 
   function next() {
@@ -173,15 +172,13 @@ export function Wizard({ zones }: { zones: readonly string[] }) {
 
   return (
     <>
-      <div id="new-poll-steps" className="scroll-mt-24">
-        <Stepper
-          label="New poll steps"
-          steps={STEPS.map((label, i) => ({ label, href: i < step ? stepHref(i) : undefined }))}
-          current={step}
-          variant="spread"
-          className="mb-7 mt-[18px]"
-        />
-      </div>
+      <Stepper
+        label="New poll steps"
+        steps={STEPS.map((label, i) => ({ label, href: i < step ? stepHref(i) : undefined }))}
+        current={step}
+        variant="spread"
+        className="mb-7 mt-[18px]"
+      />
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-[var(--gutter)] min-[1000px]:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
         <StepFrame
           key={step}

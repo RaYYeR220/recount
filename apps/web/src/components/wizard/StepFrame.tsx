@@ -26,7 +26,10 @@ export function StepFrame({ title, hint, problems = [], onBack, onNext, nextLabe
   const heading = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    if (focusHeading) heading.current?.focus();
+    if (!focusHeading) return;
+    // Scrolls only when the heading is out of view; its scroll margin keeps it clear of the sticky header.
+    heading.current?.scrollIntoView({ block: "nearest" });
+    heading.current?.focus({ preventScroll: true });
     // Only when the step first appears.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -38,7 +41,12 @@ export function StepFrame({ title, hint, problems = [], onBack, onNext, nextLabe
 
   return (
     <form noValidate onSubmit={submit} aria-labelledby="step-title" className="paper px-[18px] py-[22px] sm:px-8 sm:pb-[26px] sm:pt-[30px]">
-      <h2 id="step-title" ref={heading} tabIndex={-1} className="title text-2xl text-ink focus:outline-none">
+      <h2
+        id="step-title"
+        ref={heading}
+        tabIndex={-1}
+        className="title scroll-mt-[calc(var(--header-h)+38px)] text-2xl text-ink focus:outline-none sm:scroll-mt-[calc(var(--header-h)+46px)]"
+      >
         {title}
       </h2>
       <div className="mt-1.5 text-ink-3">{hint}</div>
