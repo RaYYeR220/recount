@@ -123,6 +123,15 @@ test.describe("new poll wizard", () => {
     await expect(page.getByRole("heading", { name: "Check and create" })).toBeVisible();
   });
 
+  test("the time zones are listed once each, by their IANA names", async ({ page }) => {
+    await toSchedule(page);
+    const zones = page.getByLabel("Time zone");
+    await expect(zones.locator('option[value="Asia/Kolkata"]')).toHaveCount(1);
+    await expect(zones.locator('option[value="Europe/Kyiv"]')).toHaveCount(1);
+    await expect(zones.locator('option[value="Asia/Calcutta"]')).toHaveCount(0);
+    await expect(zones.locator('option[value="Europe/Kiev"]')).toHaveCount(0);
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();
@@ -130,5 +139,21 @@ test.describe("new poll wizard", () => {
     await expect(page.getByLabel("Voter link")).toHaveValue(new RegExp(`/p/${slug}$`));
     await page.goto("/dashboard");
     await expect(page.getByText("Showing 1–1 of 1 poll")).toBeVisible();
+  });
+
+  test.describe("in India", () => {
+    test.use({ timezoneId: "Asia/Kolkata" });
+
+    test("the browser's zone is offered under its IANA name", async ({ page }) => {
+      await page.goto("/new");
+      await page.getByLabel("Title").fill("Diwali lunch");
+      await page.getByLabel("Option 1", { exact: true }).fill("Thali");
+      await page.getByLabel("Option 2", { exact: true }).fill("Dosa");
+      for (const heading of ["Method and seats", "Counting rules", "Who votes, who sees", "When can people vote?"]) {
+        await page.getByRole("button", { name: "Continue" }).click();
+        await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+      }
+      await expect(page.getByLabel("Time zone")).toHaveValue("Asia/Kolkata");
+    });
   });
 });
