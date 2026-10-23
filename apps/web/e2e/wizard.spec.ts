@@ -94,6 +94,26 @@ test.describe("new poll wizard", () => {
     expect(errors).toEqual([]);
   });
 
+  test("an opening time that has already passed is refused on the Opens field", async ({ page }) => {
+    await toSchedule(page);
+    const opens = page.getByLabel("Opens", { exact: true });
+    await opens.fill("2020-01-01 10:00");
+    await expect(page.getByText("The opening time has already passed. Pick a later time, or open the poll as soon as it's created.")).toBeVisible();
+    await expect(opens).toHaveAttribute("aria-invalid", "true");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "When can people vote?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toHaveCount(0);
+  });
+
+  test("a closing time before the opening time says so", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-03-15 03:30");
+    await page.getByLabel(/^Closes/).fill("2027-03-15 02:15");
+    await expect(page.getByText("The closing time must come after the opening time.")).toBeVisible();
+    await page.getByLabel(/^Closes/).fill("2027-03-15 03:30");
+    await expect(page.getByText("The poll must stay open for at least a minute.")).toBeVisible();
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();

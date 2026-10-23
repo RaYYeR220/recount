@@ -1,9 +1,11 @@
 import { resolveLocal, type DstWarning } from "../time";
-import { validationError } from "../validation";
+import { validationError, type Issue } from "../validation";
 
 export type ScheduleWarning = { field: "opensAt" | "closesAt"; code: DstWarning };
 
 const MIN_OPEN_MS = 60_000;
+/** Times are typed to the minute, so the minute that is under way still counts as now. */
+const OPENING_GRACE_MS = 60_000;
 
 export function toInstant(
   field: ScheduleWarning["field"],
@@ -16,15 +18,29 @@ export function toInstant(
   return instant;
 }
 
-export function assertSchedule(opensAt: Date, closesAt: Date | null, now: Date): void {
-  if (!closesAt) return;
-  if (closesAt.getTime() <= now.getTime()) {
-    throw validationError({ path: "closesAtLocal", message: "The closing time must be in the future" });
-  }
-  if (closesAt.getTime() < opensAt.getTime() + MIN_OPEN_MS) {
-    throw validationError({
-      path: "closesAtLocal",
-      message: "The poll must stay open for at least a minute",
+/**
+ * An opening time that has already passed is refused only when the caller sets it
+ * (`openingSet`), so an open poll can still move its closing time.
+ */
+export function assertSchedule(
+  opensAt: Date,
+  closesAt: Date | null,
+  now: Date,
+  { openingSet = false }: { openingSet?: boolean } = {},
+): void {
+  const issues: Issue[] = [];
+  if (openingSet && opensAt.getTime() < now.getTime() - OPENING_GRACE_MS) {
+    issues.push({
+      path: "opensAtLocal",
+      message: "The opening time has already passed. Pick a later time, or open the poll as soon as it's created.",
     });
   }
+  if (closesAt && closesAt.getTime() <= now.getTime()) {
+    issues.push({ path: "closesAtLocal", message: "The closing time must be in the future" });
+  } else if (closesAt && closesAt.getTime() < opensAt.getTime()) {
+    issues.push({ path: "closesAtLocal", message: "The closing time must come after the opening time" });
+  } else if (closesAt && closesAt.getTime() < opensAt.getTime() + MIN_OPEN_MS) {
+    issues.push({ path: "closesAtLocal", message: "The poll must stay open for at least a minute" });
+  }
+  if (issues.length > 0) throw validationError(...issues);
 }

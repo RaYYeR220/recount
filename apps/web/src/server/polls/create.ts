@@ -21,7 +21,7 @@ export async function createPoll(
   const closesAt = data.closesAtLocal
     ? toInstant("closesAt", data.closesAtLocal, data.timeZone, warnings)
     : null;
-  assertSchedule(opensAt, closesAt, now);
+  assertSchedule(opensAt, closesAt, now, { openingSet: Boolean(data.opensAtLocal) });
 
   return db.transaction(async (tx) => {
     const [row] = await tx
