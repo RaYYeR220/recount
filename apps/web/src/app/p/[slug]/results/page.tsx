@@ -62,7 +62,8 @@ const load = cache(async (slug: string): Promise<Loaded> => {
 
 export async function generateMetadata({ params }: PageProps<"/p/[slug]/results">): Promise<Metadata> {
   const loaded = await load((await params).slug);
-  return { title: loaded.kind === "ok" ? `${loaded.poll.title}: results` : "Poll results", description: DESCRIPTION };
+  if (loaded.kind === "denied") return { title: loaded.code === "not_found" ? "Poll not found" : "Results hidden" };
+  return { title: `${loaded.poll.title}: results`, description: DESCRIPTION };
 }
 
 export default async function ResultsPage({ params }: PageProps<"/p/[slug]/results">) {
@@ -78,6 +79,7 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
   const isPublic = canSeeResults(poll, null, now) === "yes";
   const closed = results.status === "closed";
   const empty = results.totalBallots === 0;
+  const seedSource = "seeded from the cast-vote record's SHA-256";
   const view: CountView = {
     rounds: results.rounds,
     options: results.candidates,
@@ -109,7 +111,7 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
             <span aria-hidden="true">/</span>
           </>
         ) : null}
-        <Link href={`/p/${encodeURIComponent(slug)}`}>{slug}</Link>
+        <Link href={`/p/${encodeURIComponent(slug)}`}>{poll.title}</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Results</span>
       </nav>
@@ -167,9 +169,15 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
       ) : (
         <ResultsLayout
           view={view}
-          scene={buildCountScene({ rounds: results.rounds, options: results.candidates, seats: results.seats })}
+          scene={buildCountScene({
+            rounds: results.rounds,
+            options: results.candidates,
+            seats: results.seats,
+            provisional: !closed,
+            tiebreak: { rules: results.rules, seed: seedSource },
+          })}
           title={`${poll.title}: the count, round by round`}
-          seedSource="seeded from the cast-vote record's SHA-256"
+          seedSource={seedSource}
           provisional={!closed}
           side={
             <AuditLinks

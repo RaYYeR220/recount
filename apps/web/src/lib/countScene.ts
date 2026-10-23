@@ -9,10 +9,11 @@
  * Input is the rounds as the results pages and the API carry them (decimal strings,
  * option labels as keys); roundsFromEngine() converts a TabulationResult.
  */
-import type { TabulationResult } from "@recount/engine";
+import type { Rules, TabulationResult } from "@recount/engine";
 import { serializeRounds, type ResultRound } from "@/server/results/serialize";
 import { apportion, apportionNumbers } from "./apportion";
 import { describeRounds, type CaptionPart } from "./countCaptions";
+import { findTies, tieBreakPhrase } from "./countTies";
 import type { ChitKey } from "./optionColour";
 import { formatDelta, formatUnits, fromUnits, sharedPlaces, toUnits } from "./votes";
 
@@ -32,10 +33,18 @@ export function roundsFromEngine(
 export type CountTrayGroup = {
   /** Stable id, unique among groups. */
   id: string;
-  /** Plaque name, e.g. "Adams +7". */
+  /** Tray name, e.g. "Adams & 7 more". */
   label: string;
+  /** Plaque name when the full one is too long for a plate, e.g. "Adams & 7". Default: label. */
+  short?: string;
   members: readonly string[];
 };
+
+/** A shared tray, named for its strongest member and how many more: "Adams & 7 more", "Adams & 7" on its plaque. */
+export function trayGroup(id: string, first: string, members: readonly string[]): CountTrayGroup {
+  const more = members.length - 1;
+  return { id, label: `${first} & ${more} more`, short: `${first} & ${more}`, members };
+}
 
 export type CountSceneInput = {
   rounds: readonly CountRound[];
@@ -55,6 +64,10 @@ export type CountSceneInput = {
   shortLabels?: Readonly<Record<string, string>>;
   /** What the choices are called in captions. Default "option". */
   noun?: "option" | "candidate";
+  /** The poll is still open: plates and captions name leaders, never winners. */
+  provisional?: boolean;
+  /** The rules' tiebreak, so captions can say how each tie was settled; `seed` follows "a draw". */
+  tiebreak?: { rules: Pick<Rules, "tiebreakMode" | "randomSeed">; seed?: string };
 };
 
 export const INACTIVE_TRAY = "inactive";
@@ -86,8 +99,9 @@ export type TrayRound = {
   /** Order in which this tray's option took a seat (1 = first), once elected. */
   seat: number | null;
   /**
-   * Plaque line: "first choices", a delta, "Elected in round 1", "Eliminated in round 3",
-   * "continuing", "not elected" (final round), "none yet", "no choices left".
+   * Plaque line: "first choices", a delta, "Elected in round 1" ("Leading from round 1"
+   * while the poll is open), "Eliminated in round 3", "won the tiebreak", "continuing",
+   * "not elected" (final round), "none", "none yet", "no choices left".
    */
   meta: string;
 };
@@ -160,6 +174,8 @@ export type CountScene = {
   /** "ballots" for single-winner counts, "votes" for STV. */
   unit: "ballots" | "votes";
   noun: "option" | "candidate";
+  /** The poll is still open: the elected state means leading, not elected. */
+  provisional: boolean;
 };
 
 /** 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1,000 ... */
@@ -189,6 +205,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
   const seats = input.seats ?? 1;
   const multiSeat = seats > 1;
   const noun = input.noun ?? "option";
+  const provisional = input.provisional ?? false;
 
   const figures: string[] = [];
   for (const r of rounds) {
@@ -217,7 +234,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
       const id = `group-${group.id}`;
       trayOf.set(label, id);
       if (!trays.some((t) => t.id === id)) {
-        trays.push({ id, label: group.label, short: group.label, kind: "group", members: [...group.members], chit: chitOf(group.members[0]!) });
+        trays.push({ id, label: group.label, short: group.short ?? group.label, kind: "group", members: [...group.members], chit: chitOf(group.members[0]!) });
       }
     } else {
       const id = `option-${indexOf.get(label)}`;
@@ -231,7 +248,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
   const unit = multiSeat ? "votes" : "ballots";
 
   if (rounds.length === 0) {
-    return { trays, rounds: [], chits: [], spots: [], ballotsPerChit: input.ballotsPerChit ?? 1, wholeChits: 0, seats, multiSeat, winners, dp, unit, noun };
+    return { trays, rounds: [], chits: [], spots: [], ballotsPerChit: input.ballotsPerChit ?? 1, wholeChits: 0, seats, multiSeat, winners, dp, unit, noun, provisional };
   }
 
   // ---------- round 1: deal whole chits ----------
@@ -445,7 +462,32 @@ export function buildCountScene(input: CountSceneInput): CountScene {
     return sum;
   };
 
-  const described = describeRounds({ rounds, multiSeat, noun, unit, dp, short, isTrailing: (i) => isTrailingRound(rounds, i, multiSeat) });
+  const ties = findTies(rounds);
+  const tiebreak = input.tiebreak;
+  const described = describeRounds({
+    rounds,
+    multiSeat,
+    noun,
+    unit,
+    dp,
+    short,
+    isTrailing: (i) => isTrailingRound(rounds, i, multiSeat),
+    provisional,
+    ties,
+    howTieBroke: tiebreak ? (tie) => tieBreakPhrase(tie, rounds, tiebreak.rules, tiebreak.seed, short) : undefined,
+  });
+
+  /** The plaque line of a tray caught in a tie settled at the end of round i. */
+  const tieLine = (tray: SceneTray, i: number): string | null => {
+    const tie = ties.find((x) => x.round === i + 1 && tray.members.some((m) => x.tied.includes(m)));
+    if (!tie) return null;
+    const picked = tray.members.some((m) => tie.picked.includes(m));
+    const won = tie.kind === "seat" ? picked : !picked;
+    if (provisional && tie.kind === "seat") return won ? "ahead on tiebreak" : "behind on tiebreak";
+    return won ? "won the tiebreak" : "lost the tiebreak";
+  };
+  // "none yet" only while more can go inactive: a later round, or more ballots in an open poll.
+  const noneYet = (i: number) => provisional || rounds.slice(i + 1).some((r) => inactiveOf(r) > 0n);
 
   const sceneRounds: SceneRound[] = rounds.map((r, i) => {
     const prev = i > 0 ? rounds[i - 1]! : null;
@@ -458,11 +500,11 @@ export function buildCountScene(input: CountSceneInput): CountScene {
       const elected = electedMember !== undefined;
       const delta = i > 0 && value !== null ? formatDelta(value - (before ?? 0n), dp) : null;
       const state: TrayState = tray.kind === "inactive" ? "inactive" : out ? "out" : elected ? "elected" : "continuing";
+      const electedLine = elected ? `${provisional ? "Leading from" : "Elected in"} round ${electedAt.get(electedMember)! + 1}` : null;
       let meta: string;
-      if (state === "inactive") meta = value === 0n ? "none yet" : (delta ?? "no choices left");
+      if (state === "inactive") meta = value === 0n ? (noneYet(i) ? "none yet" : "none") : (delta ?? "no choices left");
       else if (state === "out") meta = `Eliminated in round ${Math.max(...tray.members.map((m) => eliminatedAt.get(m) ?? 0)) + 1}`;
-      else if (i === 0 && !elected) meta = "first choices";
-      else meta = (i > 0 ? delta : null) ?? (elected ? `Elected in round ${electedAt.get(electedMember)! + 1}` : i === rounds.length - 1 ? "not elected" : "continuing");
+      else meta = tieLine(tray, i) ?? (i === 0 && !elected ? "first choices" : null) ?? (i > 0 ? delta : null) ?? electedLine ?? (i === rounds.length - 1 ? (provisional ? "behind" : "not elected") : "continuing");
       trayRounds[tray.id] = {
         tally: formatUnits(value ?? 0n, dp),
         raw: fromUnits(value ?? 0n, dp),
@@ -506,7 +548,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
     };
   });
 
-  return { trays, rounds: sceneRounds, chits, spots, ballotsPerChit, wholeChits, seats, multiSeat, winners, dp, unit, noun };
+  return { trays, rounds: sceneRounds, chits, spots, ballotsPerChit, wholeChits, seats, multiSeat, winners, dp, unit, noun, provisional };
 }
 
 /** RCTab's extra round after the last seat fills: nothing decided, nothing moves on. */

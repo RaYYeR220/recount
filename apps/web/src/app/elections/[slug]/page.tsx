@@ -83,9 +83,9 @@ export default async function ElectionPage({ params }: PageProps<"/elections/[sl
 
       <ResultsLayout
         view={view}
-        scene={buildCountScene({ rounds: view.rounds, options: view.options, seats: view.seats, ...scene })}
+        scene={buildCountScene({ rounds: view.rounds, options: view.options, seats: view.seats, tiebreak: { rules: replay.rules }, ...scene })}
         title={`${replay.title}: the count, round by round`}
-        seedSource={`seed ${replay.rules.randomSeed ?? "0"}`}
+        seedSource={`with seed ${replay.rules.randomSeed ?? "0"}`}
         inactiveNote={conventionNote}
         sideFirst={<PathologyExplainer view={view} />}
         main={

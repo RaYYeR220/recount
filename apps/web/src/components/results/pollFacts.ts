@@ -37,6 +37,7 @@ export function pollFacts(p: PollFactsInput): string[] {
     p.seats > 1 ? `Single transferable vote, ${p.seats} seats` : "One winner, instant runoff",
     `${formatCount(p.ballots)} ${p.ballots === 1 ? "ballot" : "ballots"}`,
     `${presetLabel(p.presetId)} rules`,
-    VISIBILITY[p.resultsVisibility],
+    // Once the poll closes, live and after-close results are the same thing: public.
+    p.status === "closed" && p.resultsVisibility !== "owner_only" ? "Results: public" : VISIBILITY[p.resultsVisibility],
   ];
 }

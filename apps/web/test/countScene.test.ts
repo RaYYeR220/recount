@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { captionText } from "@/lib/countCaptions";
-import { buildCountScene, INACTIVE_TRAY, pickBallotsPerChit, type CountRound, type CountScene } from "@/lib/countScene";
+import { buildCountScene, INACTIVE_TRAY, pickBallotsPerChit, trayGroup, type CountRound, type CountScene } from "@/lib/countScene";
 import { toUnits } from "@/lib/votes";
 import { ELECTIONS_DIR, getElection } from "@/server/elections";
 import { tabulatePoll } from "@/server/results/tabulatePoll";
@@ -75,6 +75,13 @@ describe("buildCountScene: the lunch poll", () => {
       expect(lunchScene.spots[1]![c.id]!.tray).toBe(tacos);
       expect(c.chit).toBe(2);
     }
+  });
+
+  it("says none on an empty inactive tray once nothing more can go inactive", () => {
+    const open = buildCountScene({ rounds: lunch.rounds, options: lunch.candidates, provisional: true });
+    expect(lunchScene.rounds.map((r) => r.trays[INACTIVE_TRAY]!.meta)).toEqual(["none", "none"]);
+    expect(open.rounds.map((r) => r.trays[INACTIVE_TRAY]!.meta)).toEqual(["none yet", "none yet"]);
+    expect(committeeScene.rounds[0]!.trays[INACTIVE_TRAY]!.meta).toBe("none yet");
   });
 
   it("writes captions from the rounds", () => {
@@ -166,11 +173,11 @@ describe("buildCountScene: certified replays", () => {
       rounds: e.rounds,
       options: e.candidates,
       ballotsPerChit: 2500,
-      groups: [{ id: "others", label: "Adams +7", members: minor }],
+      groups: [trayGroup("others", "Adams", minor)],
       shortLabels: { "Zohran Kwame Mamdani": "Mamdani", "Andrew M. Cuomo": "Cuomo", "Brad Lander": "Lander" },
       noun: "candidate",
     });
-    expect(scene.trays.map((t) => t.label)).toEqual(["Zohran Kwame Mamdani", "Andrew M. Cuomo", "Brad Lander", "Adams +7", "Write-ins", "Inactive"]);
+    expect(scene.trays.map((t) => t.label)).toEqual(["Zohran Kwame Mamdani", "Andrew M. Cuomo", "Brad Lander", "Adams & 7 more", "Write-ins", "Inactive"]);
     expect(scene.trays.find((t) => t.label === "Write-ins")!.chit).toBe("writein");
     for (const row of scene.spots) expect(row.filter(Boolean)).toHaveLength(scene.wholeChits);
     scene.rounds.forEach((round, i) => {

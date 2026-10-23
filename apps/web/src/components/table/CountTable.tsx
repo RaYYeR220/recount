@@ -154,6 +154,7 @@ export function CountTable({ scene, title = "The count, round by round", layout 
               state={view.trays[tray.id]!}
               figure={shown.trays[tray.id]!.tally}
               multiSeat={scene.multiSeat}
+              provisional={scene.provisional}
               countRef={(el) => {
                 if (el) counts.current.set(tray.id, el);
                 else counts.current.delete(tray.id);

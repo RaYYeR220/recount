@@ -1,14 +1,14 @@
 /**
  * Plain-language accounts of a count, written from the engine's rounds: why the
- * winner won, where ties were broken and why ballots went inactive. Figures stay the
- * engine's strings, marked so pages can set them in tabular numerals.
+ * winner won and why ballots went inactive (ties are in countTies.ts). Figures stay
+ * the engine's strings, marked so pages can set them in tabular numerals.
  */
-import type { Rules } from "@recount/engine";
 import type { ResultRound } from "@/server/results/serialize";
 import type { CaptionPart } from "./countCaptions";
 import { isPluralLabel } from "./countScene";
+import { findTies, placesOfRounds } from "./countTies";
 import { listNames } from "./names";
-import { formatUnits, formatVotes, fromUnits, sharedPlaces, toUnits } from "./votes";
+import { formatUnits, formatVotes, fromUnits, toUnits } from "./votes";
 
 export type Paragraph = CaptionPart[];
 
@@ -27,15 +27,6 @@ type StoryInput = {
 const fig = (text: string): CaptionPart => ({ text: formatVotes(text), tone: "figure" });
 const strong = (text: string): CaptionPart => ({ text, tone: "strong" });
 const t = (text: string): CaptionPart => ({ text });
-
-function placesOfRounds(rounds: readonly ResultRound[]): number {
-  const figures: string[] = [];
-  for (const r of rounds) {
-    figures.push(r.threshold, r.activeTotal, ...Object.values(r.tally), ...Object.values(r.inactive));
-    for (const tr of r.transfers) figures.push(...Object.values(tr.to));
-  }
-  return sharedPlaces(figures);
-}
 
 /** RCTab's extra round after the last seat fills. */
 export function isTrailing(rounds: readonly ResultRound[], i: number, seats: number): boolean {
@@ -103,16 +94,41 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l, provisional 
   const electedAt = new Map<string, number>();
   rounds.forEach((r, i) => r.elected.forEach((x) => electedAt.set(x, i)));
 
+  // "1 of 1 ballot", "7 of 13 ballots"
+  const unitFor = (v: string) => (toUnits(v, dp) === 10n ** BigInt(dp) ? unit.slice(0, -1) : unit);
+  const seatTies = findTies(rounds).filter((x) => x.kind === "seat");
+
   if (!multi) {
     const winner = winners[0]!;
     const at = electedAt.get(winner) ?? last;
     const won = rounds[at]!;
+    const short = toUnits(won.tally[winner]!, dp) < toUnits(won.threshold, dp);
+    const share = [fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unitFor(won.activeTotal)}`)];
+    const where = at === 0 ? "on first choices" : `in round ${at + 1}${provisional ? " of the count so far" : ""}`;
+    const tie = seatTies.find((x) => x.round === at + 1 && x.picked.includes(winner));
     const paragraphs: Paragraph[] = [];
-    if (at === 0) {
-      paragraphs.push([strong(show(winner)), t(provisional ? " has a majority of first choices so far: " : " had a majority of first choices: "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit}.`)]);
-      return paragraphs;
+    if (tie) {
+      // Level at the top: no majority, and the tiebreak picked the winner.
+      const others = tie.tied.filter((x) => x !== winner).map(show);
+      paragraphs.push([
+        strong(show(winner)),
+        t(`${others.length > 1 ? ", " : " and "}${listNames(others)} ${provisional ? "are" : "finished"} level ${where} with `),
+        ...share,
+        t(" each"),
+        ...(short ? [t(", short of the "), fig(won.threshold), t(" needed")] : []),
+        t(provisional ? `; ${show(winner)} leads only on the tiebreak.` : `, and ${show(winner)} won on the tiebreak.`),
+      ]);
+    } else if (short) {
+      // The last ones standing with ballots run out: the most, but not a majority.
+      const left = Object.keys(won.tally).length;
+      const most = left > 1 ? `the most of the last ${left === 2 ? "two" : left} left` : `the only ${noun} left`;
+      paragraphs.push([strong(show(winner)), t(provisional ? " leads with " : " won with "), ...share, t(` ${where}, short of the `), fig(won.threshold), t(` needed but ${most}.`)]);
+    } else if (at === 0) {
+      paragraphs.push([strong(show(winner)), t(provisional ? " has a majority of first choices so far: " : " had a majority of first choices: "), ...share, t(".")]);
+    } else {
+      paragraphs.push([strong(show(winner)), t(provisional ? " leads with " : " won with "), ...share, t(` ${where}.`)]);
     }
-    paragraphs.push([strong(show(winner)), t(provisional ? " leads with " : " won with "), fig(won.tally[winner]!), t(" of "), fig(won.activeTotal), t(` ${unit} in round ${at + 1}${provisional ? " of the count so far" : ""}.`)]);
+    if (at === 0) return paragraphs;
 
     const leader = Object.entries(first.tally).sort((a, b) => {
       const d = toUnits(b[1], dp) - toUnits(a[1], dp);
@@ -145,7 +161,8 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l, provisional 
     const quota = toUnits(r.threshold, dp);
     const p: Paragraph = [];
     if (tally >= quota) {
-      p.push(strong(show(w)), t(` reached the quota of `), fig(r.threshold), t(` in round ${at + 1} with `), fig(r.tally[w]!), t(at === 0 ? " first choices." : ` ${unit}.`));
+      const firsts = tally === 10n ** BigInt(dp) ? " first choice." : " first choices.";
+      p.push(strong(show(w)), t(provisional ? " reaches the quota of " : " reached the quota of "), fig(r.threshold), t(` in round ${at + 1} with `), fig(r.tally[w]!), t(at === 0 ? firsts : ` ${unitFor(r.tally[w]!)}.`));
       const transfer = r.transfers.find((tr) => tr.from === w);
       const surplus = tally - quota;
       if (transfer && surplus > 0n && !isTrailing(rounds, at + 1, seats)) {
@@ -157,7 +174,12 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l, provisional 
         p.push(t(" Every seat was filled by then, so the surplus of "), { text: formatUnits(surplus, dp), tone: "figure" }, t(" was set aside."));
       }
     } else {
-      p.push(strong(show(w)), t(` was elected in round ${at + 1} with `), fig(r.tally[w]!), t(`, as one of the last ${noun}s left for the remaining seats.`));
+      p.push(strong(show(w)), t(provisional ? ` leads in round ${at + 1} with ` : ` was elected in round ${at + 1} with `), fig(r.tally[w]!), t(`, as one of the last ${noun}s left for the remaining seats.`));
+    }
+    const tie = seatTies.find((x) => x.round === at + 1 && x.picked.includes(w));
+    if (tie) {
+      const others = listNames(tie.tied.filter((x) => !tie.picked.includes(x)).map(show));
+      p.push(t(provisional ? ` ${show(w)} is level with ${others} and ahead only on the tiebreak.` : ` ${show(w)} was level with ${others} and took the seat on the tiebreak.`));
     }
     paragraphs.push(p);
   });
@@ -170,47 +192,6 @@ export function whyItWon({ rounds, winners, seats, show = (l) => l, provisional 
     paragraphs.push([t(`Round ${last + 1} is the extra round RCTab reports after the last seat fills; nothing moves in it.`)]);
   }
   return paragraphs;
-}
-
-export type Tie = { round: number; tied: string[]; eliminated: string[]; at: string };
-
-/** Rounds where options tied for last and the tiebreak picked who went out. */
-export function findTies(rounds: readonly ResultRound[]): Tie[] {
-  const dp = placesOfRounds(rounds);
-  const elected = new Set<string>();
-  const ties: Tie[] = [];
-  rounds.forEach((r, i) => {
-    const out = r.eliminated;
-    if (out.length > 0) {
-      const survivors = Object.keys(r.tally).filter((k) => !out.includes(k) && !elected.has(k) && !r.elected.includes(k));
-      const top = out.reduce((m, x) => {
-        const v = toUnits(r.tally[x] ?? "0", dp);
-        return v > m ? v : m;
-      }, -1n);
-      const level = survivors.filter((s) => toUnits(r.tally[s]!, dp) === top);
-      if (level.length > 0) {
-        const tiedOut = out.filter((x) => toUnits(r.tally[x] ?? "0", dp) === top);
-        ties.push({ round: i + 1, tied: [...tiedOut, ...level], eliminated: tiedOut, at: formatUnits(top, dp) });
-      }
-    }
-    r.elected.forEach((x) => elected.add(x));
-  });
-  return ties;
-}
-
-/** How the rules break a tie, in words. */
-export function tiebreakWords(rules: Pick<Rules, "tiebreakMode" | "randomSeed">, seedSource?: string): string {
-  const seed = seedSource ?? `seed ${rules.randomSeed ?? "0"}`;
-  switch (rules.tiebreakMode) {
-    case "useCandidateOrder":
-      return "the option listed later on the ballot goes out";
-    case "random":
-      return `a draw from Java's random number generator, ${seed}`;
-    case "generatePermutation":
-      return `a fixed random order of the options, ${seed}`;
-    case "previousRoundCountsThenRandom":
-      return `the previous round's counts decide, then a draw, ${seed}`;
-  }
 }
 
 export const INACTIVE_REASONS = [

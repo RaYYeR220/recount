@@ -32,10 +32,22 @@ export function CountTool() {
   const resultRef = useRef<HTMLHeadingElement>(null);
   const errorsId = useId();
 
+  const seedSource = counted ? `with seed ${counted.outcome.view.rules.randomSeed ?? "0"}` : undefined;
   const scene = useMemo(
-    () => (counted ? buildCountScene({ rounds: counted.outcome.view.rounds, options: counted.outcome.view.options, seats: counted.seats, noun: "candidate" }) : null),
+    () =>
+      counted
+        ? buildCountScene({
+            rounds: counted.outcome.view.rounds,
+            options: counted.outcome.view.options,
+            seats: counted.seats,
+            noun: "candidate",
+            tiebreak: { rules: counted.outcome.view.rules },
+          })
+        : null,
     [counted],
   );
+  // Only whole-input problems ("paste at least one ballot") have no line number.
+  const lineErrors = errors.filter((e) => e.line > 0);
 
   function load(example: string) {
     setText(example);
@@ -46,20 +58,24 @@ export function CountTool() {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const seatCount = Number(seats);
+    // A count that can't run takes the last result off the page, so it never sits under the error.
     if (!Number.isInteger(seatCount) || seatCount < 1 || seatCount > 100) {
       setErrors([]);
       setFailure("Seats must be a whole number from 1 to 100.");
+      setCounted(null);
       return;
     }
     const parsed = parseBallotCsv(text);
     setErrors(parsed.errors);
     if (parsed.errors.length > 0) {
       setFailure(null);
+      setCounted(null);
       return;
     }
     const outcome = countBallots(parsed, presetId, seatCount);
     if (!outcome.ok) {
       setFailure(outcome.message);
+      setCounted(null);
       return;
     }
     setFailure(null);
@@ -127,15 +143,21 @@ export function CountTool() {
             </div>
             {errors.length > 0 ? (
               <Callout tone="fail" role="alert" id={errorsId}>
-                <p className="font-bold">
-                  {errors.length === 1 ? "One line needs fixing" : `${formatCount(errors.length)} lines need fixing`} before the count can run.
-                </p>
-                <ul className="mt-1 grid gap-0.5">
-                  {errors.slice(0, SHOWN_ERRORS).map((e) => (
-                    <li key={`${e.line}-${e.message}`}>{formatBallotError(e)}</li>
-                  ))}
-                  {errors.length > SHOWN_ERRORS ? <li>And {formatCount(errors.length - SHOWN_ERRORS)} more.</li> : null}
-                </ul>
+                {lineErrors.length === 0 ? (
+                  <p className="font-bold">{formatBallotError(errors[0]!)}</p>
+                ) : (
+                  <>
+                    <p className="font-bold">
+                      {errors.length === 1 ? "One line needs fixing" : `${formatCount(errors.length)} lines need fixing`} before the count can run.
+                    </p>
+                    <ul className="mt-1 grid gap-0.5">
+                      {errors.slice(0, SHOWN_ERRORS).map((e) => (
+                        <li key={`${e.line}-${e.message}`}>{formatBallotError(e)}</li>
+                      ))}
+                      {errors.length > SHOWN_ERRORS ? <li>And {formatCount(errors.length - SHOWN_ERRORS)} more.</li> : null}
+                    </ul>
+                  </>
+                )}
               </Callout>
             ) : null}
             {failure ? (
@@ -201,7 +223,7 @@ export function CountTool() {
                 id: "count",
                 label: "Count",
                 panel: (
-                  <ResultsLayout view={counted.outcome.view} scene={scene} title="Your ballots: the count, round by round" seedSource={`seed ${counted.outcome.view.rules.randomSeed ?? "0"}`} />
+                  <ResultsLayout view={counted.outcome.view} scene={scene} title="Your ballots: the count, round by round" seedSource={seedSource} />
                 ),
               },
               {

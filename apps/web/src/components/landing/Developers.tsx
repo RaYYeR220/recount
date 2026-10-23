@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { origin } from "@/components/developers/Curl";
 import { listOperations, type Operation } from "@/components/developers/operations";
 import { Code, CodeBlock } from "@/components/ui/CodeBlock";
 import { Tabs } from "@/components/ui/Tabs";
@@ -12,16 +14,27 @@ function rank(op: Operation): number {
   return i < 0 ? ORDER.length : i;
 }
 
+function tabulateCurl(base: string, body: string): string {
+  return [`curl -X POST "${base}/api/v1/tabulate" \\`, '  -H "Content-Type: application/json" \\', `  -d '${body.replace(/\n/g, "\n  ")}'`].join("\n");
+}
+
+const LABEL = "Example request";
+
+/** The tabulate call against this site; it reads the request, so it streams in over the $RECOUNT_URL version. */
+async function CurlForOrigin({ body }: { body: string }) {
+  const base = await origin();
+  return <CodeBlock code={tabulateCurl(base ?? "$RECOUNT_URL", body)} language="shell" label={LABEL} className="lp-dev-block" />;
+}
+
 /** "Count anything over HTTP": the endpoints from the OpenAPI document and a real tabulate call. */
 export async function Developers() {
   const example = await getApiExample();
   const operations = listOperations().sort((a, b) => rank(a) - rank(b));
-  const curl = [
-    "# RECOUNT_URL is this site's address, for example http://localhost:3000",
-    'curl -X POST "$RECOUNT_URL/api/v1/tabulate" \\',
-    '  -H "Content-Type: application/json" \\',
-    `  -d '${example.body.replace(/\n/g, "\n  ")}'`,
-  ].join("\n");
+  const curl = (
+    <Suspense fallback={<CodeBlock code={tabulateCurl("$RECOUNT_URL", example.body)} language="shell" label={LABEL} className="lp-dev-block" />}>
+      <CurlForOrigin body={example.body} />
+    </Suspense>
+  );
 
   return (
     <section className="lp-sec lp-sec-deep" id="developers" aria-labelledby="developers-h">
@@ -60,7 +73,7 @@ export async function Developers() {
             label="Example"
             tone="dark"
             tabs={[
-              { id: "request", label: "Request", panel: <CodeBlock code={curl} language="shell" label="Example request" className="lp-dev-block" /> },
+              { id: "request", label: "Request", panel: curl },
               {
                 id: "response",
                 label: "Response",

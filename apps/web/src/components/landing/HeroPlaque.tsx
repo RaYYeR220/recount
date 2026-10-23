@@ -21,7 +21,8 @@ export function plaqueLine(scene: CountScene, round: number, trayId: string): { 
   }
   if (t.state === "inactive") {
     if (t.delta) return { delta: t.delta, rest: "" };
-    return { delta: null, rest: toUnits(t.raw, scene.dp) === 0n ? "none yet" : "no choices left" };
+    // An empty tray reads "none yet" or "none", as the scene words it.
+    return { delta: null, rest: toUnits(t.raw, scene.dp) === 0n ? t.meta : "no choices left" };
   }
   return { delta: round > 0 ? t.delta : null, rest: shareOf(t.raw, r.activeTotal, scene.dp) };
 }

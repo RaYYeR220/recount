@@ -43,12 +43,40 @@ test("T23: Minneapolis rules skip the overvoted rank, and Ash wins", async ({ pa
   await expect(page.getByText("Condorcet winner: Ash. Ranked choice and the head-to-head check agree.")).toBeVisible();
 });
 
+test("plurality's pick is explained when round 1 counts overvoted ballots it can't", async ({ page }) => {
+  await countOvervoteExample(page, "Minneapolis");
+  await expect(page.getByText("Plurality would have picked Bea: it counts only clean first choices")).toBeVisible();
+});
+
 test("the tie example explains how the tie was broken", async ({ page }) => {
   await page.goto("/count");
   await page.getByRole("button", { name: "Load the tie example" }).click();
   await page.getByRole("button", { name: "Count", exact: true }).click();
   await expect(page.getByText(/^(Bea and Cal|Cal and Bea) tied for last with 3 ballots each in round 1\./)).toBeVisible();
   await expect(page.getByText("2 rounds", { exact: true })).toBeVisible();
+});
+
+test("a first-round tie is won on the tiebreak, never on a majority", async ({ page }) => {
+  await page.goto("/count");
+  await page.getByLabel("Ballots, one per line").fill("A,B\nB,A");
+  await page.getByRole("button", { name: "Count", exact: true }).click();
+  await expect(page.getByTestId("winner-card")).toContainText("1 round, won on a tiebreak");
+  await expect(page.getByText(/tied with 1 ballot each in round 1\./)).toBeVisible();
+  await expect(page.getByText(/The tiebreak elected [AB] by a draw with seed 0\./)).toBeVisible();
+  await expect(page.locator("main")).not.toContainText("majority");
+});
+
+test("a count that can't run clears the last result", async ({ page }) => {
+  await countOvervoteExample(page, "New York City");
+  await expect(page.getByTestId("winner-card")).toContainText("Winner: Bea");
+  await page.getByLabel("Ballots, one per line").fill("");
+  await page.getByRole("button", { name: "Count", exact: true }).click();
+  const failure = page.locator(".callout[role=alert]");
+  await expect(failure).toHaveText("Paste at least one ballot.");
+  await expect(page.getByTestId("winner-card")).toHaveCount(0);
+  await page.getByLabel("Ballots, one per line").fill(",,,");
+  await page.getByRole("button", { name: "Count", exact: true }).click();
+  await expect(failure).toHaveText("Every ballot is blank, so there is nothing to count.");
 });
 
 test("the RCTab summary view shows the count in RCTab's format", async ({ page }) => {

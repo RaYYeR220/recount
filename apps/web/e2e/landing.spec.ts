@@ -70,6 +70,13 @@ test("the recount runs in the browser and matches what the poll published", asyn
   await expect(audit.getByRole("status")).toHaveText(`Recount matches: same winner, same 2 rounds, CVR SHA-256 ${hash.slice(0, 12)}`, { timeout: 15_000 });
 });
 
+test("the API example calls this site", async ({ page, baseURL }) => {
+  await page.goto("/");
+  const example = page.locator("#developers").getByLabel("Example request");
+  await expect(example).toContainText(`curl -X POST "${baseURL}/api/v1/tabulate"`);
+  await expect(example).not.toContainText("localhost:3000");
+});
+
 test("the election ledger labels each replay honestly and links to it", async ({ page }) => {
   await page.goto("/");
   const ledger = page.locator("#replays table");

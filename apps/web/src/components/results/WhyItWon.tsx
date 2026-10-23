@@ -1,18 +1,44 @@
 import { Caption } from "@/components/table/Caption";
 import { Callout } from "@/components/ui/Callout";
 import { PanelHeader, Paper } from "@/components/ui/Surface";
-import { findTies, tiebreakWords, whyItWon } from "@/lib/countStory";
+import { whyItWon } from "@/lib/countStory";
+import { findTies, tieBreakPhrase, type Tie } from "@/lib/countTies";
 import { listNames } from "@/lib/names";
 import type { CountView } from "./model";
 
 export type WhyItWonProps = {
   view: Pick<CountView, "rounds" | "winners" | "seats" | "rules" | "noun">;
-  /** Where the tiebreak seed comes from, e.g. "seeded from the CVR hash". */
+  /** Where tiebreak draws come from, after "a draw": "seeded from the cast-vote record's SHA-256". */
   seedSource?: string;
   /** The poll is still open: the story of the count so far. */
   provisional?: boolean;
   id?: string;
 };
+
+/** Who tied, with what, in which round, and how the rules settled it. */
+function TieNote({ tie, view, seedSource, provisional }: { tie: Tie } & Omit<WhyItWonProps, "id">) {
+  const unit = view.seats > 1 ? (tie.at === "1" ? "vote" : "votes") : tie.at === "1" ? "ballot" : "ballots";
+  const how = tieBreakPhrase(tie, view.rounds, view.rules, seedSource);
+  const picked = listNames(tie.picked);
+  if (tie.kind === "last") {
+    return (
+      <Callout tone="info">
+        <b>
+          {listNames(tie.tied)} tied for last with {tie.at} {unit} each in round {tie.round}.
+        </b>{" "}
+        The tiebreak eliminated {picked} {how}.
+      </Callout>
+    );
+  }
+  return (
+    <Callout tone="info">
+      <b>
+        {listNames(tie.tied)} tied with {tie.at} {unit} each in round {tie.round}.
+      </b>{" "}
+      {provisional ? `The tiebreak puts ${picked} ahead ${how}.` : `The tiebreak elected ${picked} ${how}.`}
+    </Callout>
+  );
+}
 
 /** The count in plain words, with every tie the rules had to break. */
 export function WhyItWon({ view, seedSource, provisional, id = "why-h" }: WhyItWonProps) {
@@ -28,13 +54,7 @@ export function WhyItWon({ view, seedSource, provisional, id = "why-h" }: WhyItW
         </p>
       ))}
       {ties.map((tie) => (
-        <Callout key={tie.round} tone="info">
-          <b>
-            {listNames(tie.tied)} tied for last with {tie.at} {view.seats > 1 ? (tie.at === "1" ? "vote" : "votes") : tie.at === "1" ? "ballot" : "ballots"} each in round{" "}
-            {tie.round}.
-          </b>{" "}
-          The tiebreak eliminated {listNames(tie.eliminated)}: {tiebreakWords(view.rules, seedSource)}.
-        </Callout>
+        <TieNote key={`${tie.kind}-${tie.round}-${tie.at}`} tie={tie} view={view} seedSource={seedSource} provisional={provisional} />
       ))}
     </Paper>
   );

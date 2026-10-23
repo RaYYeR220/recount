@@ -5,7 +5,7 @@ import { curlFor } from "./examples";
 import type { Operation } from "./operations";
 
 /** This deployment's own origin, from the request. */
-async function origin(): Promise<string | null> {
+export async function origin(): Promise<string | null> {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   if (!host) return null;

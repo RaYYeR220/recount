@@ -21,7 +21,7 @@ export function RoundsTable({ scene, title }: { scene: CountScene; title: string
             <th scope="row">{tray.label}</th>
             {scene.rounds.map((r) => {
               const t = r.trays[tray.id]!;
-              return <td key={r.index}>{t.state === "out" ? "Eliminated" : t.state === "elected" ? `${t.tally}, elected` : t.tally}</td>;
+              return <td key={r.index}>{t.state === "out" ? "Eliminated" : t.state === "elected" ? `${t.tally}, ${scene.provisional ? "leading" : "elected"}` : t.tally}</td>;
             })}
           </tr>
         ))}

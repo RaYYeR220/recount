@@ -41,7 +41,7 @@ test("T01: NYC 2025 names Mamdani the winner with the certified final round", as
   await expect(mamdani.getByRole("cell").last()).toContainText("573,169");
   await expect(cuomo.getByRole("cell").last()).toContainText("443,229");
   await expect(page.getByRole("region", { name: /: the count, round by round$/ })).toBeVisible();
-  await expect(page.locator(".plaque").filter({ hasText: "Adams +7" })).toHaveCount(1);
+  await expect(page.locator('.plaque .pl-name[title="Adams & 7 more"]')).toHaveText("Adams & 7");
   expect(errors).toEqual([]);
 });
 

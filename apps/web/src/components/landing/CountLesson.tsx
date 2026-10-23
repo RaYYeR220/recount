@@ -3,7 +3,7 @@ import type { CountedPoll } from "./lessonData";
 import { ClearFigure, DealFigure, SurplusFigure, WinFigure, type ThreeTrays } from "./LessonFigures";
 import { getLesson } from "./loaders";
 import { N, Section } from "./Section";
-import { capitalize, countWord, listOf, trimDecimal } from "./words";
+import { capitalize, countWord, listOf } from "./words";
 
 const byVotes = (tally: Record<string, string>) => Object.entries(tally).sort(([, a], [, b]) => Number(b) - Number(a));
 
@@ -114,7 +114,8 @@ function surplusStep(poll: CountedPoll) {
   const surplus = tally - toUnits(r1.threshold, dp);
   const scale = 10n ** BigInt(dp);
   const share = (surplus * scale) / tally;
-  const fraction = trimDecimal(fromUnits(share, dp));
+  // At the engine's places, like every other figure here: 0.3000, 1.8000.
+  const fraction = formatVotes(fromUnits(share, dp));
   const dests = Object.entries(transfer.to).filter(([k]) => k !== "exhausted" && k !== "residualSurplus");
   const others = dests.map(([label, amount]) => ({
     label,
@@ -123,6 +124,9 @@ function surplusStep(poll: CountedPoll) {
     value: `${r1.tally[label] ?? 0} + ${formatVotes(amount)}`,
     slivers: Number((toUnits(amount, dp) * scale) / share / scale),
   }));
+  // Three trays fit; the rest of the 20 ballots are named under them.
+  const drawn = [name, ...others.slice(0, 2).map((o) => o.label)];
+  const unseen = Object.entries(r1.tally).filter(([k]) => !drawn.includes(k));
   return {
     title: "More seats, same table",
     figure: (
@@ -131,13 +135,14 @@ function surplusStep(poll: CountedPoll) {
         others={others}
         fraction={Number(share) / Number(scale)}
         head={`quota ${r1.threshold} of ${results.totalBallots}`}
+        foot={unseen.length > 0 ? `Not shown: ${unseen.map(([k, v]) => `${k} ${formatVotes(v)}`).join(", ")}` : undefined}
         label={`${name}'s surplus moves on: ${dests.map(([k, v]) => `${formatVotes(v)} to ${k}`).join(", ")}`}
       />
     ),
     text: (
       <>
         With {results.seats} seats from {results.totalBallots} ballots the quota is <N>{r1.threshold}</N>. {name} has <N>{r1.tally[name]}</N>, so{" "}
-        <N>{trimDecimal(fromUnits(surplus, dp))}</N> are surplus: each of her ballots moves on at <N>{fraction}</N>, sending{" "}
+        <N>{formatVotes(fromUnits(surplus, dp))}</N> are surplus: each of her ballots moves on at <N>{fraction}</N>, sending{" "}
         {dests.map(([k, v], i) => (
           <span key={k}>
             {i > 0 ? (i === dests.length - 1 ? " and " : ", ") : ""}
