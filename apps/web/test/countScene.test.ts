@@ -77,6 +77,13 @@ describe("buildCountScene: the lunch poll", () => {
     }
   });
 
+  it("says none on an empty inactive tray once nothing more can go inactive", () => {
+    const open = buildCountScene({ rounds: lunch.rounds, options: lunch.candidates, provisional: true });
+    expect(lunchScene.rounds.map((r) => r.trays[INACTIVE_TRAY]!.meta)).toEqual(["none", "none"]);
+    expect(open.rounds.map((r) => r.trays[INACTIVE_TRAY]!.meta)).toEqual(["none yet", "none yet"]);
+    expect(committeeScene.rounds[0]!.trays[INACTIVE_TRAY]!.meta).toBe("none yet");
+  });
+
   it("writes captions from the rounds", () => {
     expect(lunchScene.rounds.map((r) => r.label)).toEqual(["First choices", "Final round"]);
     expect(captionText(lunchScene.rounds[0]!.caption)).toBe(

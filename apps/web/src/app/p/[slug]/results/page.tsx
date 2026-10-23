@@ -110,7 +110,7 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
             <span aria-hidden="true">/</span>
           </>
         ) : null}
-        <Link href={`/p/${encodeURIComponent(slug)}`}>{slug}</Link>
+        <Link href={`/p/${encodeURIComponent(slug)}`}>{poll.title}</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Results</span>
       </nav>

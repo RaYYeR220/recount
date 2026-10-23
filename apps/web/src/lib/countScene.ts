@@ -93,7 +93,7 @@ export type TrayRound = {
   /**
    * Plaque line: "first choices", a delta, "Elected in round 1" ("Leading from round 1"
    * while the poll is open), "Eliminated in round 3", "won the tiebreak", "continuing",
-   * "not elected" (final round), "none yet", "no choices left".
+   * "not elected" (final round), "none", "none yet", "no choices left".
    */
   meta: string;
 };
@@ -478,6 +478,8 @@ export function buildCountScene(input: CountSceneInput): CountScene {
     if (provisional && tie.kind === "seat") return won ? "ahead on tiebreak" : "behind on tiebreak";
     return won ? "won the tiebreak" : "lost the tiebreak";
   };
+  // "none yet" only while more can go inactive: a later round, or more ballots in an open poll.
+  const noneYet = (i: number) => provisional || rounds.slice(i + 1).some((r) => inactiveOf(r) > 0n);
 
   const sceneRounds: SceneRound[] = rounds.map((r, i) => {
     const prev = i > 0 ? rounds[i - 1]! : null;
@@ -492,7 +494,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
       const state: TrayState = tray.kind === "inactive" ? "inactive" : out ? "out" : elected ? "elected" : "continuing";
       const electedLine = elected ? `${provisional ? "Leading from" : "Elected in"} round ${electedAt.get(electedMember)! + 1}` : null;
       let meta: string;
-      if (state === "inactive") meta = value === 0n ? "none yet" : (delta ?? "no choices left");
+      if (state === "inactive") meta = value === 0n ? (noneYet(i) ? "none yet" : "none") : (delta ?? "no choices left");
       else if (state === "out") meta = `Eliminated in round ${Math.max(...tray.members.map((m) => eliminatedAt.get(m) ?? 0)) + 1}`;
       else meta = tieLine(tray, i) ?? (i === 0 && !elected ? "first choices" : null) ?? (i > 0 ? delta : null) ?? electedLine ?? (i === rounds.length - 1 ? (provisional ? "behind" : "not elected") : "continuing");
       trayRounds[tray.id] = {
