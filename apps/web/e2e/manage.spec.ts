@@ -48,11 +48,22 @@ test("T11: invite codes are generated, listed and work once each", async ({ page
 
 test("closing early stops voting and is logged", async ({ page }) => {
   await signUp(page);
-  await createPollWithWizard(page, { title: "Team mascot", options: ["Owl", "Otter", "Orca"] });
+  const slug = await createPollWithWizard(page, { title: "Team mascot", options: ["Owl", "Otter", "Orca"] });
+  const turnout = page.getByRole("region", { name: "Turnout" });
+  await expect(turnout).toContainText("No closing time");
+  await expect(turnout).not.toContainText("Open, no closing time");
   await page.getByRole("button", { name: "Close voting now" }).click();
   await page.getByRole("button", { name: "Yes, close voting" }).click();
   await expect(page.getByText(/^Voting closed on .*The count is final/)).toBeVisible();
   await expect(page.getByRole("region", { name: "Audit log" })).toContainText(/Voting closed\. CVR SHA-256 [0-9a-f]{12}…/);
+
+  // Nothing on the page reads as open any more.
+  await expect(page.getByRole("link", { name: "See the results" })).toHaveAttribute("href", `/p/${slug}/results`);
+  await expect(page.getByRole("link", { name: "Open the voter page" })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Share" })).toContainText("Voting is over.");
+  const schedule = page.getByRole("region", { name: "Schedule" });
+  await expect(schedule).toContainText(/Closed\s*\w+ \d+, \d{4}, \d+:\d{2} [AP]M, by hand/);
+  await expect(schedule).not.toContainText("When you close it");
 });
 
 test("the closing time can be moved, in the poll's zone", async ({ page }) => {

@@ -43,6 +43,31 @@ function when(date: Date | null, poll: PollDetail): string {
   return date ? formatWhen(date, poll.timeZone) : "—";
 }
 
+/** The schedule in the tense of each part: what is still to come, and what happened when. */
+function scheduleFacts(poll: PollDetail): Array<[string, string]> {
+  const at = (date: Date) => when(date, poll);
+  const opens = poll.opensAt ?? poll.createdAt;
+  const closes = poll.closesAt ? at(poll.closesAt) : "When you close it";
+  if (poll.status === "scheduled") return [["Opens", at(opens)], ["Closes", closes]];
+  if (poll.status === "open") return [["Opened", at(opens)], ["Closes", closes]];
+  const early = poll.closedEarlyAt !== null && (poll.closesAt === null || poll.closedEarlyAt.getTime() < poll.closesAt.getTime());
+  if (!early) return [["Opened", at(opens)], ["Closed", at(closedAt(poll)!)]];
+  return [
+    ["Opened", at(opens)],
+    ["Closed", `${at(poll.closedEarlyAt!)}, by hand`],
+    ...(poll.closesAt ? ([["Was due to close", at(poll.closesAt)]] as Array<[string, string]>) : []),
+  ];
+}
+
+function shareText(poll: PollDetail): string {
+  if (poll.status === "closed") {
+    return poll.resultsVisibility === "owner_only"
+      ? "Voting is over. The link now says when it closed; the results stay private."
+      : "Voting is over. The link now says when it closed and leads to the results.";
+  }
+  return poll.accessMode === "codes" ? "Voters open the link and enter their code." : "Anyone with this link can vote once from their browser.";
+}
+
 async function load(slug: string) {
   const viewer = await requireViewer({ next: `/dashboard/p/${slug}` });
   const db = getDb();
@@ -100,12 +125,25 @@ async function Manage({ params, searchParams }: PageProps<"/dashboard/p/[slug]">
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <ButtonLink href={voterPath} variant="brass">
-            Open the voter page
-          </ButtonLink>
-          <ButtonLink href={`${voterPath}/results`} variant="line">
-            Results
-          </ButtonLink>
+          {poll.status === "closed" ? (
+            <>
+              <ButtonLink href={`${voterPath}/results`} variant="brass">
+                See the results
+              </ButtonLink>
+              <ButtonLink href={voterPath} variant="line">
+                Voter page
+              </ButtonLink>
+            </>
+          ) : (
+            <>
+              <ButtonLink href={voterPath} variant="brass">
+                Open the voter page
+              </ButtonLink>
+              <ButtonLink href={`${voterPath}/results`} variant="line">
+                Results
+              </ButtonLink>
+            </>
+          )}
         </div>
       </div>
 
@@ -137,31 +175,22 @@ async function Manage({ params, searchParams }: PageProps<"/dashboard/p/[slug]">
               <p className="grid gap-1 text-sm text-ink-2">
                 <StatusMark status={poll.status} />
                 <span>
-                  {scheduleLine(poll, { short: false })} <span className="text-ink-3">({poll.timeZone})</span>
+                  {scheduleLine(poll, { short: false })}
+                  {poll.status === "open" && !poll.closesAt ? null : <span className="text-ink-3"> ({poll.timeZone})</span>}
                 </span>
               </p>
             </div>
           </Paper>
 
           <Paper as="section" aria-labelledby="share-title">
-            <PanelHeader
-              id="share-title"
-              title="Share"
-              description={poll.accessMode === "codes" ? "Voters open the link and enter their code." : "Anyone with this link can vote once from their browser."}
-            />
+            <PanelHeader id="share-title" title="Share" description={shareText(poll)} />
             <ShareLink path={voterPath} />
           </Paper>
 
           <Paper as="section" aria-labelledby="schedule-title">
             <PanelHeader id="schedule-title" title="Schedule" description={`All times in ${poll.timeZone}`} />
             <div className="grid gap-6">
-              <Facts
-                rows={[
-                  ["Opens", when(poll.opensAt ?? poll.createdAt, poll)],
-                  ["Closes", poll.closesAt ? when(poll.closesAt, poll) : "When you close it"],
-                  ...(poll.closedEarlyAt ? ([["Closed early", when(poll.closedEarlyAt, poll)]] as Array<[string, string]>) : []),
-                ]}
-              />
+              <Facts rows={scheduleFacts(poll)} />
               <ScheduleSimulator poll={poll} at={at} action={`/dashboard/p/${poll.slug}`} />
               {poll.status === "closed" ? (
                 <p className="border-t border-paper-3 pt-5 text-sm text-ink-2">
