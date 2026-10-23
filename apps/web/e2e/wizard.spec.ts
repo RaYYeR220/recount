@@ -94,6 +94,71 @@ test.describe("new poll wizard", () => {
     expect(errors).toEqual([]);
   });
 
+  test("an opening time that has already passed is refused on the Opens field", async ({ page }) => {
+    await toSchedule(page);
+    const opens = page.getByLabel("Opens", { exact: true });
+    await opens.fill("2020-01-01 10:00");
+    await expect(page.getByText("The opening time has already passed. Pick a later time, or open the poll as soon as it's created.")).toBeVisible();
+    await expect(opens).toHaveAttribute("aria-invalid", "true");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "When can people vote?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toHaveCount(0);
+  });
+
+  test("a closing time before the opening time says so", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-03-15 03:30");
+    await page.getByLabel(/^Closes/).fill("2027-03-15 02:15");
+    await expect(page.getByText("The closing time must come after the opening time.")).toBeVisible();
+    await page.getByLabel(/^Closes/).fill("2027-03-15 03:30");
+    await expect(page.getByText("The poll must stay open for at least a minute.")).toBeVisible();
+  });
+
+  test("a time written the way the API takes it is understood too", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-01-15T12:00");
+    const card = page.getByRole("region", { name: "What voters see before it opens" });
+    await expect(card).toContainText("Opens January 15, 2027, 12:00 PM (America/New_York).");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toBeVisible();
+  });
+
+  test("the time zones are listed once each, by their IANA names", async ({ page }) => {
+    await toSchedule(page);
+    const zones = page.getByLabel("Time zone");
+    await expect(zones.locator('option[value="Asia/Kolkata"]')).toHaveCount(1);
+    await expect(zones.locator('option[value="Europe/Kyiv"]')).toHaveCount(1);
+    await expect(zones.locator('option[value="Asia/Calcutta"]')).toHaveCount(0);
+    await expect(zones.locator('option[value="Europe/Kiev"]')).toHaveCount(0);
+  });
+
+  test("pasting a list fills one option per line and leaves no empty rows under it", async ({ page }) => {
+    await page.goto("/new");
+    await page.getByLabel("Option 1", { exact: true }).focus();
+    await page.evaluate(() => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "- Lisbon\n- Kraków\n- Tallinn\n- Valencia\n");
+      document.activeElement!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+    });
+    await expect(page.getByRole("textbox", { name: /^Option \d+$/ })).toHaveCount(4);
+    await expect(page.getByLabel("Option 4", { exact: true })).toHaveValue("Valencia");
+  });
+
+  test("a reload keeps the draft, and creating the poll lets it go", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-01-15 12:00");
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "When can people vote?" })).toBeVisible();
+    await expect(page.getByLabel("Opens", { exact: true })).toHaveValue("2027-01-15 12:00");
+    await expect(page.getByLabel("Time zone")).toHaveValue("America/New_York");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toBeVisible();
+    await page.getByRole("button", { name: "Create poll" }).click();
+    await expect(page).toHaveURL(/\/dashboard\/p\/[^/?]+\?created=1$/);
+    await page.goto("/new");
+    await expect(page.getByLabel("Title")).toHaveValue("");
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();
@@ -101,5 +166,50 @@ test.describe("new poll wizard", () => {
     await expect(page.getByLabel("Voter link")).toHaveValue(new RegExp(`/p/${slug}$`));
     await page.goto("/dashboard");
     await expect(page.getByText("Showing 1–1 of 1 poll")).toBeVisible();
+  });
+
+  test.describe("in India", () => {
+    test.use({ timezoneId: "Asia/Kolkata" });
+
+    test("the browser's zone is offered under its IANA name", async ({ page }) => {
+      await page.goto("/new");
+      await page.getByLabel("Title").fill("Diwali lunch");
+      await page.getByLabel("Option 1", { exact: true }).fill("Thali");
+      await page.getByLabel("Option 2", { exact: true }).fill("Dosa");
+      for (const heading of ["Method and seats", "Counting rules", "Who votes, who sees", "When can people vote?"]) {
+        await page.getByRole("button", { name: "Continue" }).click();
+        await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+      }
+      await expect(page.getByLabel("Time zone")).toHaveValue("Asia/Kolkata");
+    });
+  });
+
+  test.describe("on a phone", () => {
+    test.use({ viewport: { width: 390, height: 844 } });
+
+    test("each step's heading comes into view below the header, with nothing half hidden behind it", async ({ page }) => {
+      await page.goto("/new");
+      await page.getByLabel("Title").fill("Spring offsite 2027");
+      await page.getByLabel("Option 1", { exact: true }).fill("Lisbon");
+      await page.getByLabel("Option 2", { exact: true }).fill("Kraków");
+      for (const heading of ["Method and seats", "Counting rules", "Who votes, who sees", "When can people vote?"]) {
+        await page.getByRole("button", { name: "Continue" }).click();
+        await expect(page.getByRole("heading", { name: heading })).toBeFocused();
+        const { header, step, cut } = await page.evaluate(() => {
+          const header = document.querySelector(".site-header")!.getBoundingClientRect().bottom;
+          const current = '[aria-label="New poll steps"] [aria-current="step"]';
+          // The page title and this step's dot and label: each wholly behind the header or wholly below it.
+          const below = (selector: string) => document.querySelector(selector)!.getBoundingClientRect().top >= header;
+          const cut = ["h1", `${current} .stepper-dot`, `${current} .stepper-label`].filter((selector) => {
+            const { top, bottom } = document.querySelector(selector)!.getBoundingClientRect();
+            return top < header && bottom > header;
+          });
+          if (below(`${current} .stepper-label`) && !below(`${current} .stepper-dot`)) cut.push("label without its dot");
+          return { header, step: document.getElementById("step-title")!.getBoundingClientRect().top, cut };
+        });
+        expect(step).toBeGreaterThanOrEqual(header);
+        expect(cut).toEqual([]);
+      }
+    });
   });
 });

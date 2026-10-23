@@ -4,6 +4,7 @@ const STATUS = {
   validation: 422,
   poll_not_open: 423,
   poll_closed: 423,
+  cvr_not_published: 423,
   already_voted: 409,
   code_used: 409,
   code_required: 400,

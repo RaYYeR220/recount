@@ -154,7 +154,7 @@ export const countPaths = {
         },
         "401": errorResponse("An Authorization header was sent but the token is unknown"),
         "404": errorResponse("No such poll, or its results are private"),
-        "423": errorResponse("The poll is not closed yet"),
+        "423": errorResponse("The poll hasn't closed yet; the cast-vote record is published when it closes (cvr_not_published)"),
       },
     },
   },

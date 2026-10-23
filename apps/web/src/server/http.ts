@@ -10,6 +10,7 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   validation: "The request is not valid",
   poll_not_open: "The poll is not open yet",
   poll_closed: "The poll is closed",
+  cvr_not_published: "The cast-vote record is published when the poll closes",
   already_voted: "This browser has already voted in this poll",
   code_used: "This invite code has already been used",
   code_required: "This poll needs an invite code",

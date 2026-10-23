@@ -14,6 +14,10 @@ test("T14: the schedule simulator shows a scheduled poll open at a later time", 
   await page.getByLabel("See this poll at").fill(`${utcDay(0)} 00:00`);
   await page.getByRole("button", { name: "Show" }).click();
   await expect(page.getByText("At that time this poll hasn't opened yet.")).toBeVisible();
+  await page.getByLabel("See this poll at").fill("next tuesday");
+  await page.getByRole("button", { name: "Show" }).click();
+  await expect(page.getByText("Use the format YYYY-MM-DD HH:mm, for example 2027-03-14 09:00.")).toBeVisible();
+  await expect(page.getByLabel("See this poll at")).toHaveAttribute("aria-invalid", "true");
 });
 
 test("T11: invite codes are generated, listed and work once each", async ({ page, browser }) => {
@@ -35,7 +39,7 @@ test("T11: invite codes are generated, listed and work once each", async ({ page
   await voter.getByRole("button", { name: "Review ballot" }).click();
   await voter.getByRole("button", { name: "Cast ballot" }).click();
   await expect(voter.getByRole("heading", { name: "Your receipt" })).toBeVisible();
-  await voter.getByRole("link", { name: "Back to ballot" }).click();
+  await voter.getByRole("link", { name: "Back to the poll" }).click();
   await voter.getByLabel("Invite code").fill(first);
   await voter.getByRole("button", { name: "Continue to the ballot" }).click();
   await expect(voter.getByText("This code has already been used.")).toBeVisible();
@@ -48,11 +52,22 @@ test("T11: invite codes are generated, listed and work once each", async ({ page
 
 test("closing early stops voting and is logged", async ({ page }) => {
   await signUp(page);
-  await createPollWithWizard(page, { title: "Team mascot", options: ["Owl", "Otter", "Orca"] });
+  const slug = await createPollWithWizard(page, { title: "Team mascot", options: ["Owl", "Otter", "Orca"] });
+  const turnout = page.getByRole("region", { name: "Turnout" });
+  await expect(turnout).toContainText("No closing time");
+  await expect(turnout).not.toContainText("Open, no closing time");
   await page.getByRole("button", { name: "Close voting now" }).click();
   await page.getByRole("button", { name: "Yes, close voting" }).click();
   await expect(page.getByText(/^Voting closed on .*The count is final/)).toBeVisible();
   await expect(page.getByRole("region", { name: "Audit log" })).toContainText(/Voting closed\. CVR SHA-256 [0-9a-f]{12}…/);
+
+  // Nothing on the page reads as open any more.
+  await expect(page.getByRole("link", { name: "See the results" })).toHaveAttribute("href", `/p/${slug}/results`);
+  await expect(page.getByRole("link", { name: "Open the voter page" })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Share" })).toContainText("Voting is over.");
+  const schedule = page.getByRole("region", { name: "Schedule" });
+  await expect(schedule).toContainText(/Closed\s*\w+ \d+, \d{4}, \d+:\d{2} [AP]M, by hand/);
+  await expect(schedule).not.toContainText("When you close it");
 });
 
 test("the closing time can be moved, in the poll's zone", async ({ page }) => {

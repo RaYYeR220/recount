@@ -92,7 +92,9 @@ export async function updatePoll(
       if (issues.length > 0) throw validationError(...issues);
     }
     if (changed.includes("opensAt") || changed.includes("closesAt")) {
-      assertSchedule(next.opensAt ?? current.createdAt, next.closesAt, now);
+      assertSchedule(next.opensAt ?? current.createdAt, next.closesAt, now, {
+        openingSet: changed.includes("opensAt"),
+      });
     }
 
     const [row] = await tx

@@ -4,15 +4,16 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Wizard } from "@/components/wizard/Wizard";
 import { WizardSkeleton } from "@/components/wizard/WizardSkeleton";
+import { zoneChoices } from "@/lib/timeZones";
 import { requireViewer } from "@/server/session";
 
 export const metadata: Metadata = { title: "New poll" };
 
-/** Every zone the poll services accept, UTC first, then by name. */
+/** Every zone the poll services accept, under its IANA name, UTC first, then by name. */
 async function timeZones(): Promise<string[]> {
   "use cache";
   cacheLife("max");
-  return ["UTC", ...Intl.supportedValuesOf("timeZone").filter((zone) => zone !== "UTC").sort()];
+  return zoneChoices(Intl.supportedValuesOf("timeZone"));
 }
 
 async function WizardGate() {

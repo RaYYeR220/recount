@@ -18,7 +18,11 @@ export function NotFoundPoll({ signedIn = false }: NotFoundPollProps) {
   return (
     <StatusPage
       title={NOT_FOUND_POLL_COPY}
-      description="Check the link you were sent. If the poll is private, sign in with the account it was shared with, or ask its organiser to share it again."
+      description={
+        signedIn
+          ? "Check the link you were sent. A poll can only be managed from the account that made it."
+          : "Check the link you were sent. If it's your poll, sign in to see it."
+      }
       actions={
         <>
           <ButtonLink href="/dashboard" variant="brass" size="lg">

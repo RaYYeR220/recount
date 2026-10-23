@@ -2,7 +2,7 @@
 
 import type { ClipboardEvent } from "react";
 import { Button, Chit, ErrorText, Field, Hint, Input, Textarea } from "@/components/ui";
-import { MAX_OPTION_LENGTH, MAX_OPTIONS, splitPasted, type Draft } from "./draft";
+import { MAX_OPTION_LENGTH, MAX_OPTIONS, pasteOptions, splitPasted } from "./draft";
 import type { FieldsProps } from "./fields";
 
 /** Title, description and the options, one input each. Pasting a list adds a row per line. */
@@ -30,12 +30,7 @@ export function OptionsFields({ draft, update, errors }: FieldsProps) {
     const lines = splitPasted(event.clipboardData.getData("text"));
     if (lines.length < 2) return;
     event.preventDefault();
-    let key = nextKey();
-    const added: Draft["options"] = lines.slice(1).map((label) => ({ key: key++, label }));
-    const merged = [...options.slice(0, index), { ...options[index]!, label: lines[0]! }, ...added, ...options.slice(index + 1)];
-    // Blank rows after the paste point make room before the list grows.
-    const trimmed = merged.filter((o, i) => i <= index + added.length || o.label.trim() !== "" || merged.length <= MAX_OPTIONS);
-    update({ options: trimmed.slice(0, MAX_OPTIONS) });
+    update({ options: pasteOptions(options, index, lines) });
   }
 
   return (

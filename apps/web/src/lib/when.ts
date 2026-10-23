@@ -7,12 +7,15 @@ import type { ScheduleWarning } from "@/server/polls/schedule";
  * "AM", which would make the same sentence differ between Node and browsers.
  */
 
-const WALL_INPUT = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/;
+const WALL_INPUT = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/;
 const WALL = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 
 export const WALL_INPUT_FORMAT = "YYYY-MM-DD HH:mm";
 
-/** "2027-03-14 02:30" (what people type) to "2027-03-14T02:30" (what the services take); null if not that shape. */
+/**
+ * "2027-03-14 02:30" (what people type) to "2027-03-14T02:30" (what the services take);
+ * the services' own form is taken as typed too. Null if neither shape.
+ */
 export function parseWallInput(text: string): string | null {
   const m = WALL_INPUT.exec(text.trim());
   if (!m) return null;

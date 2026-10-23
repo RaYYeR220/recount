@@ -24,7 +24,16 @@ test("T07: rank by clicking, review and cast, then get a receipt", async ({ page
   await page.getByRole("button", { name: "Cast ballot" }).click();
   await expect(page.getByRole("heading", { name: "Your receipt" })).toBeVisible();
   await expect(page.getByTestId("receipt-code")).toHaveText(RECEIPT);
+  // The poll's results are live, so the receipt leads to them.
+  await expect(page.getByRole("link", { name: "See the results" })).toHaveAttribute("href", "/p/offsite-2026/results");
   expect(errors).toEqual([]);
+});
+
+test("the receipt page without a receipt says so, outside the voting steps", async ({ page }) => {
+  await page.goto("/p/offsite-2026/receipt");
+  await expect(page.getByRole("heading", { name: "Receipts are shown once" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Voting steps" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Back to the poll" })).toHaveAttribute("href", "/p/offsite-2026");
 });
 
 test("T08 and T09: the receipt checks out, and the same browser can't vote twice", async ({ page }) => {
@@ -42,7 +51,7 @@ test("T08 and T09: the receipt checks out, and the same browser can't vote twice
   await expect(recorded).toHaveText(["1. Kraków", "2. Lisbon", "3. Valencia"]);
 
   await page.goto(`/p/offsite-2026/receipt`);
-  await page.getByRole("link", { name: "Back to ballot" }).click();
+  await page.getByRole("link", { name: "Back to the poll" }).click();
   await expect(page.getByText("You've already voted in this poll from this browser.")).toBeVisible();
   await expect(page.getByRole("button", { name: /^Rank/ })).toHaveCount(0);
 });

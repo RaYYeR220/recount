@@ -119,10 +119,50 @@ describe("poll lifecycle", () => {
         "closesAtLocal",
       ],
       ["a close in the past", { closesAtLocal: "2026-10-19T11:59" }, "closesAtLocal"],
+      ["an opening time that has already passed", { opensAtLocal: "2020-01-01T10:00" }, "opensAtLocal"],
     ])("rejects %s", async (_, overrides, path) => {
       const error = await rejectionOf(createPoll(db, owner.id, pollInput(overrides), T0));
       expect(error.code).toBe("validation");
       expect(error.details).toMatchObject({ issues: expect.arrayContaining([expect.objectContaining({ path })]) });
+    });
+
+    it.each([
+      [
+        "an opening time that has already passed",
+        { timeZone: "America/New_York", opensAtLocal: "2020-01-01T10:00" },
+        "opensAtLocal",
+        "The opening time has already passed. Pick a later time, or open the poll as soon as it's created.",
+      ],
+      [
+        "a close before the open",
+        { opensAtLocal: "2026-10-20T03:30", closesAtLocal: "2026-10-20T02:15" },
+        "closesAtLocal",
+        "The closing time must come after the opening time",
+      ],
+      [
+        "a close at the same time as the open",
+        { opensAtLocal: "2026-10-20T10:00", closesAtLocal: "2026-10-20T10:00" },
+        "closesAtLocal",
+        "The poll must stay open for at least a minute",
+      ],
+    ])("says why it rejects %s", async (_, overrides, path, message) => {
+      const error = await rejectionOf(createPoll(db, owner.id, pollInput(overrides), T0));
+      expect(error.details).toEqual({ issues: [{ path, message }] });
+    });
+
+    it("reports a passed opening and a passed closing together", async () => {
+      const input = pollInput({ opensAtLocal: "2020-01-01T10:00", closesAtLocal: "2020-01-02T10:00" });
+      const error = await rejectionOf(createPoll(db, owner.id, input, T0));
+      expect((error.details as { issues: Array<{ path: string }> }).issues.map((i) => i.path)).toEqual([
+        "opensAtLocal",
+        "closesAtLocal",
+      ]);
+    });
+
+    it("takes an opening time in the minute that is under way as now", async () => {
+      const poll = await createPoll(db, owner.id, pollInput({ opensAtLocal: "2026-10-19T12:00" }), minutesAfter(0.5));
+      expect(poll.status).toBe("open");
+      expect(poll.opensAt?.toISOString()).toBe("2026-10-19T12:00:00.000Z");
     });
 
     it("accepts the widest allowed shape", async () => {
@@ -187,6 +227,20 @@ describe("poll lifecycle", () => {
       const { slug } = await createPoll(db, owner.id, pollInput({ opensAtLocal: "2026-10-20T09:00" }), T0);
       const updated = await updatePoll(db, owner.id, slug, { opensAtLocal: "2026-10-21T09:00" }, T0);
       expect(updated.opensAt?.toISOString()).toBe("2026-10-21T09:00:00.000Z");
+    });
+
+    it("refuses to move the opening time into the past", async () => {
+      const { slug } = await createPoll(db, owner.id, pollInput({ opensAtLocal: "2026-10-20T09:00" }), T0);
+      const error = await rejectionOf(updatePoll(db, owner.id, slug, { opensAtLocal: "2026-10-18T09:00" }, T0));
+      expect(error.details).toMatchObject({ issues: [expect.objectContaining({ path: "opensAtLocal" })] });
+    });
+
+    it("moves the closing time of a poll that opened at a set time", async () => {
+      const { slug } = await createPoll(db, owner.id, pollInput({ opensAtLocal: "2026-10-20T09:00" }), T0);
+      const open = new Date("2026-10-21T09:00:00Z");
+      const updated = await updatePoll(db, owner.id, slug, { closesAtLocal: "2026-10-27T12:00" }, open);
+      expect(updated.status).toBe("open");
+      expect(updated.closesAt?.toISOString()).toBe("2026-10-27T12:00:00.000Z");
     });
 
     it("locks the opening time once open", async () => {

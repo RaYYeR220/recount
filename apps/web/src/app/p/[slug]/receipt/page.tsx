@@ -46,6 +46,7 @@ async function Receipt({ params }: { params: PageProps<"/p/[slug]/receipt">["par
     : null;
   const index = new Map(poll.options.map((o, i) => [o.label, i]));
 
+  // No voting steps here: without a ballot just cast there is no step to be on.
   if (!receipt || !found) {
     return (
       <Paper as="section" aria-labelledby="receipt-title" padded={false} className="grid justify-items-center gap-3.5 px-6 pb-8 pt-9 text-center">
@@ -60,15 +61,18 @@ async function Receipt({ params }: { params: PageProps<"/p/[slug]/receipt">["par
             Check your ballot
           </ButtonLink>
           <ButtonLink href={`/p/${slug}`} variant="line">
-            Back to ballot
+            Back to the poll
           </ButtonLink>
         </div>
       </Paper>
     );
   }
 
+  const resultsShown = poll.resultsVisibility === "live" || (poll.resultsVisibility === "after_close" && poll.status === "closed");
+
   return (
     <>
+      <VotingSteps current={2} />
       <Paper as="section" aria-labelledby="receipt-title" padded={false} className="overflow-hidden">
         <div className="grid justify-items-center gap-3.5 px-6 pb-7 pt-9 text-center">
           <Badge tone="match">Ballot cast</Badge>
@@ -90,6 +94,11 @@ async function Receipt({ params }: { params: PageProps<"/p/[slug]/receipt">["par
             <ButtonLink href={`/p/${slug}/verify`} variant="ink">
               Check your ballot
             </ButtonLink>
+            {resultsShown ? (
+              <ButtonLink href={`/p/${slug}/results`} variant="line">
+                See the results
+              </ButtonLink>
+            ) : null}
           </div>
           <p className="text-sm text-ink-3">For {poll.title}</p>
         </div>
@@ -97,7 +106,7 @@ async function Receipt({ params }: { params: PageProps<"/p/[slug]/receipt">["par
       </Paper>
       <p className="mt-[18px] text-center text-sm text-cream-3">
         <Link href={`/p/${slug}`} className="font-bold text-cream-2 underline underline-offset-4">
-          Back to ballot
+          Back to the poll
         </Link>
       </p>
     </>
@@ -108,7 +117,6 @@ export default function ReceiptPage({ params }: PageProps<"/p/[slug]/receipt">) 
   return (
     <div className="wrap page">
       <div className="mx-auto max-w-[980px]">
-        <VotingSteps current={2} />
         <Suspense
           fallback={
             <Paper padded={false} className="h-[480px]" aria-label="Loading your receipt">

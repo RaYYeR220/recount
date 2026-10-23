@@ -38,6 +38,10 @@ test("a short password is refused before anything is sent", async ({ page }) => 
   await page.getByLabel("Password").fill("short");
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByText("Use at least 8 characters.")).toBeVisible();
+  // One message under the field, and what was typed is still there to finish.
+  await expect(page.getByText("At least 8 characters.", { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("Password")).toHaveValue("short");
+  await expect(page.getByLabel("Password")).toHaveAttribute("minlength", "8");
 });
 
 for (const next of ["https://evil.example", "//evil.example", "/.//evil.example"]) {

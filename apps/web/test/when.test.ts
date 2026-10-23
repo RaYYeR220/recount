@@ -20,7 +20,12 @@ describe("parseWallInput", () => {
     expect(parseWallInput("  2027-01-15 12:00 ")).toBe("2027-01-15T12:00");
   });
 
-  it.each(["2027-03-14T02:30", "2027-3-14 02:30", "2027-02-30 10:00", "2027-13-01 10:00", "2027-01-01 24:00", "2027-01-01 10:60", "tomorrow", ""])(
+  it("takes the services' own form as typed", () => {
+    expect(parseWallInput("2027-03-14T02:30")).toBe("2027-03-14T02:30");
+    expect(parseWallInput("2027-02-30T10:00")).toBeNull();
+  });
+
+  it.each(["2027-03-14  02:30", "2027-3-14 02:30", "2027-02-30 10:00", "2027-13-01 10:00", "2027-01-01 24:00", "2027-01-01 10:60", "tomorrow", ""])(
     "rejects %j",
     (text) => {
       expect(parseWallInput(text)).toBeNull();
