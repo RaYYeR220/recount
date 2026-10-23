@@ -10,12 +10,15 @@ export type PlaqueProps = {
   figure: string;
   /** Several seats: the badge names the seat ("Seat 2") instead of "Winner". */
   multiSeat: boolean;
+  /** The poll is still open: the badge says "Leading". */
+  provisional?: boolean;
   countRef: Ref<HTMLSpanElement>;
 };
 
 /** A brass name plate on the front edge of a tray. */
-export function Plaque({ tray, state, figure, multiSeat, countRef }: PlaqueProps) {
+export function Plaque({ tray, state, figure, multiSeat, provisional, countRef }: PlaqueProps) {
   const up = state.delta?.startsWith("+") && state.meta === state.delta;
+  const badge = provisional ? "Leading" : multiSeat ? `Seat ${state.seat ?? ""}` : "Winner";
   return (
     // State goes in data-state: the renderer adds is-wide to the class list, and a changing className would wipe it.
     <div className="plaque" data-state={state.state} data-tray={tray.id}>
@@ -24,7 +27,7 @@ export function Plaque({ tray, state, figure, multiSeat, countRef }: PlaqueProps
         <span className="pl-name" title={tray.label}>
           {tray.short}
         </span>
-        <span className="pl-badge">{multiSeat ? `Seat ${state.seat ?? ""}` : "Winner"}</span>
+        <span className="pl-badge">{badge}</span>
       </div>
       <span className="pl-count" ref={countRef}>
         {figure}

@@ -1,9 +1,12 @@
 /**
  * Round captions and lamp labels written from the engine's round records, for any
  * count. A caption says what moved coming into the round (the previous round's
- * eliminations and surpluses) and what stands now (who wins or reaches the quota).
+ * eliminations and surpluses) and what stands now (who wins or reaches the quota,
+ * and any tie the rules had to break).
  */
 import type { ResultRound } from "@/server/results/serialize";
+import type { Tie } from "./countTies";
+import { listNames } from "./names";
 import { formatUnits, formatVotes, fromUnits, toUnits } from "./votes";
 
 export type CaptionPart = {
@@ -22,6 +25,12 @@ export type CaptionContext = {
   dp: number;
   short: (label: string) => string;
   isTrailing: (index: number) => boolean;
+  /** The poll is still open: options lead or are ahead; nobody wins or is elected yet. */
+  provisional?: boolean;
+  /** Ties the tiebreak settled (findTies). */
+  ties?: readonly Tie[];
+  /** How a tie was settled, e.g. "by a draw with seed 0"; null when the rules aren't known. */
+  howTieBroke?: (tie: Tie) => string | null;
 };
 
 const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
@@ -39,12 +48,18 @@ function joinList(items: CaptionPart[][]): CaptionPart[] {
 }
 
 export function describeRounds(ctx: CaptionContext): RoundDescription[] {
-  const { rounds, multiSeat, noun, unit, dp, short } = ctx;
+  const { rounds, multiSeat, noun, unit, dp, short, provisional = false, ties = [] } = ctx;
   const U = (v: string | undefined) => (v === undefined ? 0n : toUnits(v, dp));
   const fig = (v: string | bigint): CaptionPart => ({ text: typeof v === "bigint" ? formatUnits(v, dp) : formatVotes(v), tone: "figure" });
   const t = (text: string): CaptionPart => ({ text });
   const one = unit === "votes" ? "vote" : "ballot";
   const nouns = `${noun}s`;
+  /** "1 ballot", "13 ballots": the unit after a figure. */
+  const unitOf = (v: string) => (U(v) === 10n ** BigInt(dp) ? one : unit);
+  const how = (tie: Tie) => {
+    const words = ctx.howTieBroke?.(tie);
+    return words ? ` ${words}.` : ".";
+  };
 
   /** "a to A, b to B and c to the other 7", plus whatever went inactive. */
   function destinations(to: Record<string, string>): { list: CaptionPart[]; inactive: bigint; count: number } {
@@ -118,31 +133,73 @@ export function describeRounds(ctx: CaptionContext): RoundDescription[] {
     ];
   }
 
-  function standing(r: ResultRound): CaptionPart[] {
+  /** " Lisbon and Valencia have 7 of 14 ballots each, short of the 8 needed. The tiebreak elects Lisbon on …" */
+  function seatTieText(r: ResultRound, tie: Tie): CaptionPart[] {
+    const level = U(r.tally[tie.picked[0]!]);
+    const out: CaptionPart[] = [t(` ${listNames(tie.tied.map(short))} ${multiSeat ? "are level with " : "have "}`), fig(level)];
+    if (!multiSeat) out.push(t(" of "), fig(r.activeTotal), t(` ${unitOf(r.activeTotal)} each`));
+    if (level < U(r.threshold)) out.push(t(", short of the "), fig(r.threshold), t(" needed"));
+    out.push(t(`. The tiebreak ${provisional ? "puts" : "elects"} `));
+    tie.picked.forEach((x, k) => {
+      if (k > 0) out.push(t(k === tie.picked.length - 1 ? " and " : ", "));
+      out.push({ text: short(x), tone: "strong" });
+    });
+    out.push(t(`${provisional ? " ahead" : ""}${how(tie)}`));
+    return out;
+  }
+
+  /** " Bea and Cal are level for last with 3; the tiebreak eliminates Cal by …", settled at the end of round i. */
+  function lastTies(i: number): CaptionPart[] {
+    return ties
+      .filter((x) => x.kind === "last" && x.round === i + 1)
+      .flatMap((tie) => [
+        t(` ${listNames(tie.tied.map(short))} are level for last with `),
+        { text: tie.at, tone: "figure" as const },
+        t(`; the tiebreak eliminates ${listNames(tie.picked.map(short))}${how(tie)}`),
+      ]);
+  }
+
+  function standing(r: ResultRound, i: number): CaptionPart[] {
     const out: CaptionPart[] = [];
+    const seatTies = ties.filter((x) => x.kind === "seat" && x.round === i + 1);
+    const settled = new Set(seatTies.flatMap((x) => x.picked));
     if (!multiSeat) {
       for (const x of r.elected) {
+        if (settled.has(x)) continue;
         const tally = U(r.tally[x]);
         const active = U(r.activeTotal);
-        const why = tally * 2n > active ? "more than half" : "the most left";
-        out.push(t(" "), { text: short(x), tone: "strong" }, t(" has "), fig(tally), t(" of "), fig(active), t(` ${unit}, ${why}, and wins.`));
+        out.push(t(" "), { text: short(x), tone: "strong" }, t(" has "), fig(tally), t(" of "), fig(active), t(` ${unitOf(r.activeTotal)}, `));
+        // Below the threshold the winner is only the stronger of the last two: no majority to claim.
+        if (tally < U(r.threshold)) out.push(t("short of the "), fig(r.threshold), t(" needed but the most left"));
+        else out.push(t(tally * 2n > active ? "more than half" : "the most left"));
+        out.push(t(provisional ? ", and leads." : ", and wins."));
       }
+      for (const tie of seatTies) out.push(...seatTieText(r, tie));
       return out;
     }
     const quota = U(r.threshold);
     const reached = r.elected.filter((x) => U(r.tally[x]) >= quota);
     const rest = r.elected.filter((x) => U(r.tally[x]) < quota);
     for (const x of reached) {
-      out.push(t(" "), { text: short(x), tone: "strong" }, t(" reaches the quota of "), fig(r.threshold), t(" with "), fig(r.tally[x]!), t(" and is elected."));
+      out.push(
+        t(" "),
+        { text: short(x), tone: "strong" },
+        t(" reaches the quota of "),
+        fig(r.threshold),
+        t(" with "),
+        fig(r.tally[x]!),
+        t(provisional ? " and leads for a seat." : " and is elected."),
+      );
     }
     if (rest.length > 0) {
       out.push(t(` Only as many ${nouns} remain as seats, so `));
       rest.forEach((x, k) => {
         if (k > 0) out.push(t(k === rest.length - 1 ? " and " : ", "));
-        out.push({ text: short(x), tone: "strong" }, t(k === 0 ? " is elected with " : " with "), fig(r.tally[x]!));
+        out.push({ text: short(x), tone: "strong" }, t(k === 0 ? (provisional ? " leads for a seat with " : " is elected with ") : " with "), fig(r.tally[x]!));
       });
       out.push(t("."));
     }
+    for (const tie of seatTies) out.push(...seatTieText(r, tie));
     return out;
   }
 
@@ -152,15 +209,26 @@ export function describeRounds(ctx: CaptionContext): RoundDescription[] {
       const caption: CaptionPart[] = [{ text: "Round 1, first choices.", tone: "lead" }];
       if (multiSeat) {
         if (r.elected.length === 0) caption.push(t(" Nobody reaches the quota of "), fig(r.threshold), t(", so the count goes on."));
-        caption.push(...standing(r));
+        caption.push(...standing(r, i));
       } else {
-        caption.push(t(" "), fig(r.activeTotal), t(` ${unit} count.`));
-        if (r.elected.length > 0) caption.push(...standing(r));
+        caption.push(t(" "), fig(r.activeTotal), t(unitOf(r.activeTotal) === one ? ` ${one} counts.` : ` ${unit} count.`));
+        if (r.elected.length > 0) caption.push(...standing(r, i));
         else {
-          const leader = Object.entries(r.tally).sort((a, b) => (U(b[1]) > U(a[1]) ? 1 : U(b[1]) < U(a[1]) ? -1 : 0))[0];
-          if (leader) caption.push(t(` ${short(leader[0])} leads with `), fig(leader[1]), t(", short of the "), fig(r.threshold), t(" needed, so the count goes on."));
+          const top = Object.values(r.tally).reduce((m, v) => (U(v) > m ? U(v) : m), -1n);
+          const leaders = Object.keys(r.tally).filter((x) => U(r.tally[x]) === top);
+          if (leaders.length > 0) {
+            const each = leaders.length > 1;
+            caption.push(
+              t(` ${listNames(leaders.map(short))} ${each ? "lead" : "leads"} with `),
+              fig(top),
+              t(`${each ? " each" : ""}, short of the `),
+              fig(r.threshold),
+              t(" needed, so the count goes on."),
+            );
+          }
         }
       }
+      caption.push(...lastTies(i));
       return { label: "First choices", caption };
     }
 
@@ -204,12 +272,12 @@ export function describeRounds(ctx: CaptionContext): RoundDescription[] {
       lead = `Round ${n}.`;
       label = `Round ${n}`;
     }
-    if (r.elected.length > 0) label = multiSeat ? `${short(r.elected[0]!)} elected` : "Final round";
+    if (r.elected.length > 0) label = multiSeat ? `${short(r.elected[0]!)} ${provisional ? "ahead" : "elected"}` : "Final round";
 
     const caption: CaptionPart[] = [{ text: lead, tone: "lead" }];
     for (const x of surpluses) caption.push(t(" "), ...surplusText(prev, x, false));
     if (eliminated.length > 0) caption.push(t(" "), ...eliminationText(prev));
-    caption.push(...standing(r));
+    caption.push(...standing(r, i), ...lastTies(i));
     return { label, caption: tidy(caption) };
   });
 }

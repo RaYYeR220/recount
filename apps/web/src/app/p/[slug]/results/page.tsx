@@ -78,6 +78,7 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
   const isPublic = canSeeResults(poll, null, now) === "yes";
   const closed = results.status === "closed";
   const empty = results.totalBallots === 0;
+  const seedSource = "seeded from the cast-vote record's SHA-256";
   const view: CountView = {
     rounds: results.rounds,
     options: results.candidates,
@@ -167,9 +168,15 @@ export default async function ResultsPage({ params }: PageProps<"/p/[slug]/resul
       ) : (
         <ResultsLayout
           view={view}
-          scene={buildCountScene({ rounds: results.rounds, options: results.candidates, seats: results.seats })}
+          scene={buildCountScene({
+            rounds: results.rounds,
+            options: results.candidates,
+            seats: results.seats,
+            provisional: !closed,
+            tiebreak: { rules: results.rules, seed: seedSource },
+          })}
           title={`${poll.title}: the count, round by round`}
-          seedSource="seeded from the cast-vote record's SHA-256"
+          seedSource={seedSource}
           provisional={!closed}
           side={
             <AuditLinks

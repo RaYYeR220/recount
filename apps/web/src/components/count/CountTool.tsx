@@ -32,8 +32,18 @@ export function CountTool() {
   const resultRef = useRef<HTMLHeadingElement>(null);
   const errorsId = useId();
 
+  const seedSource = counted ? `with seed ${counted.outcome.view.rules.randomSeed ?? "0"}` : undefined;
   const scene = useMemo(
-    () => (counted ? buildCountScene({ rounds: counted.outcome.view.rounds, options: counted.outcome.view.options, seats: counted.seats, noun: "candidate" }) : null),
+    () =>
+      counted
+        ? buildCountScene({
+            rounds: counted.outcome.view.rounds,
+            options: counted.outcome.view.options,
+            seats: counted.seats,
+            noun: "candidate",
+            tiebreak: { rules: counted.outcome.view.rules },
+          })
+        : null,
     [counted],
   );
 
@@ -201,7 +211,7 @@ export function CountTool() {
                 id: "count",
                 label: "Count",
                 panel: (
-                  <ResultsLayout view={counted.outcome.view} scene={scene} title="Your ballots: the count, round by round" seedSource={`seed ${counted.outcome.view.rules.randomSeed ?? "0"}`} />
+                  <ResultsLayout view={counted.outcome.view} scene={scene} title="Your ballots: the count, round by round" seedSource={seedSource} />
                 ),
               },
               {

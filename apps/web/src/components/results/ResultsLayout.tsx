@@ -13,7 +13,7 @@ export type ResultsLayoutProps = {
   scene: CountScene;
   /** Accessible name of the count table. */
   title: string;
-  /** Where tiebreak draws are seeded from, for the tie notes. */
+  /** Where tiebreak draws come from, for the tie notes: "seeded from the cast-vote record's SHA-256". */
   seedSource?: string;
   /** The poll is still open: tell the count so far in the present tense. */
   provisional?: boolean;
@@ -31,7 +31,7 @@ export function ResultsLayout({ view, scene, title, seedSource, provisional, mai
     <div className="res-grid">
       <div className="res-main">
         <CountTable scene={scene} title={title} />
-        <RoundTable view={view} note={roundNote} />
+        <RoundTable view={view} note={roundNote} provisional={provisional} />
         {main}
         <TransferList view={view} />
         <InactiveBreakdown view={view} note={inactiveNote} />
@@ -39,7 +39,7 @@ export function ResultsLayout({ view, scene, title, seedSource, provisional, mai
       <div className="res-side">
         {sideFirst}
         <WhyItWon view={view} seedSource={seedSource} provisional={provisional} />
-        <CondorcetCheck view={view} />
+        <CondorcetCheck view={view} provisional={provisional} />
         {side}
       </div>
     </div>

@@ -21,6 +21,8 @@ function matrixOptions(view: Pick<CountView, "options" | "pairwise" | "winners" 
 
 export type CondorcetCheckProps = {
   view: Pick<CountView, "options" | "pairwise" | "winners" | "pluralityWinner" | "rounds" | "seats" | "noun" | "shortLabels">;
+  /** The poll is still open: the count so far has leaders, not winners. */
+  provisional?: boolean;
   id?: string;
 };
 
@@ -38,7 +40,7 @@ function Name({ label, short }: { label: string; short?: string }) {
 }
 
 /** Head-to-head check: does any option beat every other one, and is it the ranked-choice winner? */
-export function CondorcetCheck({ view, id = "condorcet-h" }: CondorcetCheckProps) {
+export function CondorcetCheck({ view, provisional, id = "condorcet-h" }: CondorcetCheckProps) {
   const { matrix, condorcetWinner: cw } = view.pairwise;
   const noun = view.noun ?? "option";
   const agrees = cw !== null && view.winners.includes(cw);
@@ -53,12 +55,21 @@ export function CondorcetCheck({ view, id = "condorcet-h" }: CondorcetCheckProps
       ) : agrees ? (
         <Callout tone="match">
           <b>
-            Condorcet winner: {cw}. {view.seats > 1 ? "It is also elected." : "Ranked choice and the head-to-head check agree."}
+            Condorcet winner: {cw}.{" "}
+            {view.seats > 1 ? (provisional ? "It also leads for a seat." : "It is also elected.") : "Ranked choice and the head-to-head check agree."}
           </b>
         </Callout>
       ) : (
         <Callout tone="warn">
-          <b>Condorcet winner: {cw}.</b> The ranked-choice {view.seats > 1 ? "count does not elect it" : "winner is different"}: {cw} beats every other {noun} head to head.
+          <b>Condorcet winner: {cw}.</b> The ranked-choice{" "}
+          {view.seats > 1
+            ? provisional
+              ? "count so far does not put it ahead"
+              : "count does not elect it"
+            : provisional
+              ? "leader is different"
+              : "winner is different"}
+          : {cw} beats every other {noun} head to head.
         </Callout>
       )}
       {view.pluralityWinner && !view.winners.includes(view.pluralityWinner) ? (

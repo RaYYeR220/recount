@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { matchLabel, reportName } from "@/components/elections/matchLabel";
-import { findTies, inactiveSummary, whyItWon } from "@/lib/countStory";
+import { inactiveSummary, whyItWon } from "@/lib/countStory";
 import { captionText } from "@/lib/countCaptions";
+import { findTies } from "@/lib/countTies";
 import { parseCsv } from "@/lib/csv";
 import { personName, surname } from "@/lib/names";
 import { comparePollRecount, compareElectionRecount, figuresLine, largestGap, pollMatchLine, type PollRecount } from "@/lib/recount";

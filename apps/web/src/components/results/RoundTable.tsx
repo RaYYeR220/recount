@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Chit } from "@/components/ui/Chit";
 import { PanelHeader, Paper } from "@/components/ui/Surface";
 import { isTrailing } from "@/lib/countStory";
+import { findTies, type Tie } from "@/lib/countTies";
 import { cx } from "@/lib/cx";
+import { ballotsText } from "@/lib/pollText";
 import { formatDelta, formatUnits, formatVotes, sharedPlaces, toUnits } from "@/lib/votes";
 import type { ResultRound } from "@/server/results/serialize";
 import { chitOf, type CountView } from "./model";
@@ -11,6 +13,8 @@ export type RoundTableProps = {
   view: Pick<CountView, "rounds" | "options" | "seats" | "writeIns" | "totalBallots" | "noun">;
   /** Quiet note beside the heading. Default: what the figures are. */
   note?: ReactNode;
+  /** The poll is still open: leaders, not winners. */
+  provisional?: boolean;
   id?: string;
 };
 
@@ -22,20 +26,33 @@ function inactiveOf(r: ResultRound, dp: number): bigint {
   return Object.values(r.inactive).reduce((a, v) => a + toUnits(v, dp), 0n);
 }
 
+/** The word under a figure: elected or eliminated this round, and whether a tiebreak decided it. */
+function tagOf(option: string, r: ResultRound, ties: readonly Tie[], provisional: boolean): { text: string; out: boolean } | null {
+  const tie = ties.find((x) => x.round === r.round && x.tied.includes(option));
+  if (r.elected.includes(option)) {
+    if (provisional) return { text: tie ? "Ahead on tiebreak" : "Leading", out: false };
+    return { text: tie ? "Elected on tiebreak" : "Elected", out: false };
+  }
+  if (r.eliminated.includes(option)) return { text: tie ? "Eliminated on tiebreak" : "Eliminated", out: true };
+  if (tie?.kind === "seat") return { text: provisional ? "Behind on tiebreak" : "Lost tiebreak", out: true };
+  return null;
+}
+
 /**
  * Every option's figure in every round, with the change from the round before and
  * the round it was elected or eliminated. Scrolls sideways inside its card.
  */
-export function RoundTable({ view, note, id = "rounds-h" }: RoundTableProps) {
+export function RoundTable({ view, note, provisional = false, id = "rounds-h" }: RoundTableProps) {
   const { rounds, seats } = view;
   const dp = placesOf(rounds);
   const multi = seats > 1;
+  const ties = findTies(rounds);
   const rows = view.options.filter((o) => rounds.some((r) => r.tally[o] !== undefined));
   const lastInactive = rounds.length ? inactiveOf(rounds.at(-1)!, dp) : 0n;
   const fallbackNote =
     dp > 0
       ? `Fractional votes at ${dp} decimal places, truncated, as RCTab counts them.`
-      : `${view.totalBallots.toLocaleString("en-US")} ballots, ${lastInactive === 0n ? "nothing inactive" : `${formatUnits(lastInactive, dp)} inactive by the last round`}.`;
+      : `${ballotsText(view.totalBallots)}, ${lastInactive === 0n ? "nothing inactive" : `${formatUnits(lastInactive, dp)} inactive by the last round`}.`;
 
   return (
     <Paper as="section" aria-labelledby={id}>
@@ -78,13 +95,12 @@ export function RoundTable({ view, note, id = "rounds-h" }: RoundTableProps) {
                     );
                   const prev = i > 0 ? rounds[i - 1]!.tally[o] : undefined;
                   const delta = prev === undefined ? null : formatDelta(toUnits(value, dp) - toUnits(prev, dp), dp);
-                  const elected = r.elected.includes(o);
-                  const out = r.eliminated.includes(o);
+                  const tag = tagOf(o, r, ties, provisional);
                   return (
-                    <td key={r.round} className={cx("num", elected && "el", trailing && "trail")}>
+                    <td key={r.round} className={cx("num", r.elected.includes(o) && "el", trailing && "trail")}>
                       {formatVotes(value)}
                       {delta ? <span className={cx("d", delta.startsWith("−") && "neg")}>{delta}</span> : null}
-                      {elected ? <span className="tag">Elected</span> : out ? <span className="tag out">Eliminated</span> : null}
+                      {tag ? <span className={cx("tag", tag.out && "out")}>{tag.text}</span> : null}
                     </td>
                   );
                 })}
