@@ -132,6 +132,18 @@ test.describe("new poll wizard", () => {
     await expect(zones.locator('option[value="Europe/Kiev"]')).toHaveCount(0);
   });
 
+  test("pasting a list fills one option per line and leaves no empty rows under it", async ({ page }) => {
+    await page.goto("/new");
+    await page.getByLabel("Option 1", { exact: true }).focus();
+    await page.evaluate(() => {
+      const data = new DataTransfer();
+      data.setData("text/plain", "- Lisbon\n- Kraków\n- Tallinn\n- Valencia\n");
+      document.activeElement!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+    });
+    await expect(page.getByRole("textbox", { name: /^Option \d+$/ })).toHaveCount(4);
+    await expect(page.getByLabel("Option 4", { exact: true })).toHaveValue("Valencia");
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   emptyDraft,
   firstOpenStep,
+  pasteOptions,
   REVIEW_STEP,
   splitPasted,
   stepIssues,
@@ -84,5 +85,18 @@ describe("new poll draft", () => {
 
   it("splits a pasted list into options, dropping bullets and blank lines", () => {
     expect(splitPasted("- Lisbon\r\n\n2. Kraków\n• Tallinn  \n")).toEqual(["Lisbon", "Kraków", "Tallinn"]);
+  });
+
+  it("pastes a list into the rows, leaving no blank rows under it", () => {
+    const pasted = pasteOptions(emptyDraft().options, 0, ["Lisbon", "Kraków", "Tallinn", "Valencia"]);
+    expect(pasted.map((o) => o.label)).toEqual(["Lisbon", "Kraków", "Tallinn", "Valencia"]);
+    expect(new Set(pasted.map((o) => o.key)).size).toBe(4);
+    const rows = [{ key: 1, label: "Porto" }, { key: 2, label: "" }, { key: 3, label: "" }, { key: 4, label: "Riga" }];
+    expect(pasteOptions(rows, 1, ["Lisbon", "Kraków"]).map((o) => o.label)).toEqual(["Porto", "Lisbon", "Kraków", "Riga"]);
+  });
+
+  it("keeps a pasted list to the most options a poll can have", () => {
+    const lines = Array.from({ length: 40 }, (_, i) => `City ${i + 1}`);
+    expect(pasteOptions(emptyDraft().options, 0, lines)).toHaveLength(30);
   });
 });

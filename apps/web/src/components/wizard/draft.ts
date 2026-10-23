@@ -163,3 +163,14 @@ export function splitPasted(text: string): string[] {
     .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim())
     .filter((line) => line !== "");
 }
+
+/**
+ * The options after pasting `lines` into row `index`: the first line fills that row,
+ * the rest get rows of their own below it, and blank rows after them are dropped.
+ */
+export function pasteOptions(options: Draft["options"], index: number, lines: string[]): Draft["options"] {
+  let key = Math.max(0, ...options.map((o) => o.key)) + 1;
+  const pasted = [{ ...options[index]!, label: lines[0] ?? "" }, ...lines.slice(1).map((label) => ({ key: key++, label }))];
+  const after = options.slice(index + 1).filter((o) => o.label.trim() !== "");
+  return [...options.slice(0, index), ...pasted, ...after].slice(0, MAX_OPTIONS);
+}
