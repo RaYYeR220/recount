@@ -114,6 +114,15 @@ test.describe("new poll wizard", () => {
     await expect(page.getByText("The poll must stay open for at least a minute.")).toBeVisible();
   });
 
+  test("a time written the way the API takes it is understood too", async ({ page }) => {
+    await toSchedule(page);
+    await page.getByLabel("Opens", { exact: true }).fill("2027-01-15T12:00");
+    const card = page.getByRole("region", { name: "What voters see before it opens" });
+    await expect(card).toContainText("Opens January 15, 2027, 12:00 PM (America/New_York).");
+    await page.getByRole("button", { name: "Continue to review" }).click();
+    await expect(page.getByRole("heading", { name: "Check and create" })).toBeVisible();
+  });
+
   test("creating the poll opens its manage page", async ({ page }) => {
     const slug = await createPollWithWizard(page, { title: "Lunch on Friday", options: ["Pizza", "Tacos", "Sushi"] });
     await expect(page.getByText("Share the link below with your voters.")).toBeVisible();
