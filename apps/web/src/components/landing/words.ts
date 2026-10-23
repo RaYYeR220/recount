@@ -17,8 +17,3 @@ export function listOf(items: readonly string[]): string {
   if (items.length <= 1) return items.join("");
   return `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
 }
-
-/** "0.3000" → "0.3", "7.0000" → "7": a share written the short way. */
-export function trimDecimal(value: string): string {
-  return value.includes(".") ? value.replace(/0+$/, "").replace(/\.$/, "") : value;
-}

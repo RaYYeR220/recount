@@ -177,12 +177,15 @@ export function SurplusFigure({
   others,
   fraction,
   head,
+  foot,
   label,
 }: {
   elected: { label: string; chit: ChitKey; count: number; value: string };
   others: Array<{ label: string; chit: ChitKey; count: number; value: string; slivers: number }>;
   fraction: number;
   head: string;
+  /** Under the trays: the options that don't have one. */
+  foot?: string;
   label: string;
 }) {
   return (
@@ -199,6 +202,11 @@ export function SurplusFigure({
         </g>
       ))}
       <Head>{head}</Head>
+      {foot ? (
+        <text x={150} y={204} textAnchor="middle" className="fig-foot">
+          {foot}
+        </text>
+      ) : null}
     </Figure>
   );
 }
