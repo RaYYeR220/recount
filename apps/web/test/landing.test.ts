@@ -95,10 +95,11 @@ describe("the hero", () => {
   });
 
   it("puts the leaders in trays of their own and everyone else in one", () => {
-    expect(hero.table.groups).toEqual([{ id: "others", label: "Adams +7", members: replay.candidates.slice(3, 11) }]);
+    expect(hero.table.groups).toEqual([{ id: "others", label: "Adams & 7 more", short: "Adams & 7", members: replay.candidates.slice(3, 11) }]);
     expect(hero.table.ballotsPerChit).toBe(2500);
     const scene = buildCountScene({ ...hero.table, noun: "candidate" });
-    expect(scene.trays.map((t) => t.short)).toEqual(["Mamdani", "Cuomo", "Lander", "Adams +7", "Write-ins", "Inactive"]);
+    expect(scene.trays.map((t) => t.short)).toEqual(["Mamdani", "Cuomo", "Lander", "Adams & 7", "Write-ins", "Inactive"]);
+    expect(scene.trays.map((t) => t.label)).toContain("Adams & 7 more");
     const last = scene.rounds.at(-1)!;
     expect(last.trays["option-0"]).toMatchObject({ tally: "573,169", state: "elected" });
     expect(last.trays.inactive!.tally).toBe("55,332");

@@ -33,10 +33,18 @@ export function roundsFromEngine(
 export type CountTrayGroup = {
   /** Stable id, unique among groups. */
   id: string;
-  /** Plaque name, e.g. "Adams +7". */
+  /** Tray name, e.g. "Adams & 7 more". */
   label: string;
+  /** Plaque name when the full one is too long for a plate, e.g. "Adams & 7". Default: label. */
+  short?: string;
   members: readonly string[];
 };
+
+/** A shared tray, named for its strongest member and how many more: "Adams & 7 more", "Adams & 7" on its plaque. */
+export function trayGroup(id: string, first: string, members: readonly string[]): CountTrayGroup {
+  const more = members.length - 1;
+  return { id, label: `${first} & ${more} more`, short: `${first} & ${more}`, members };
+}
 
 export type CountSceneInput = {
   rounds: readonly CountRound[];
@@ -226,7 +234,7 @@ export function buildCountScene(input: CountSceneInput): CountScene {
       const id = `group-${group.id}`;
       trayOf.set(label, id);
       if (!trays.some((t) => t.id === id)) {
-        trays.push({ id, label: group.label, short: group.label, kind: "group", members: [...group.members], chit: chitOf(group.members[0]!) });
+        trays.push({ id, label: group.label, short: group.short ?? group.label, kind: "group", members: [...group.members], chit: chitOf(group.members[0]!) });
       }
     } else {
       const id = `option-${indexOf.get(label)}`;

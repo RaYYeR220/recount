@@ -1,12 +1,12 @@
 /**
  * A replay as the results components draw it: names in reading order ("Mary S.
  * Peltola"), options ordered by first choices so the strongest get the first chit
- * colours, and minor candidates sharing one tray ("Adams +7") so a city-sized
+ * colours, and minor candidates sharing one tray ("Adams & 7 more") so a city-sized
  * table stays readable.
  */
 import type { GoldenMismatch, GoldenRound } from "@recount/engine";
 import type { CountView } from "@/components/results/model";
-import type { CountSceneInput, CountTrayGroup } from "@/lib/countScene";
+import { trayGroup, type CountSceneInput, type CountTrayGroup } from "@/lib/countScene";
 import { OVERLAY_MAX_TRAYS } from "@/components/table/layout";
 import { personName, surname } from "@/lib/names";
 import { placesOf, toUnits } from "@/lib/votes";
@@ -56,7 +56,7 @@ export function replayView(replay: ElectionReplay, analysis: ElectionAnalysis): 
     for (const n of [...finalists].sort(byStrength)) if (keep.size < Math.max(room - 1, winners.length)) keep.add(n);
     for (const n of options) if (!writeIns.includes(n) && keep.size < Math.max(room - 1, winners.length)) keep.add(n);
     const minor = options.filter((n) => !keep.has(n) && !writeIns.includes(n));
-    if (minor.length > 1) groups.push({ id: "others", label: `${surname(minor[0]!)} +${minor.length - 1}`, members: minor });
+    if (minor.length > 1) groups.push(trayGroup("others", surname(minor[0]!), minor));
   }
   for (const n of options) shortLabels[n] = writeIns.includes(n) ? (n.length > 12 ? "Write-ins" : n) : surname(n);
 

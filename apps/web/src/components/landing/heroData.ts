@@ -1,5 +1,5 @@
 import type { Golden, ReportConvention } from "@recount/engine";
-import { isPluralLabel, pickBallotsPerChit, type CountRound, type CountTrayGroup } from "@/lib/countScene";
+import { isPluralLabel, pickBallotsPerChit, trayGroup, type CountRound, type CountTrayGroup } from "@/lib/countScene";
 import type { ChitKey } from "@/lib/optionColour";
 import { formatCount, formatVotes, fromUnits, sharedPlaces, toUnits } from "@/lib/votes";
 import type { ElectionReplay } from "@/server/elections";
@@ -88,7 +88,7 @@ export function buildHeroData(replay: ElectionReplay, golden: Golden, href: stri
   const shared = declared.filter((c) => !own.has(c));
   const shortLabels = Object.fromEntries(candidates.map((c) => [c, surname(c)]));
   const groups: CountTrayGroup[] =
-    shared.length > 1 ? [{ id: "others", label: `${surname([...shared].sort(byFirst)[0]!)} +${shared.length - 1}`, members: shared }] : [];
+    shared.length > 1 ? [trayGroup("others", surname([...shared].sort(byFirst)[0]!), shared)] : [];
 
   const table = reportedRounds(rounds, replay.reportConvention.inactive);
   const counted = Number(toUnits(table[0]!.activeTotal, tallyDp) / 10n ** BigInt(tallyDp));
