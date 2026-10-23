@@ -23,7 +23,7 @@
     },
     {
       "type": "action",
-      "description": "Click the \"Back to ballot\" link"
+      "description": "Click the \"Back to the poll\" link"
     },
     {
       "type": "assertion",

@@ -39,7 +39,7 @@ test("T11: invite codes are generated, listed and work once each", async ({ page
   await voter.getByRole("button", { name: "Review ballot" }).click();
   await voter.getByRole("button", { name: "Cast ballot" }).click();
   await expect(voter.getByRole("heading", { name: "Your receipt" })).toBeVisible();
-  await voter.getByRole("link", { name: "Back to ballot" }).click();
+  await voter.getByRole("link", { name: "Back to the poll" }).click();
   await voter.getByLabel("Invite code").fill(first);
   await voter.getByRole("button", { name: "Continue to the ballot" }).click();
   await expect(voter.getByText("This code has already been used.")).toBeVisible();
