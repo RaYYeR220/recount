@@ -27,6 +27,8 @@ test.describe("results of a closed poll", () => {
     await expect(page.getByTestId("winner-card")).toContainText("Winner: Tacos");
     await expect(page.getByTestId("winner-card")).toContainText("2 rounds");
     await expect(page.getByRole("heading", { level: 1, name: "Lunch, closed" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Lunch, closed" })).toHaveAttribute("href", "/p/lunch-closed");
+    await expect(page.getByText("Results: public", { exact: true })).toBeVisible();
 
     const rounds = page.getByRole("table", { name: "Votes for each option in each round" });
     await expect(rounds.getByRole("row", { name: /Tacos/ })).toContainText("7");
@@ -89,6 +91,7 @@ test.describe("results of a closed poll", () => {
       const table = page.getByRole("region", { name: "Lunch, closed: the count, round by round" });
       await expect(table).toHaveAttribute("data-round", "2");
       await expect(table.locator(".ct-caption")).toContainText("Tacos has 7 of 13 ballots");
+      await expect(table.locator('.plaque[data-tray="inactive"] .pl-meta')).toHaveText("none");
     });
   });
 });
@@ -105,6 +108,7 @@ test.describe("who may see results", () => {
     const response = await page.goto("/p/no-such-poll-anywhere/results");
     expect(response?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("This poll doesn't exist or isn't shared with you.");
+    await expect(page).toHaveTitle("Poll not found · Recount");
   });
 
   test("T17: results hidden until close answer 403", async ({ page }) => {
@@ -112,6 +116,7 @@ test.describe("who may see results", () => {
     expect(response?.status()).toBe(403);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Results are hidden until this poll closes.");
     await expect(page.getByRole("link", { name: "Go to the ballot" })).toHaveAttribute("href", "/p/board-2026");
+    await expect(page).toHaveTitle("Results hidden · Recount");
   });
 
   test("the owner sees hidden results, labelled as private", async ({ page, baseURL }) => {
