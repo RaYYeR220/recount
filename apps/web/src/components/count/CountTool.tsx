@@ -46,6 +46,8 @@ export function CountTool() {
         : null,
     [counted],
   );
+  // Only whole-input problems ("paste at least one ballot") have no line number.
+  const lineErrors = errors.filter((e) => e.line > 0);
 
   function load(example: string) {
     setText(example);
@@ -56,20 +58,24 @@ export function CountTool() {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const seatCount = Number(seats);
+    // A count that can't run takes the last result off the page, so it never sits under the error.
     if (!Number.isInteger(seatCount) || seatCount < 1 || seatCount > 100) {
       setErrors([]);
       setFailure("Seats must be a whole number from 1 to 100.");
+      setCounted(null);
       return;
     }
     const parsed = parseBallotCsv(text);
     setErrors(parsed.errors);
     if (parsed.errors.length > 0) {
       setFailure(null);
+      setCounted(null);
       return;
     }
     const outcome = countBallots(parsed, presetId, seatCount);
     if (!outcome.ok) {
       setFailure(outcome.message);
+      setCounted(null);
       return;
     }
     setFailure(null);
@@ -137,15 +143,21 @@ export function CountTool() {
             </div>
             {errors.length > 0 ? (
               <Callout tone="fail" role="alert" id={errorsId}>
-                <p className="font-bold">
-                  {errors.length === 1 ? "One line needs fixing" : `${formatCount(errors.length)} lines need fixing`} before the count can run.
-                </p>
-                <ul className="mt-1 grid gap-0.5">
-                  {errors.slice(0, SHOWN_ERRORS).map((e) => (
-                    <li key={`${e.line}-${e.message}`}>{formatBallotError(e)}</li>
-                  ))}
-                  {errors.length > SHOWN_ERRORS ? <li>And {formatCount(errors.length - SHOWN_ERRORS)} more.</li> : null}
-                </ul>
+                {lineErrors.length === 0 ? (
+                  <p className="font-bold">{formatBallotError(errors[0]!)}</p>
+                ) : (
+                  <>
+                    <p className="font-bold">
+                      {errors.length === 1 ? "One line needs fixing" : `${formatCount(errors.length)} lines need fixing`} before the count can run.
+                    </p>
+                    <ul className="mt-1 grid gap-0.5">
+                      {errors.slice(0, SHOWN_ERRORS).map((e) => (
+                        <li key={`${e.line}-${e.message}`}>{formatBallotError(e)}</li>
+                      ))}
+                      {errors.length > SHOWN_ERRORS ? <li>And {formatCount(errors.length - SHOWN_ERRORS)} more.</li> : null}
+                    </ul>
+                  </>
+                )}
               </Callout>
             ) : null}
             {failure ? (

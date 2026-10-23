@@ -81,6 +81,16 @@ describe("the overvote example", () => {
   });
 });
 
+describe("counts that can't run", () => {
+  it("calls a paste of empty ranks blank instead of counting candidates and seats", () => {
+    expect(countBallots(parseBallotCsv(",,,"), "recount-standard", 1)).toEqual({ ok: false, message: "Every ballot is blank, so there is nothing to count." });
+    expect(countBallots(parseBallotCsv("Ash"), "recount-standard", 3)).toEqual({
+      ok: false,
+      message: "There is 1 candidate for 3 seats; add candidates or lower the seats.",
+    });
+  });
+});
+
 describe("the tie example", () => {
   it("ties Bea and Cal for last in round 1", () => {
     const outcome = countBallots(parseBallotCsv(TIE_EXAMPLE), "recount-standard", 1);
