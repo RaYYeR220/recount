@@ -1,6 +1,6 @@
 import { Callout } from "@/components/ui/Callout";
 import { PanelHeader, Paper } from "@/components/ui/Surface";
-import { formatCount, placesOf, toUnits } from "@/lib/votes";
+import { formatCount, placesOf, sharedPlaces, toUnits } from "@/lib/votes";
 import type { CountView } from "./model";
 
 const MAX_SHOWN = 6;
@@ -26,6 +26,15 @@ export type CondorcetCheckProps = {
   id?: string;
 };
 
+/** Options with the most votes in round 1. */
+function firstRoundLeaders(rounds: CountView["rounds"]): string[] {
+  const tally = rounds[0]?.tally ?? {};
+  const dp = sharedPlaces(Object.values(tally));
+  const units = (o: string) => toUnits(tally[o]!, dp);
+  const top = Object.keys(tally).reduce((m, o) => (units(o) > m ? units(o) : m), -1n);
+  return Object.keys(tally).filter((o) => units(o) === top);
+}
+
 /** A short name on screen, the full one for screen readers. */
 function Name({ label, short }: { label: string; short?: string }) {
   if (!short || short === label) return label;
@@ -46,6 +55,9 @@ export function CondorcetCheck({ view, provisional, id = "condorcet-h" }: Condor
   const agrees = cw !== null && view.winners.includes(cw);
   const shown = matrixOptions(view);
   const total = view.options.filter((o) => matrix[o] !== undefined).length;
+  const plurality = view.pluralityWinner;
+  // Round 1 can count a ballot plurality can't: one that marks two first choices and goes on to its next rank.
+  const pluralityDiffers = plurality !== null && !firstRoundLeaders(view.rounds).includes(plurality);
 
   return (
     <Paper as="section" aria-labelledby={id}>
@@ -72,8 +84,11 @@ export function CondorcetCheck({ view, provisional, id = "condorcet-h" }: Condor
           : {cw} beats every other {noun} head to head.
         </Callout>
       )}
-      {view.pluralityWinner && !view.winners.includes(view.pluralityWinner) ? (
-        <p className="hint-line">Plurality would have picked {view.pluralityWinner}.</p>
+      {plurality && !view.winners.includes(plurality) ? (
+        <p className="hint-line">
+          Plurality would have picked {plurality}
+          {pluralityDiffers ? ": it counts only clean first choices, and a ballot that marks two first choices counts for nobody." : "."}
+        </p>
       ) : null}
       {shown.length > 1 ? (
         <div className="pair-scroll" role="region" aria-labelledby={`${id}-cap`} tabIndex={0}>

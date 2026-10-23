@@ -43,6 +43,11 @@ test("T23: Minneapolis rules skip the overvoted rank, and Ash wins", async ({ pa
   await expect(page.getByText("Condorcet winner: Ash. Ranked choice and the head-to-head check agree.")).toBeVisible();
 });
 
+test("plurality's pick is explained when round 1 counts overvoted ballots it can't", async ({ page }) => {
+  await countOvervoteExample(page, "Minneapolis");
+  await expect(page.getByText("Plurality would have picked Bea: it counts only clean first choices")).toBeVisible();
+});
+
 test("the tie example explains how the tie was broken", async ({ page }) => {
   await page.goto("/count");
   await page.getByRole("button", { name: "Load the tie example" }).click();
