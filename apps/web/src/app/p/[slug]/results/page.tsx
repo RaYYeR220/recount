@@ -62,7 +62,8 @@ const load = cache(async (slug: string): Promise<Loaded> => {
 
 export async function generateMetadata({ params }: PageProps<"/p/[slug]/results">): Promise<Metadata> {
   const loaded = await load((await params).slug);
-  return { title: loaded.kind === "ok" ? `${loaded.poll.title}: results` : "Poll results", description: DESCRIPTION };
+  if (loaded.kind === "denied") return { title: loaded.code === "not_found" ? "Poll not found" : "Results hidden" };
+  return { title: `${loaded.poll.title}: results`, description: DESCRIPTION };
 }
 
 export default async function ResultsPage({ params }: PageProps<"/p/[slug]/results">) {
