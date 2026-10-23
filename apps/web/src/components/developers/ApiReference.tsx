@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { Curl } from "./Curl";
@@ -48,7 +49,19 @@ export function OperationCard({ op, example }: { op: Operation; example?: { labe
       <header className="dev-op-head">
         <h3 id={`${opAnchor(op)}-h`} className="dev-op-title">
           <span className={op.method === "get" ? "lp-verb" : "lp-verb is-post"}>{op.method.toUpperCase()}</span>{" "}
-          <code>{op.url}</code>
+          <code>
+            {/* A narrow screen wraps the path after a slash, never inside a segment. */}
+            {op.url.split("/").map((part, i) => (
+              <Fragment key={i}>
+                {i > 0 ? (
+                  <>
+                    /<wbr />
+                  </>
+                ) : null}
+                {part}
+              </Fragment>
+            ))}
+          </code>
         </h3>
         {AUTH[op.auth]}
       </header>
