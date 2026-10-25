@@ -124,7 +124,7 @@
     }
   },
   "generated": {
-    "note": "Proposed by TestSprite's own exploration of the live site (test plan generate) and accepted as is; they cover public pages ours don't.",
+    "note": "Proposed by TestSprite's own exploration of the live site (test plan generate) and accepted; they cover public pages ours don't. G2's steps were rewritten after TestSprite read them literally and looked for a control that doesn't exist.",
     "tests": {
       "G1": {
         "testId": "db2ee0b8-0658-4cd7-b568-3025936cde61",
@@ -149,6 +149,73 @@
       "G6": {
         "testId": "18d000e1-1cfc-46d1-85c7-473b1083b9d0",
         "name": "Create a new poll from the start poll flow"
+      }
+    }
+  },
+  "api": {
+    "note": "Backend tests in their own TestSprite project. Each file in testsprite/api is the test's code as uploaded; TestSprite prepends the bearer token of a dedicated organiser account (api-suite@recount.dev) as __AUTH_HEADERS__.",
+    "projectId": "48394e7e-ca5e-443c-8c1d-50060c34c042",
+    "target": "https://recount-kappa.vercel.app/api/v1",
+    "tests": {
+      "A01": {
+        "testId": "b24f7f23-b462-47e2-af8a-ec2fbc623a95",
+        "file": "testsprite/api/A01_replay_library.py",
+        "name": "A01 Replay library lists eight sourced elections"
+      },
+      "A02": {
+        "testId": "ba7a4a7f-873b-4513-b713-0b8209090026",
+        "file": "testsprite/api/A02_nyc_replay.py",
+        "name": "A02 NYC 2025 replay matches all 28 certified figures"
+      },
+      "A03": {
+        "testId": "69fda3b4-ea63-408a-8d14-99d12b8e3d85",
+        "file": "testsprite/api/A03_every_replay_compared.py",
+        "name": "A03 Every replay is compared with its official report"
+      },
+      "A04": {
+        "testId": "6416498b-4184-46d6-a264-2fffac6384e0",
+        "file": "testsprite/api/A04_tabulate_irv.py",
+        "name": "A04 Tabulate counts an instant runoff and keeps every ballot"
+      },
+      "A05": {
+        "testId": "b3dbf876-459b-45e7-a5f3-9283827871f9",
+        "file": "testsprite/api/A05_tabulate_stv_surplus.py",
+        "name": "A05 STV moves a surplus at four decimals, truncated"
+      },
+      "A06": {
+        "testId": "a4dd65d2-c3aa-49ef-9bac-4f593a1475e6",
+        "file": "testsprite/api/A06_tabulate_rejects.py",
+        "name": "A06 Tabulate rejects bad input field by field"
+      },
+      "A07": {
+        "testId": "e217cea9-206c-4e58-8699-bda8bde0c2d4",
+        "file": "testsprite/api/A07_poll_public_view.py",
+        "name": "A07 A poll reads publicly, unknown slugs are a plain 404"
+      },
+      "A08": {
+        "testId": "c15366f6-25da-477a-98d4-dd51bde611aa",
+        "file": "testsprite/api/A08_results_access.py",
+        "name": "A08 Results access is enforced"
+      },
+      "A09": {
+        "testId": "01087886-3b6b-49df-a788-e6c8213035b0",
+        "file": "testsprite/api/A09_cvr_recount.py",
+        "name": "A09 The published CVR counts again to the published result"
+      },
+      "A10": {
+        "testId": "2b60c5b2-4592-4fe0-9c8e-efda65098067",
+        "file": "testsprite/api/A10_poll_lifecycle.py",
+        "name": "A10 An organiser creates and closes a poll with a token"
+      },
+      "A11": {
+        "testId": "be55b09f-61a8-4fc7-9f14-8bb970967f8b",
+        "file": "testsprite/api/A11_create_poll_rejects.py",
+        "name": "A11 A bad poll is refused field by field"
+      },
+      "A12": {
+        "testId": "8c83cece-d803-405f-acd2-3b7811c4b134",
+        "file": "testsprite/api/A12_openapi_contract.py",
+        "name": "A12 The OpenAPI document describes what the API serves"
       }
     }
   }
