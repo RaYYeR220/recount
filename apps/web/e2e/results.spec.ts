@@ -40,6 +40,19 @@ test.describe("results of a closed poll", () => {
     expect(errors).toEqual([]);
   });
 
+  test("a recount clicked before the page's script loads still runs", async ({ page }) => {
+    // Hold the scripts back so the click lands on the server HTML's button.
+    await page.route(/\/_next\/static\/chunks\/.*\.js/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+    await page.goto("/p/lunch-closed/results", { waitUntil: "domcontentloaded" });
+    // A plain DOM click, as a browser agent sends it: no waiting for the button to be ready.
+    await page.getByRole("button", { name: "Recount in your browser" }).evaluate((button: HTMLButtonElement) => button.click());
+    await expect(page.locator(".recount-box [role=status]")).toContainText("Recount matches: same winner, same 2 rounds", { timeout: 30_000 });
+    await expect(page).toHaveURL("/p/lunch-closed/results");
+  });
+
   test("T20: the browser recount matches the published result", async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto("/p/lunch-closed/results");

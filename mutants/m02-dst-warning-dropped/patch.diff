@@ -1,13 +1,11 @@
 diff --git a/apps/web/src/components/wizard/ScheduleFields.tsx b/apps/web/src/components/wizard/ScheduleFields.tsx
-index b921a98..c668c27 100644
 --- a/apps/web/src/components/wizard/ScheduleFields.tsx
 +++ b/apps/web/src/components/wizard/ScheduleFields.tsx
-@@ -90,7 +90,7 @@ export function ScheduleFields({ draft, update, errors, zones, timeZone, browser
-       </div>
- 
-       <ScheduleWarnings
--        warnings={check?.warnings ?? []}
-+        warnings={(check?.warnings ?? []).filter((w) => w.field === "closesAt")}
-         opensAtLocal={input.opensAtLocal}
-         closesAtLocal={input.closesAtLocal}
-         opensAt={check?.opensAt ?? null}
+@@ -92,7 +92,6 @@
+             <Field id="opens" label="Opens" hint={`Format ${WALL_INPUT_FORMAT}, 24-hour, in ${timeZone}.`} error={errors.opens}>
+               <Input mono value={draft.opensText} onChange={(e) => update({ opensText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
+             </Field>
+-            <ScheduleWarnings field="opensAt" {...warningProps} />
+           </div>
+         ) : null}
+         <div className="grid gap-2">

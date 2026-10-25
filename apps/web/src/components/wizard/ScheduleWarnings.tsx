@@ -3,6 +3,8 @@ import { scheduleWarningText } from "@/lib/when";
 import type { ScheduleWarning } from "@/server/polls/schedule";
 
 export type ScheduleWarningsProps = {
+  /** Which time these warnings sit under. */
+  field: ScheduleWarning["field"];
   /** The DST warnings createPoll gave for this schedule. */
   warnings: ScheduleWarning[];
   /** The wall times they are about, as sent: "2027-03-14T02:30". */
@@ -14,11 +16,12 @@ export type ScheduleWarningsProps = {
 };
 
 /**
- * Each DST warning from the poll service as one plain sentence. The live region is
- * always there, so a warning that appears while typing is read out.
+ * The DST warnings from the poll service for one of the two times, each as one plain
+ * sentence, right under that time's field. The live region is always there, so a
+ * warning that appears while typing is read out.
  */
-export function ScheduleWarnings({ warnings, opensAtLocal, closesAtLocal, opensAt, closesAt, timeZone }: ScheduleWarningsProps) {
-  const lines = warnings.flatMap((warning) => {
+export function ScheduleWarnings({ field, warnings, opensAtLocal, closesAtLocal, opensAt, closesAt, timeZone }: ScheduleWarningsProps) {
+  const lines = warnings.filter((warning) => warning.field === field).flatMap((warning) => {
     const local = warning.field === "opensAt" ? opensAtLocal : closesAtLocal;
     const instant = warning.field === "opensAt" ? opensAt : closesAt;
     return local && instant ? [{ key: warning.field, text: scheduleWarningText(warning, local, timeZone, instant) }] : [];
