@@ -68,6 +68,7 @@ export async function listPolls(
     .where(where)
     .orderBy(desc(poll.createdAt), desc(poll.id))
     .limit(pageSize)
+    // Pages are numbered from 1.
     .offset((page - 1) * pageSize);
 
   return {
