@@ -1,6 +1,6 @@
 # Runs worth keeping
 
-Full-suite runs of the 24 scenarios, with what each one showed. The ids open in the TestSprite portal under project `09e3cdbd-0340-48af-95ac-2789db1a41fd`.
+Full-suite runs, with what each one showed. The ids open in the TestSprite portal under project `09e3cdbd-0340-48af-95ac-2789db1a41fd`.
 
 ## 2026-10-21 00:35 CEST: first run against the live site — 23 of 24
 
@@ -19,3 +19,16 @@ Exactly one test failed, **T13**, with: "the UI shows the adjusted opening time 
 ## 2026-10-22 14:12 CEST: the same suite on the fixed code — 24 of 24
 
 Execution `71e653f6-f024-470a-995d-9fa8e64f1ff5`, target a preview of `main` at `32322eb`.
+
+## 2026-10-25: pull request #1 held by the merge gate, then released
+
+[Pull request #1](https://github.com/RaYYeR220/recount/pull/1) moved each daylight-saving warning in the new-poll wizard under the field it explains. The TestSprite GitHub App runs all 30 tests against the pull request's Vercel preview once `preflight` passes, and `TestSprite V3` is a required check on `main`.
+
+- **59ef0ac: red, merge blocked.** Execution `2ed35de3-7a7e-4e66-ab48-e753a1b09194`, 28 of 30.
+  - **T13 failed.** The move left the Opens field without its warning: "The schedule page did not show the requested daylight-saving warning. It displayed the opening as 3:30 AM EDT instead."
+  - **T03 was blocked.** TestSprite's browser clicked "Recount in your browser" before the page's script had loaded, and the click was lost. Our Playwright tests never hit this because they wait for the page to settle.
+  - CI failed the same pull request on Playwright's two daylight-saving cases.
+- **f65d148: green, merged.** Execution `a1f2fc2d-6276-44fe-9bf7-b7d88ef91782`, all 30.
+  - The opening-time warning is back under Opens.
+  - Mutant m02 follows it to the new layout.
+  - The recount button is now a form, so a click before the script loads still starts the recount.
