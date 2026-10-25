@@ -67,9 +67,24 @@ jobs:
         run: pnpm --filter @recount/web test:e2e
       # Last, so a change that moves a mutant's target fails on its tests first.
       - name: Mutants still apply
-        run: for patch in mutants/*/patch.diff; do git apply --check "$patch" || exit 1; done
+        # On a saboteur branch its own mutant is already planted: that one reverses instead.
+        run: for patch in mutants/*/patch.diff; do git apply --check "$patch" || git apply --check -R "$patch" || exit 1; done
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/web/playwright-report
+
+  # A run started with the workflow token can't trigger workflow_run, so the
+  # saboteur's CI asks for its verdict itself.
+  verdict:
+    name: ask for the saboteur's verdict
+    needs: ci
+    if: always() && github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'saboteur/')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run saboteur-verdict.yml --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
