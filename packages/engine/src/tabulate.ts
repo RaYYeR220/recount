@@ -281,7 +281,7 @@ class Count {
     const chosen = sorted.filter((id) => rec.tally[id]! > cut);
     const tied = sorted.filter((id) => rec.tally[id] === cut);
     while (chosen.length < n) {
-      const pick = tied.length === 1 ? tied[0]! : this.tiebreak.winner(tied, this.previousTally());
+      const pick = tied[0]!;
       chosen.push(pick);
       tied.splice(tied.indexOf(pick), 1);
     }
