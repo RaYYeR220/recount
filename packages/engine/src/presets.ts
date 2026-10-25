@@ -17,7 +17,7 @@ export const PRESETS: Record<PresetId, Partial<Rules>> = {
   // NYC Board of Elections: an overvote exhausts, write-ins go first, batch elimination,
   // count down to the final two.
   nyc: {
-    overvoteRule: 'exhaustImmediately',
+    overvoteRule: 'alwaysSkipToNextRank',
     maxSkippedRanksAllowed: 'unlimited',
     maxRankingsAllowed: 5,
     eliminateWriteInsFirst: true,
