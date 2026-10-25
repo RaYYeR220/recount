@@ -132,7 +132,7 @@
       },
       "G2": {
         "testId": "35ba0fd0-2a7a-4f3b-92a1-96cc672a00ff",
-        "name": "Count ranked ballots with the default example"
+        "name": "Count the overvote example under the default rules"
       },
       "G3": {
         "testId": "9d2ce65b-a09f-4757-a4de-fdbb76d0dbdc",
