@@ -67,7 +67,9 @@ function cell(name, gate, expected) {
 const pulls = await gh(`repos/${repo}/pulls?state=open&per_page=100`);
 for (const pr of pulls) {
   if (!pr.labels.some((label) => label.name === "saboteur")) continue;
-  const id = /^saboteur\/(m\d+-[a-z0-9-]+)-\d+$/.exec(pr.head.ref)?.[1];
+  // sab/<mutant> now; saboteur/<mutant>-<run> before Vercel's 63-character alias limit bit.
+  const match = /^(?:sab\/(m\d+-[a-z0-9-]+)|saboteur\/(m\d+-[a-z0-9-]+)-\d+)$/.exec(pr.head.ref);
+  const id = match?.[1] ?? match?.[2];
   if (!id) continue;
   const meta = JSON.parse(readFileSync(`mutants/${id}/meta.json`, "utf8"));
   const expected = meta.gates ?? ["ci"];
