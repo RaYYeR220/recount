@@ -1,10 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { STEP_TEXT } from "@/lib/recount";
-import { useHydrated } from "@/lib/useHydrated";
 import type { RecountState } from "./useRecountWorker";
 
 export type RecountVerdict = { matches: boolean; line: ReactNode; detail?: ReactNode; differences: string[] };
@@ -18,14 +17,36 @@ export type RecountShellProps = {
   intro?: ReactNode;
 };
 
-/** The button, the live progress line and the verdict of a browser recount. */
+/** Set by the form when it is sent before the page's script runs. */
+const AUTO_START = "recount";
+
+/**
+ * The button, the live progress line and the verdict of a browser recount. The button
+ * is a form, so a click that lands before the script has loaded still counts: the page
+ * reopens with ?recount and starts the recount as soon as it can.
+ */
 export function RecountShell({ state, onRun, verdict, intro }: RecountShellProps) {
   const running = state.status === "running";
-  // A click before the script runs would be lost, so the button waits for it.
-  const hydrated = useHydrated();
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (autoStarted.current || !url.searchParams.has(AUTO_START)) return;
+    autoStarted.current = true;
+    url.searchParams.delete(AUTO_START);
+    window.history.replaceState(window.history.state, "", url);
+    onRun();
+  }, [onRun]);
   return (
-    <div className="recount-box">
-      <Button variant="ink" onClick={onRun} disabled={running || !hydrated} aria-busy={running || undefined}>
+    <form
+      className="recount-box"
+      method="get"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onRun();
+      }}
+    >
+      <input type="hidden" name={AUTO_START} value="1" />
+      <Button type="submit" variant="ink" disabled={running} aria-busy={running || undefined}>
         {running ? "Recounting…" : state.status === "idle" ? "Recount in your browser" : "Recount again"}
       </Button>
       <div role="status" aria-live="polite" className="grid gap-2.5">
@@ -55,6 +76,6 @@ export function RecountShell({ state, onRun, verdict, intro }: RecountShellProps
           )
         ) : null}
       </div>
-    </div>
+    </form>
   );
 }
