@@ -32,3 +32,14 @@ Execution `71e653f6-f024-470a-995d-9fa8e64f1ff5`, target a preview of `main` at 
   - The opening-time warning is back under Opens.
   - Mutant m02 follows it to the new layout.
   - The recount button is now a form, so a click before the script loads still starts the recount.
+
+## API suite (Oct 25)
+
+- **Production: 12 of 12 passed.** Execution `591a9739-c1ad-475f-8187-33cb5943a687`.
+  - A12 failed once before running: TestSprite's validator rejected the path template `/polls/{slug}` as an unsubstituted URL. Rewritten with `<slug>`, it passes.
+- **`m07-round-not-truncate` on a throwaway preview: 11 of 12, A05 failed.** Execution `77c6e40d-fd8a-4321-a6fd-9d5d7f530b04`.
+  - Ana's surplus moved to Ben as 4.6669 instead of 4.6662.
+- **`m08-nyc-no-batch` on a throwaway preview: 10 of 12, A02 and A03 failed.** Execution `dd95e8ba-d8a1-4bac-924b-c7479792cf12`.
+  - New York City's replay still named Mamdani but took 11 rounds, and 3 of its 28 figures no longer matched.
+
+The mutant runs used copies of the twelve files with the preview's address in place of production's, in their own TestSprite projects.

@@ -1,0 +1,41 @@
+name: api-suite
+# Runs when Vercel reports a production deployment as live: TestSprite runs the
+# API suite (testsprite/api) against it. The suite's tests have production's
+# address in their code, so previews are not checked here.
+on:
+  deployment_status:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: api-suite
+  cancel-in-progress: false
+jobs:
+  api-suite:
+    name: TestSprite API suite
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
+      PROJECT: 48394e7e-ca5e-443c-8c1d-50060c34c042
+    steps:
+      # Nothing from the repository runs here: only the pinned CLI, with the key.
+      - uses: actions/setup-node@v7
+        with: { node-version: 24 }
+      - name: Run every API test against production
+        run: |
+          if [ -z "$TESTSPRITE_API_KEY" ]; then
+            echo "::notice::TESTSPRITE_API_KEY is not set; the API suite did not run."
+            exit 0
+          fi
+          npx --yes @testsprite/testsprite-cli@0.14.0 test run --all --project "$PROJECT" \
+            --wait --timeout 900 --output json > run.json || true
+          node -e '
+            const run = require("./run.json");
+            for (const t of [...run.accepted].sort((a, b) => a.testTitle.localeCompare(b.testTitle)))
+              console.log(`${t.status.padEnd(8)} ${t.testTitle}`);
+            const { passed, total } = run.summary;
+            console.log(`${passed} of ${total} passed`);
+            if (total === 0 || passed !== total) process.exit(1);
+          '

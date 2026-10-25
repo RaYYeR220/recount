@@ -44,12 +44,17 @@ Voters get a receipt (`xxxx-xxxx-xxxx`) and can look their ballot up afterwards,
 | Browser | 138 Playwright tests against a production build with a seeded Postgres | `apps/web/e2e` |
 | Preflight | Every route of a preview deployment answers with the right status and copy, before anything slower runs | `e2e/preflight.spec.ts`, `.github/workflows/preflight.yml` |
 | TestSprite | 24 scenarios on the live app (voters, organisers, an intruder, time zones, the replays, the audit trail), plus 6 TestSprite proposed from its own exploration | `testsprite/` |
+| TestSprite API | 12 backend tests of the public API on production: the replays against their official reports, counting (including STV surplus arithmetic), access rules, a token-driven poll from creation to close, the CVR counted again | `testsprite/api/`, `.github/workflows/api-suite.yml` |
 
 The TestSprite scenarios are kept in the repository as plan files (`testsprite/plans/`), each decided by one or two sentences the app renders word for word. Their first run against the live site passed 23 of 24. The one it blocked was right to: a click on "Recount in your browser" before the page's script had loaded did nothing, and the test's assertion couldn't tell the browser's recount from the build-time comparison printed above it. Both were fixed (`9099685`), and all 24 pass. With a bug planted on a preview (a wizard that stops explaining a skipped opening time), the suite failed on exactly that scenario and passed again on the fixed code.
 
 `TestSprite V3` is a required check on `main`, together with `ci` and `preflight`. [Pull request #1](https://github.com/RaYYeR220/recount/pull/1) shows the gate holding a real regression:
 - **Red, merge blocked.** A refactor dropped the opening-time warning, so T13 failed. TestSprite also blocked on a second, unplanned problem: a recount click before hydration was lost.
 - **Green, merged.** Both were fixed, and all 30 tests passed on the pull request's preview.
+
+The API suite is TestSprite's backend testing: each test is a Python file in `testsprite/api/` that calls the API over HTTP, with the bearer token of a dedicated organiser account injected by TestSprite. It runs against production after every production deploy. To check that it bites, two engine mutants were deployed to throwaway previews and the same twelve tests pointed at them. TestSprite failed exactly the tests that cover each bug and nothing else:
+- **`m07`, rounding instead of truncating at four decimals:** A05 failed. A surplus moving at two thirds went out at 0.6667 instead of 0.6666.
+- **`m08`, New York City rules without batch elimination:** A02 and A03 failed. The winner was still right, but the replay took 11 rounds instead of 3.
 
 [`testsprite/RUNS.md`](testsprite/RUNS.md) lists every run worth keeping.
 
@@ -103,7 +108,7 @@ packages/engine   the counting engine: IRV and STV, RCTab rules, presets, pairwi
 apps/web          Next.js app: pages, API, services (src/server), Playwright suite (e2e)
 scripts/datasets  rebuild the replay datasets from the official files
 mutants           planted bugs for the saboteur
-testsprite        the TestSprite suite as plan files
+testsprite        the TestSprite suites: browser plan files and API test code
 ```
 
 ## Limits worth knowing
