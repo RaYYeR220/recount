@@ -39,6 +39,18 @@ function slugOf(segment: string): string | null {
 
 const rewrite = (req: NextRequest, path: string) => NextResponse.rewrite(new URL(path, req.url));
 
+/** A poll link pasted from a sentence often brings the sentence's punctuation along. */
+const TRAILING_PUNCTUATION = /^([a-z0-9][a-z0-9-]*)[.,;:!?'")\]]+$/;
+
+/** "/p/board-2026;" → "/p/board-2026": the same page, without the stray punctuation. */
+function withoutTrailingPunctuation(req: NextRequest, segment: string): NextResponse | null {
+  const clean = TRAILING_PUNCTUATION.exec(slugOf(segment) ?? "")?.[1];
+  if (!clean) return null;
+  const url = req.nextUrl.clone();
+  url.pathname = url.pathname.replace(`/p/${segment}`, `/p/${clean}`);
+  return NextResponse.redirect(url, 308);
+}
+
 /** The status a page should answer with; 200 lets the page render as usual. */
 async function decide(req: NextRequest, parts: string[]): Promise<NextResponse> {
   const [section, segment = "", child] = parts;
@@ -47,6 +59,11 @@ async function decide(req: NextRequest, parts: string[]): Promise<NextResponse> 
     // Dataset files (/elections/portland-2024-d1.json.gz) are served from public/ as they are.
     if (slug?.includes(".")) return NextResponse.next();
     return slug && ELECTION_SLUGS.has(slug) ? NextResponse.next() : rewrite(req, PAGE_NOT_FOUND);
+  }
+
+  if (section === "p") {
+    const cleaned = withoutTrailingPunctuation(req, segment);
+    if (cleaned) return cleaned;
   }
 
   const viewer = await viewerFrom(auth, req.headers);

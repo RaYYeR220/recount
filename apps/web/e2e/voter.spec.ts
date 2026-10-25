@@ -205,6 +205,18 @@ test("an unknown poll answers 404", async ({ page }) => {
   }
 });
 
+test("a poll link pasted with the sentence's punctuation still opens the poll", async ({ page }) => {
+  for (const [path, clean] of [
+    ["/p/offsite-2026;", "/p/offsite-2026"],
+    ["/p/offsite-2026).", "/p/offsite-2026"],
+    ["/p/lunch-closed./results", "/p/lunch-closed/results"],
+  ]) {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page).toHaveURL(clean);
+  }
+});
+
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
