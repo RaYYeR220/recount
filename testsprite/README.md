@@ -33,6 +33,6 @@ Every assertion is a sentence the app renders word for word, so a test fails on 
 
 Negative paths: T09, T10, T11, T13, T15, T16, T17, T18. Several actors in one test: T11 (organizer, then voter), T16 (one organizer, another's poll). Time: T12, T13, T14. Checked against an outside answer: T01–T04 (official election reports), T20–T23 (the published count, RCTab's format, two cities' overvote rules).
 
-TestSprite's own exploration of the live site proposed eight more tests; the six that cover pages ours don't (opening a replay from the home page, the count tool's default and tie examples, the API reference and token guidance, starting a poll) were accepted as they were and run with the suite. They are listed under `generated` in `tests.json`.
+TestSprite's own exploration of the live site proposed eight more tests; the six that cover pages ours don't (opening a replay from the home page, the count tool's default and tie examples, the API reference and token guidance, starting a poll) were accepted and run with the suite. One of them asked to "load the default ballot example", which the count tool doesn't have, and failed when TestSprite read it literally. It now counts the overvote example under the default rules. They are listed under `generated` in `tests.json`.
 
 The demo accounts these tests sign in with are public: `ada@recount.dev` / `recount-demo-ada`.

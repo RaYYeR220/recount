@@ -62,6 +62,16 @@ Two mutants got through when first planted, and stay listed as survivors with th
 - `m06-cvr-row-order`: ordering the cast-vote record by cast time kept every test green, and would let anyone who saw a voter vote find their row (`a24402d`).
 - `m09-tie-by-list-order`: settling a tie at the last seat by candidate order. The property test that should catch it reaches such a tie about once in 2,500 cases and CI ran 200; the case is now always checked (`1185526`).
 
+Run through the live gates on Oct 25:
+- **All seven engine and service mutants were caught by `ci`:** #3, #10 to #15.
+- **The page mutant `m02` was caught twice in #17.** Playwright failed in `ci`, and TestSprite failed T13.
+- **The comment-only control went green on all three gates** in #8.
+
+The control runs before #8 turned up real problems, and each was fixed:
+- **#4 and #6 broke our own CI.** The control's comment sat next to the line `m05` rewrites, and CI's patch check tried to apply the planted mutant a second time. Both fixed in #5 and #7.
+- **A pasted link broke.** TestSprite's browser opened `/p/board-2026;` with a stray semicolon and got the not-found page. Links pasted with trailing punctuation now redirect to the clean address (#5).
+- **TestSprite never ran on #9.** Its branch name made the Vercel preview alias longer than 63 characters, so TestSprite couldn't find the preview. Saboteur branches are shorter now (#16).
+
 ## API
 
 A JSON API serves the same counts (`/api/v1/openapi.json`, documented at [`/developers`](https://recount-kappa.vercel.app/developers)): `POST /api/v1/tabulate` counts ballots you send without storing them, the replay library and poll results are public reads, and organisers create and close polls with `rk_` tokens from Settings.
