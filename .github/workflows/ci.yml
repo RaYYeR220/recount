@@ -80,7 +80,7 @@ jobs:
   verdict:
     name: ask for the saboteur's verdict
     needs: ci
-    if: always() && github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'saboteur/')
+    if: always() && github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'sab/')
     runs-on: ubuntu-latest
     permissions:
       actions: write

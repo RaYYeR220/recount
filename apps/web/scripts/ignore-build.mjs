@@ -3,7 +3,8 @@
 // test the deployed app; every other branch always builds.
 import { existsSync, readFileSync } from "node:fs";
 
-const id = /^saboteur\/(m\d+-[a-z0-9-]+)-\d+$/.exec(process.env.VERCEL_GIT_COMMIT_REF ?? "")?.[1];
+const match = /^(?:sab\/(m\d+-[a-z0-9-]+)|saboteur\/(m\d+-[a-z0-9-]+)-\d+)$/.exec(process.env.VERCEL_GIT_COMMIT_REF ?? "");
+const id = match?.[1] ?? match?.[2];
 if (!id) process.exit(1);
 
 const meta = new URL(`../../../mutants/${id}/meta.json`, import.meta.url);

@@ -86,6 +86,12 @@ describe("trustedVerdict", () => {
     expect(trustedVerdict(byBot({ ...record, mutant: "m99-made-up" }), unknown, catalog, now)).toBeNull();
   });
 
+  it("reads the mutant from the short sab/ branches as well as the older saboteur/ ones", () => {
+    const short = { ...pr, title: "planted", headRef: "sab/m08-nyc-no-batch" };
+    expect(trustedVerdict(byBot(record), short, catalog, now)).toEqual(record);
+    expect(trustedVerdict(byBot(record), { ...pr, title: "planted" }, catalog, now)).toEqual(record);
+  });
+
   it("takes the mutant from the title when the branch name says nothing", () => {
     expect(trustedVerdict(byBot(record), { ...pr, headRef: "some-branch" }, catalog, now)).toEqual(record);
   });

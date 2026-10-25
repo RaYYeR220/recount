@@ -89,7 +89,7 @@ export type VerdictComment = { body?: string | null; user?: { login?: string; ty
 /** A closed pull request labelled saboteur: its number, title and head branch. */
 export type SaboteurPull = { number: number; title: string; headRef: string };
 
-const PLANTED_BRANCH = /^saboteur\/(m\d+-[a-z0-9-]+)-\d+$/;
+const PLANTED_BRANCH = /^(?:sab\/(m\d+-[a-z0-9-]+)|saboteur\/(m\d+-[a-z0-9-]+)-\d+)$/;
 const PLANTED_TITLE = /^Saboteur: (m\d+-[a-z0-9-]+)$/;
 
 /**
@@ -102,7 +102,8 @@ export function trustedVerdict(comment: VerdictComment, pr: SaboteurPull, catalo
   if (comment.user?.login !== VERDICT_AUTHOR || comment.user?.type !== "Bot") return null;
   const verdict = parseVerdictComment(comment.body ?? "");
   if (!verdict || verdict.pr !== pr.number) return null;
-  const planted = [PLANTED_BRANCH.exec(pr.headRef)?.[1], PLANTED_TITLE.exec(pr.title.trim())?.[1]];
+  const branch = PLANTED_BRANCH.exec(pr.headRef);
+  const planted = [branch?.[1] ?? branch?.[2], PLANTED_TITLE.exec(pr.title.trim())?.[1]];
   if (!planted.includes(verdict.mutant) || !catalog.has(verdict.mutant)) return null;
   if (Date.parse(verdict.at) > now.getTime()) return null;
   return verdict;

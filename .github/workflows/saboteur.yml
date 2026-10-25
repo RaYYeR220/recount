@@ -35,7 +35,12 @@ jobs:
           fi
           test -f "mutants/$id/patch.diff" || { echo "::error::no mutant $id"; exit 1; }
           echo "id=$id" >> "$GITHUB_OUTPUT"
-          echo "branch=saboteur/$id-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          # Short on purpose: Vercel hashes branch aliases past 63 characters, and
+          # TestSprite finds the preview by the alias.
+          if git ls-remote --exit-code origin "refs/heads/sab/$id" > /dev/null; then
+            echo "::error::$id is already planted on sab/$id"; exit 1
+          fi
+          echo "branch=sab/$id" >> "$GITHUB_OUTPUT"
       - name: Plant the bug
         run: |
           git switch -c "${{ steps.pick.outputs.branch }}"
