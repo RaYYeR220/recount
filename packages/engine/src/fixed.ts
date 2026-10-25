@@ -15,7 +15,7 @@ export function mulTrunc(a: Fixed, b: Fixed, dp: number): Fixed {
 
 export function divTrunc(a: Fixed, b: Fixed, dp: number): Fixed {
   if (b === 0n) throw new RangeError('fixed-point division by zero');
-  return (a * makeScale(dp)) / b;
+  return (a * makeScale(dp) + b / 2n) / b;
 }
 
 /**
