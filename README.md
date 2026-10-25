@@ -40,8 +40,8 @@ Voters get a receipt (`xxxx-xxxx-xxxx`) and can look their ballot up afterwards,
 | Layer | What it checks | Where |
 |---|---|---|
 | Engine | 131 tests: unit, fast-check properties (ballot conservation, order and id independence, scale invariance), RCTab conformance, certified replays | `packages/engine/test` |
-| Services | 368 tests on an in-memory Postgres (PGlite): authorisation, visibility, schedules across time zones and daylight saving, invite codes, receipts, rate limits, CVR hashing | `apps/web/test` |
-| Browser | 123 Playwright tests against a production build with a seeded Postgres | `apps/web/e2e` |
+| Services | 402 tests on an in-memory Postgres (PGlite): authorisation, visibility, schedules across time zones and daylight saving, invite codes, receipts, rate limits, CVR hashing | `apps/web/test` |
+| Browser | 138 Playwright tests against a production build with a seeded Postgres | `apps/web/e2e` |
 | Preflight | Every route of a preview deployment answers with the right status and copy, before anything slower runs | `e2e/preflight.spec.ts`, `.github/workflows/preflight.yml` |
 | TestSprite | 24 scenarios on the live app (voters, organisers, an intruder, time zones, the replays, the audit trail), plus 6 TestSprite proposed from its own exploration | `testsprite/` |
 
