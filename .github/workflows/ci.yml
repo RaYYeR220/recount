@@ -50,8 +50,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Mutants still apply
-        run: for patch in mutants/*/patch.diff; do git apply --check "$patch" || exit 1; done
       - name: Typecheck
         run: pnpm typecheck
       - name: Lint
@@ -67,6 +65,9 @@ jobs:
       - run: pnpm --filter @recount/web exec playwright install --with-deps chromium
       - name: End to end (Playwright against next start)
         run: pnpm --filter @recount/web test:e2e
+      # Last, so a change that moves a mutant's target fails on its tests first.
+      - name: Mutants still apply
+        run: for patch in mutants/*/patch.diff; do git apply --check "$patch" || exit 1; done
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
