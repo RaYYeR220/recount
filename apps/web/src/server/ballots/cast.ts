@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { assertSlugShape } from "../authz";
 import type { Db } from "../db/client";
 import { ballot, inviteCode, poll } from "../db/schema";
@@ -33,7 +33,7 @@ async function claimCode(tx: Db, pollId: string, code: string, now: Date): Promi
   const [claimed] = await tx
     .update(inviteCode)
     .set({ usedAt: now })
-    .where(and(eq(inviteCode.pollId, pollId), eq(inviteCode.code, code), isNull(inviteCode.usedAt)))
+    .where(and(eq(inviteCode.pollId, pollId), eq(inviteCode.code, code)))
     .returning({ id: inviteCode.id });
   if (claimed) return claimed.id;
 
