@@ -53,10 +53,10 @@ export function buildCvr(
 export async function loadCvr(db: Db, poll: Pick<PollRow, "id" | "maxRanks">): Promise<Cvr> {
   const options = await loadOptions(db, poll.id);
   const ballots = await db
-    .select({ ranking: ballot.ranking, receipt: ballot.receipt })
+    .select({ ranking: ballot.ranking, receipt: ballot.receipt, createdAt: ballot.createdAt })
     .from(ballot)
     .where(eq(ballot.pollId, poll.id));
-  ballots.sort((a, b) => (a.receipt < b.receipt ? -1 : 1));
+  ballots.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   return buildCvr(options, ballots, poll.maxRanks);
 }
 
