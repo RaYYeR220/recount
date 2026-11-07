@@ -92,7 +92,6 @@ export function ScheduleFields({ draft, update, errors, zones, timeZone, browser
             <Field id="opens" label="Opens" hint={`Format ${WALL_INPUT_FORMAT}, 24-hour, in ${timeZone}.`} error={errors.opens}>
               <Input mono value={draft.opensText} onChange={(e) => update({ opensText: e.target.value })} placeholder={WALL_INPUT_FORMAT} inputMode="numeric" autoComplete="off" spellCheck={false} />
             </Field>
-            <ScheduleWarnings field="opensAt" {...warningProps} />
           </div>
         ) : null}
         <div className="grid gap-2">
