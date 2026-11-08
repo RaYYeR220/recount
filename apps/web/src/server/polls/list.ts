@@ -68,7 +68,7 @@ export async function listPolls(
     .where(where)
     .orderBy(desc(poll.createdAt), desc(poll.id))
     .limit(pageSize)
-    .offset((page - 1) * pageSize);
+    .offset(page * pageSize);
 
   return {
     items: rows.map((row) => ({ ...row, status: pollStatus(row, now) })),
