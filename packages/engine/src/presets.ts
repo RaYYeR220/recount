@@ -21,7 +21,7 @@ export const PRESETS: Record<PresetId, Partial<Rules>> = {
     maxSkippedRanksAllowed: 'unlimited',
     maxRankingsAllowed: 5,
     eliminateWriteInsFirst: true,
-    batchElimination: true,
+    batchElimination: false,
     continueUntilTwoCandidatesRemain: true,
   },
   // Minneapolis Code ch. 167: an overvoted rank is skipped, three rankings, threshold fixed
