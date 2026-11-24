@@ -1,3 +1,4 @@
+// Digits and lowercase letters without the easily confused 0, 1, i, l and o.
 export const ID_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz";
 
 export function randomString(length: number, alphabet: string = ID_ALPHABET): string {
